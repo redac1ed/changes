@@ -1,6 +1,6 @@
 [gd_scene load_steps=30 format=3 uid="uid://level1"]
 
-[ext_resource type="Script" path="res://scripts/level_template.gd" id="1_level"]
+[ext_resource type="Script" path="res://scripts/level_1_controller.gd" id="1_level"]
 [ext_resource type="Script" path="res://scripts/goal.gd" id="2_goal"]
 [ext_resource type="Script" path="res://scripts/moving_platform.gd" id="3_moving_platform"]
 [ext_resource type="Script" path="res://scripts/mechanics/lava_hazard.gd" id="4_lava"]
