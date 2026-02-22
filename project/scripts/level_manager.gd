@@ -29,6 +29,8 @@ func _ready():
 		for world_key in WORLD_SCENES.keys():
 			if WORLD_SCENES[world_key] is Array:
 				WORLD_SCENES[world_key].sort()
+	
+	print("[LevelManager] Discovered scenes: %s" % str(WORLD_SCENES))
 
 
 func load_world(world: int) -> void:
@@ -56,6 +58,7 @@ func load_next_level() -> void:
 	"""Load the next level in the current world"""
 	var world = GameState.current_world
 	var level = GameState.current_level
+	print("[LevelManager] load_next_level: world=%d level=%d" % [world, level])
 	
 	if WORLD_SCENES[world] is String:
 		# Single scene world (tutorial/bonus)

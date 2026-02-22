@@ -13,6 +13,7 @@ var _reached: bool = false
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
+	print("[Goal] Ready at %s | monitoring=%s" % [str(global_position), monitoring])
 
 
 func _process(delta: float) -> void:
@@ -74,10 +75,14 @@ func _draw_ring(radius: float, color: Color, width: float) -> void:
 
 
 func _on_body_entered(body: Node2D) -> void:
+	print("[Goal] body_entered: %s (class=%s) is_rigid=%s reached=%s" % [body.name, body.get_class(), body is RigidBody2D, _reached])
 	if body is RigidBody2D and not _reached:
+		print("[Goal] GOAL REACHED! Celebrating...")
 		_reached = true
 		goal_reached.emit()
 		_celebrate()
+	else:
+		print("[Goal] Ignored (not RigidBody2D or already reached)")
 
 
 func _celebrate() -> void:

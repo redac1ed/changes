@@ -1,128 +1,352 @@
-[gd_scene load_steps=17 format=3 uid="uid://level1"]
+[gd_scene load_steps=30 format=3 uid="uid://level1"]
 
 [ext_resource type="Script" path="res://scripts/level_template.gd" id="1_level"]
 [ext_resource type="Script" path="res://scripts/goal.gd" id="2_goal"]
 [ext_resource type="Script" path="res://scripts/moving_platform.gd" id="3_moving_platform"]
 [ext_resource type="Script" path="res://scripts/mechanics/lava_hazard.gd" id="4_lava"]
 
+; ============================================================
+;  SUB-RESOURCES — collision shapes
+; ============================================================
+
 [sub_resource type="CircleShape2D" id="circle_goal"]
 radius = 35.0
 
-[sub_resource type="RectangleShape2D" id="rect_g800"]
+; —— ground / floor segments ——
+[sub_resource type="RectangleShape2D" id="rect_floor_xl"]
+size = Vector2(1200, 40)
+
+[sub_resource type="RectangleShape2D" id="rect_floor_lg"]
 size = Vector2(800, 40)
 
-[sub_resource type="RectangleShape2D" id="rect_g400"]
-size = Vector2(400, 40)
+[sub_resource type="RectangleShape2D" id="rect_floor_md"]
+size = Vector2(500, 40)
 
-[sub_resource type="RectangleShape2D" id="rect_g200"]
-size = Vector2(200, 40)
+[sub_resource type="RectangleShape2D" id="rect_floor_sm"]
+size = Vector2(300, 40)
 
-[sub_resource type="RectangleShape2D" id="rect_plat_step"]
-size = Vector2(120, 18)
+[sub_resource type="RectangleShape2D" id="rect_floor_xs"]
+size = Vector2(160, 40)
 
-[sub_resource type="RectangleShape2D" id="rect_plat_mov"]
+; —— platforms ——
+[sub_resource type="RectangleShape2D" id="rect_plat_lg"]
+size = Vector2(260, 20)
+
+[sub_resource type="RectangleShape2D" id="rect_plat_md"]
 size = Vector2(180, 20)
 
-[sub_resource type="RectangleShape2D" id="rect_wall"]
-size = Vector2(40, 200)
+[sub_resource type="RectangleShape2D" id="rect_plat_sm"]
+size = Vector2(120, 18)
 
-[sub_resource type="RectangleShape2D" id="rect_spike"]
-size = Vector2(40, 300)
+[sub_resource type="RectangleShape2D" id="rect_plat_xs"]
+size = Vector2(80, 16)
 
-[sub_resource type="RectangleShape2D" id="rect_lava"]
-size = Vector2(200, 40)
+; —— walls / pillars ——
+[sub_resource type="RectangleShape2D" id="rect_wall_tall"]
+size = Vector2(40, 260)
 
-[sub_resource type="RectangleShape2D" id="rect_lava_l"]
-size = Vector2(280, 40)
+[sub_resource type="RectangleShape2D" id="rect_wall_med"]
+size = Vector2(40, 180)
 
+[sub_resource type="RectangleShape2D" id="rect_wall_short"]
+size = Vector2(40, 120)
+
+[sub_resource type="RectangleShape2D" id="rect_pillar"]
+size = Vector2(30, 100)
+
+; —— spike columns ——
+[sub_resource type="RectangleShape2D" id="rect_spike_tall"]
+size = Vector2(36, 320)
+
+[sub_resource type="RectangleShape2D" id="rect_spike_med"]
+size = Vector2(36, 220)
+
+; —— lava pits ——
+[sub_resource type="RectangleShape2D" id="rect_lava_sm"]
+size = Vector2(160, 36)
+
+[sub_resource type="RectangleShape2D" id="rect_lava_md"]
+size = Vector2(240, 36)
+
+[sub_resource type="RectangleShape2D" id="rect_lava_lg"]
+size = Vector2(320, 36)
+
+; —— world boundary walls ——
 [sub_resource type="RectangleShape2D" id="rect_bnd_h"]
-size = Vector2(5000, 400)
+size = Vector2(6000, 400)
 
 [sub_resource type="RectangleShape2D" id="rect_bnd_v"]
-size = Vector2(400, 1600)
+size = Vector2(400, 2000)
+
+; —— ramp shape ——
+[sub_resource type="ConvexPolygonShape2D" id="ramp_up"]
+points = PackedVector2Array(-100, 30, 100, 30, 100, -30)
+
+[sub_resource type="ConvexPolygonShape2D" id="ramp_down"]
+points = PackedVector2Array(-100, -30, 100, 30, -100, 30)
+
+; ============================================================
+;  ROOT — Level
+; ============================================================
 
 [node name="World1MeadowLevel1" type="Node2D"]
 script = ExtResource("1_level")
 level_number = 1
 world_number = 1
-camera_limits = Rect2(0, 0, 4000, 800)
+camera_limits = Rect2(0, 0, 4800, 800)
+
+; ============================================================
+;  BACKGROUNDS
+; ============================================================
 
 [node name="Background" type="ColorRect" parent="."]
-offset_left = -600.0
-offset_top = -600.0
-offset_right = 4600.0
-offset_bottom = 1400.0
+offset_left = -800.0
+offset_top = -800.0
+offset_right = 5600.0
+offset_bottom = 1600.0
 color = Color(0.68, 0.86, 0.97, 1)
 
-[node name="SkyGlow" type="ColorRect" parent="."]
-offset_left = -600.0
-offset_top = -600.0
-offset_right = 4600.0
-offset_bottom = 300.0
-color = Color(0.82, 0.92, 0.99, 0.45)
+[node name="SkyGradient" type="ColorRect" parent="."]
+offset_left = -800.0
+offset_top = -800.0
+offset_right = 5600.0
+offset_bottom = 200.0
+color = Color(0.55, 0.78, 0.96, 0.5)
 
+[node name="CloudLayer" type="ColorRect" parent="."]
+offset_left = 200.0
+offset_top = 60.0
+offset_right = 460.0
+offset_bottom = 100.0
+color = Color(1, 1, 1, 0.18)
+
+[node name="CloudLayer2" type="ColorRect" parent="."]
+offset_left = 900.0
+offset_top = 90.0
+offset_right = 1200.0
+offset_bottom = 125.0
+color = Color(1, 1, 1, 0.14)
+
+[node name="CloudLayer3" type="ColorRect" parent="."]
+offset_left = 1700.0
+offset_top = 50.0
+offset_right = 2050.0
+offset_bottom = 88.0
+color = Color(1, 1, 1, 0.16)
+
+[node name="CloudLayer4" type="ColorRect" parent="."]
+offset_left = 2600.0
+offset_top = 75.0
+offset_right = 2900.0
+offset_bottom = 110.0
+color = Color(1, 1, 1, 0.13)
+
+[node name="CloudLayer5" type="ColorRect" parent="."]
+offset_left = 3400.0
+offset_top = 55.0
+offset_right = 3700.0
+offset_bottom = 90.0
+color = Color(1, 1, 1, 0.15)
+
+[node name="CloudLayer6" type="ColorRect" parent="."]
+offset_left = 4100.0
+offset_top = 85.0
+offset_right = 4380.0
+offset_bottom = 118.0
+color = Color(1, 1, 1, 0.12)
+
+; hills in background
+[node name="HillBg1" type="ColorRect" parent="."]
+offset_left = -200.0
+offset_top = 380.0
+offset_right = 500.0
+offset_bottom = 530.0
+color = Color(0.52, 0.74, 0.36, 0.35)
+
+[node name="HillBg2" type="ColorRect" parent="."]
+offset_left = 400.0
+offset_top = 400.0
+offset_right = 1000.0
+offset_bottom = 530.0
+color = Color(0.48, 0.7, 0.34, 0.3)
+
+[node name="HillBg3" type="ColorRect" parent="."]
+offset_left = 1400.0
+offset_top = 370.0
+offset_right = 2100.0
+offset_bottom = 530.0
+color = Color(0.5, 0.72, 0.35, 0.28)
+
+[node name="HillBg4" type="ColorRect" parent="."]
+offset_left = 2500.0
+offset_top = 390.0
+offset_right = 3200.0
+offset_bottom = 530.0
+color = Color(0.52, 0.74, 0.36, 0.3)
+
+[node name="HillBg5" type="ColorRect" parent="."]
+offset_left = 3500.0
+offset_top = 375.0
+offset_right = 4200.0
+offset_bottom = 530.0
+color = Color(0.48, 0.7, 0.34, 0.32)
+
+; deep ground fill
 [node name="GroundFill" type="ColorRect" parent="."]
-offset_left = -600.0
-offset_top = 700.0
-offset_right = 4600.0
-offset_bottom = 1400.0
-color = Color(0.38, 0.65, 0.24, 1)
+offset_left = -800.0
+offset_top = 690.0
+offset_right = 5600.0
+offset_bottom = 1600.0
+color = Color(0.34, 0.56, 0.2, 1)
 
 [node name="GrassLine" type="ColorRect" parent="."]
-offset_left = -600.0
-offset_top = 696.0
-offset_right = 4600.0
-offset_bottom = 710.0
+offset_left = -800.0
+offset_top = 686.0
+offset_right = 5600.0
+offset_bottom = 700.0
 color = Color(0.52, 0.82, 0.3, 1)
 
-[node name="BallSpawn" type="Marker2D" parent="."]
-position = Vector2(140, 666)
+[node name="GrassDark" type="ColorRect" parent="."]
+offset_left = -800.0
+offset_top = 700.0
+offset_right = 5600.0
+offset_bottom = 720.0
+color = Color(0.3, 0.52, 0.18, 1)
 
-[node name="Ground1" type="StaticBody2D" parent="."]
-position = Vector2(400, 720)
+; ============================================================
+;  BALL SPAWN
+; ============================================================
+
+[node name="BallSpawn" type="Marker2D" parent="."]
+position = Vector2(160, 530)
+
+; ============================================================
+;  SECTION 1 — INTRO (x 0-800)
+;  "Welcome! Learn to click & drag"
+;  Elevated floor at y=560 so ball rolls on a nice platform
+; ============================================================
+
+[node name="Floor1" type="StaticBody2D" parent="."]
+position = Vector2(400, 580)
 collision_layer = 1
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground1"]
-shape = SubResource("rect_g800")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor1"]
+shape = SubResource("rect_floor_lg")
 
-[node name="Visual" type="ColorRect" parent="Ground1"]
+[node name="Top" type="ColorRect" parent="Floor1"]
 offset_left = -400.0
 offset_top = -20.0
 offset_right = 400.0
-offset_bottom = 80.0
-color = Color(0.35, 0.62, 0.22, 1)
+offset_bottom = 0.0
+color = Color(0.52, 0.78, 0.32, 1)
+
+[node name="Body" type="ColorRect" parent="Floor1"]
+offset_left = -400.0
+offset_top = 0.0
+offset_right = 400.0
+offset_bottom = 120.0
+color = Color(0.38, 0.62, 0.24, 1)
+
+[node name="DirtLayer" type="ColorRect" parent="Floor1"]
+offset_left = -400.0
+offset_top = 40.0
+offset_right = 400.0
+offset_bottom = 120.0
+color = Color(0.45, 0.36, 0.22, 0.6)
+
+; tutorial sign board 1
+[node name="SignPost1" type="ColorRect" parent="."]
+offset_left = 50.0
+offset_top = 320.0
+offset_right = 56.0
+offset_bottom = 560.0
+color = Color(0.42, 0.3, 0.18, 1)
 
 [node name="SignBg1" type="ColorRect" parent="."]
-position = Vector2(40, 368)
-size = Vector2(330, 138)
-color = Color(0.12, 0.15, 0.08, 0.86)
+offset_left = 20.0
+offset_top = 300.0
+offset_right = 380.0
+offset_bottom = 460.0
+color = Color(0.58, 0.42, 0.22, 1)
+
+[node name="SignInner1" type="ColorRect" parent="."]
+offset_left = 28.0
+offset_top = 308.0
+offset_right = 372.0
+offset_bottom = 452.0
+color = Color(0.14, 0.16, 0.1, 0.88)
 
 [node name="Sign1" type="Label" parent="."]
-position = Vector2(52, 378)
-size = Vector2(308, 120)
-text = "HOW TO PLAY
-Click & drag away from the ball
-to pull it back and aim.
-theme_override_font_sizes/font_size = 15
-theme_override_colors/font_color = Color(0.96, 0.98, 0.88, 1)
+offset_left = 36.0
+offset_top = 316.0
+offset_right = 364.0
+offset_bottom = 444.0
+text = "WELCOME!
+
+Click near the ball, then
+DRAG AWAY from it to aim.
+
+Release to SHOOT!"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.96, 0.94, 0.84, 1)
 autowrap_mode = 2
 
-[node name="ArrowBg" type="ColorRect" parent="."]
-position = Vector2(490, 558)
-size = Vector2(190, 36)
-color = Color(0.12, 0.15, 0.08, 0.86)
+; arrow pointing right
+[node name="ArrowBg1" type="ColorRect" parent="."]
+offset_left = 540.0
+offset_top = 486.0
+offset_right = 740.0
+offset_bottom = 526.0
+color = Color(0.14, 0.16, 0.1, 0.82)
 
-[node name="ArrowLabel" type="Label" parent="."]
-position = Vector2(496, 563)
-size = Vector2(178, 28)
-text = "->   This way!   ->"
-theme_override_font_sizes/font_size = 16
+[node name="ArrowLabel1" type="Label" parent="."]
+offset_left = 548.0
+offset_top = 492.0
+offset_right = 732.0
+offset_bottom = 520.0
+text = ">>>  This way!  >>>"
+theme_override_font_sizes/font_size = 15
 theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 1)
 horizontal_alignment = 1
 
+; decorative flowers on floor 1
+[node name="Flower1" type="ColorRect" parent="."]
+offset_left = 260.0
+offset_top = 548.0
+offset_right = 272.0
+offset_bottom = 560.0
+color = Color(0.95, 0.45, 0.5, 0.7)
+
+[node name="Flower2" type="ColorRect" parent="."]
+offset_left = 440.0
+offset_top = 550.0
+offset_right = 450.0
+offset_bottom = 560.0
+color = Color(0.95, 0.85, 0.3, 0.7)
+
+[node name="Flower3" type="ColorRect" parent="."]
+offset_left = 600.0
+offset_top = 549.0
+offset_right = 611.0
+offset_bottom = 560.0
+color = Color(0.6, 0.45, 0.9, 0.7)
+
+[node name="Flower4" type="ColorRect" parent="."]
+offset_left = 150.0
+offset_top = 551.0
+offset_right = 160.0
+offset_bottom = 560.0
+color = Color(0.95, 0.7, 0.4, 0.7)
+
+; ============================================================
+;  SECTION 2 — FIRST GAP (x 800-1300)
+;  Small lava pit with a short jump
+; ============================================================
+
+; lava below gap
 [node name="Lava1" type="Area2D" parent="."]
-position = Vector2(900, 725)
+position = Vector2(920, 720)
 script = ExtResource("4_lava")
 lava_color = Color(0.95, 0.35, 0.12)
 glow_color = Color(1, 0.7, 0.25)
@@ -130,124 +354,364 @@ bubble_count = 5
 surface_wave_speed = 2.2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Lava1"]
-shape = SubResource("rect_lava")
+shape = SubResource("rect_lava_sm")
 
-[node name="Ground2" type="StaticBody2D" parent="."]
-position = Vector2(1200, 720)
+; landing platform after gap
+[node name="Floor2" type="StaticBody2D" parent="."]
+position = Vector2(1150, 580)
 collision_layer = 1
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground2"]
-shape = SubResource("rect_g400")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor2"]
+shape = SubResource("rect_floor_md")
 
-[node name="Visual" type="ColorRect" parent="Ground2"]
-offset_left = -200.0
+[node name="Top" type="ColorRect" parent="Floor2"]
+offset_left = -250.0
 offset_top = -20.0
-offset_right = 200.0
-offset_bottom = 80.0
-color = Color(0.35, 0.62, 0.22, 1)
+offset_right = 250.0
+offset_bottom = 0.0
+color = Color(0.52, 0.78, 0.32, 1)
 
+[node name="Body" type="ColorRect" parent="Floor2"]
+offset_left = -250.0
+offset_top = 0.0
+offset_right = 250.0
+offset_bottom = 120.0
+color = Color(0.38, 0.62, 0.24, 1)
+
+[node name="DirtLayer" type="ColorRect" parent="Floor2"]
+offset_left = -250.0
+offset_top = 40.0
+offset_right = 250.0
+offset_bottom = 120.0
+color = Color(0.45, 0.36, 0.22, 0.6)
+
+; sign for gap
+[node name="SignPost2" type="ColorRect" parent="."]
+offset_left = 828.0
+offset_top = 370.0
+offset_right = 834.0
+offset_bottom = 560.0
+color = Color(0.42, 0.3, 0.18, 1)
+
+[node name="SignBg2" type="ColorRect" parent="."]
+offset_left = 800.0
+offset_top = 350.0
+offset_right = 1090.0
+offset_bottom = 470.0
+color = Color(0.58, 0.42, 0.22, 1)
+
+[node name="SignInner2" type="ColorRect" parent="."]
+offset_left = 808.0
+offset_top = 358.0
+offset_right = 1082.0
+offset_bottom = 462.0
+color = Color(0.14, 0.16, 0.1, 0.88)
+
+[node name="Sign2" type="Label" parent="."]
+offset_left = 816.0
+offset_top = 366.0
+offset_right = 1074.0
+offset_bottom = 454.0
+text = "FIRST JUMP!
+
+Shoot across the gap.
+Don't fall in the lava!"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.96, 0.94, 0.84, 1)
+autowrap_mode = 2
+
+; ============================================================
+;  SECTION 3 — WALL OBSTACLE (x 1300-1900)
+;  A wall to shoot over
+; ============================================================
+
+; wall
 [node name="Wall1" type="StaticBody2D" parent="."]
-position = Vector2(1310, 620)
+position = Vector2(1420, 470)
 collision_layer = 1
 collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Wall1"]
-shape = SubResource("rect_wall")
+shape = SubResource("rect_wall_med")
 
-[node name="WallBody" type="ColorRect" parent="Wall1"]
+[node name="Body" type="ColorRect" parent="Wall1"]
 offset_left = -20.0
-offset_top = -100.0
+offset_top = -90.0
 offset_right = 20.0
-offset_bottom = 100.0
-color = Color(0.48, 0.32, 0.18, 1)
+offset_bottom = 90.0
+color = Color(0.52, 0.38, 0.22, 1)
 
-[node name="WallStripe" type="ColorRect" parent="Wall1"]
+[node name="CapTop" type="ColorRect" parent="Wall1"]
+offset_left = -24.0
+offset_top = -96.0
+offset_right = 24.0
+offset_bottom = -86.0
+color = Color(0.62, 0.48, 0.28, 1)
+
+[node name="Stripe1" type="ColorRect" parent="Wall1"]
 offset_left = -20.0
-offset_top = -100.0
+offset_top = -50.0
 offset_right = 20.0
-offset_bottom = -80.0
-color = Color(0.72, 0.22, 0.1, 1)
+offset_bottom = -40.0
+color = Color(0.72, 0.25, 0.12, 0.6)
 
-[node name="SignBg2" type="ColorRect" parent="."]
-position = Vector2(842, 450)
-size = Vector2(258, 82)
-color = Color(0.12, 0.15, 0.08, 0.86)
+[node name="Stripe2" type="ColorRect" parent="Wall1"]
+offset_left = -20.0
+offset_top = 0.0
+offset_right = 20.0
+offset_bottom = 10.0
+color = Color(0.72, 0.25, 0.12, 0.6)
 
-[node name="Sign2" type="Label" parent="."]
-position = Vector2(852, 458)
-size = Vector2(238, 68)
-text = "Shoot OVER the wall!
-Aim HIGH to clear it."
-theme_override_font_sizes/font_size = 15
-theme_override_colors/font_color = Color(0.96, 0.98, 0.88, 1)
+[node name="Stripe3" type="ColorRect" parent="Wall1"]
+offset_left = -20.0
+offset_top = 50.0
+offset_right = 20.0
+offset_bottom = 60.0
+color = Color(0.72, 0.25, 0.12, 0.6)
+
+; floor continues after wall
+[node name="Floor3" type="StaticBody2D" parent="."]
+position = Vector2(1650, 580)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor3"]
+shape = SubResource("rect_floor_md")
+
+[node name="Top" type="ColorRect" parent="Floor3"]
+offset_left = -250.0
+offset_top = -20.0
+offset_right = 250.0
+offset_bottom = 0.0
+color = Color(0.52, 0.78, 0.32, 1)
+
+[node name="Body" type="ColorRect" parent="Floor3"]
+offset_left = -250.0
+offset_top = 0.0
+offset_right = 250.0
+offset_bottom = 120.0
+color = Color(0.38, 0.62, 0.24, 1)
+
+[node name="DirtLayer" type="ColorRect" parent="Floor3"]
+offset_left = -250.0
+offset_top = 40.0
+offset_right = 250.0
+offset_bottom = 120.0
+color = Color(0.45, 0.36, 0.22, 0.6)
+
+; sign for wall section
+[node name="SignPost3" type="ColorRect" parent="."]
+offset_left = 1328.0
+offset_top = 300.0
+offset_right = 1334.0
+offset_bottom = 470.0
+color = Color(0.42, 0.3, 0.18, 1)
+
+[node name="SignBg3" type="ColorRect" parent="."]
+offset_left = 1300.0
+offset_top = 280.0
+offset_right = 1600.0
+offset_bottom = 400.0
+color = Color(0.58, 0.42, 0.22, 1)
+
+[node name="SignInner3" type="ColorRect" parent="."]
+offset_left = 1308.0
+offset_top = 288.0
+offset_right = 1592.0
+offset_bottom = 392.0
+color = Color(0.14, 0.16, 0.1, 0.88)
+
+[node name="Sign3" type="Label" parent="."]
+offset_left = 1316.0
+offset_top = 296.0
+offset_right = 1584.0
+offset_bottom = 384.0
+text = "WALL AHEAD!
+
+Aim UP and pull back hard
+to arc OVER the wall."
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.96, 0.94, 0.84, 1)
 autowrap_mode = 2
 
+; flower decorations
+[node name="Flower5" type="ColorRect" parent="."]
+offset_left = 1520.0
+offset_top = 548.0
+offset_right = 1532.0
+offset_bottom = 560.0
+color = Color(0.95, 0.45, 0.5, 0.7)
+
+[node name="Flower6" type="ColorRect" parent="."]
+offset_left = 1680.0
+offset_top = 549.0
+offset_right = 1690.0
+offset_bottom = 560.0
+color = Color(0.95, 0.85, 0.3, 0.7)
+
+; ============================================================
+;  SECTION 4 — STEPPING STONES OVER LAVA (x 1900-2500)
+;  Wide lava with 2 stepping stones
+; ============================================================
+
+; lava pool
 [node name="Lava2" type="Area2D" parent="."]
-position = Vector2(1540, 725)
+position = Vector2(2100, 720)
+script = ExtResource("4_lava")
+lava_color = Color(0.95, 0.35, 0.12)
+glow_color = Color(1, 0.7, 0.25)
+bubble_count = 10
+surface_wave_speed = 2.4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava2"]
+shape = SubResource("rect_lava_lg")
+
+; second lava extending the gap
+[node name="Lava2b" type="Area2D" parent="."]
+position = Vector2(2350, 720)
 script = ExtResource("4_lava")
 lava_color = Color(0.95, 0.35, 0.12)
 glow_color = Color(1, 0.7, 0.25)
 bubble_count = 8
-surface_wave_speed = 2.5
+surface_wave_speed = 2.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava2"]
-shape = SubResource("rect_lava_l")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava2b"]
+shape = SubResource("rect_lava_md")
 
+; stepping stone 1
 [node name="StepStone1" type="StaticBody2D" parent="."]
-position = Vector2(1540, 578)
+position = Vector2(2060, 530)
 collision_layer = 1
 collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StepStone1"]
-shape = SubResource("rect_plat_step")
+shape = SubResource("rect_plat_sm")
 
-[node name="Visual" type="ColorRect" parent="StepStone1"]
+[node name="Top" type="ColorRect" parent="StepStone1"]
 offset_left = -60.0
 offset_top = -9.0
 offset_right = 60.0
-offset_bottom = 9.0
-color = Color(0.42, 0.72, 0.26, 1)
+offset_bottom = 0.0
+color = Color(0.52, 0.78, 0.32, 1)
 
-[node name="StepStoneSide" type="ColorRect" parent="StepStone1"]
+[node name="Body" type="ColorRect" parent="StepStone1"]
+offset_left = -60.0
+offset_top = 0.0
+offset_right = 60.0
+offset_bottom = 20.0
+color = Color(0.42, 0.64, 0.26, 1)
+
+[node name="Side" type="ColorRect" parent="StepStone1"]
 offset_left = -60.0
 offset_top = 9.0
 offset_right = 60.0
-offset_bottom = 22.0
-color = Color(0.3, 0.52, 0.18, 1)
+offset_bottom = 24.0
+color = Color(0.34, 0.52, 0.2, 1)
 
-[node name="Ground3" type="StaticBody2D" parent="."]
-position = Vector2(1780, 720)
+; stepping stone 2
+[node name="StepStone2" type="StaticBody2D" parent="."]
+position = Vector2(2280, 510)
 collision_layer = 1
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground3"]
-shape = SubResource("rect_g200")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StepStone2"]
+shape = SubResource("rect_plat_sm")
 
-[node name="Visual" type="ColorRect" parent="Ground3"]
-offset_left = -100.0
+[node name="Top" type="ColorRect" parent="StepStone2"]
+offset_left = -60.0
+offset_top = -9.0
+offset_right = 60.0
+offset_bottom = 0.0
+color = Color(0.52, 0.78, 0.32, 1)
+
+[node name="Body" type="ColorRect" parent="StepStone2"]
+offset_left = -60.0
+offset_top = 0.0
+offset_right = 60.0
+offset_bottom = 20.0
+color = Color(0.42, 0.64, 0.26, 1)
+
+[node name="Side" type="ColorRect" parent="StepStone2"]
+offset_left = -60.0
+offset_top = 9.0
+offset_right = 60.0
+offset_bottom = 24.0
+color = Color(0.34, 0.52, 0.2, 1)
+
+; landing floor
+[node name="Floor4" type="StaticBody2D" parent="."]
+position = Vector2(2550, 580)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor4"]
+shape = SubResource("rect_floor_sm")
+
+[node name="Top" type="ColorRect" parent="Floor4"]
+offset_left = -150.0
 offset_top = -20.0
-offset_right = 100.0
-offset_bottom = 80.0
-color = Color(0.35, 0.62, 0.22, 1)
+offset_right = 150.0
+offset_bottom = 0.0
+color = Color(0.52, 0.78, 0.32, 1)
 
-[node name="SignBg3" type="ColorRect" parent="."]
-position = Vector2(1408, 438)
-size = Vector2(278, 96)
-color = Color(0.12, 0.15, 0.08, 0.86)
+[node name="Body" type="ColorRect" parent="Floor4"]
+offset_left = -150.0
+offset_top = 0.0
+offset_right = 150.0
+offset_bottom = 120.0
+color = Color(0.38, 0.62, 0.24, 1)
 
-[node name="Sign3" type="Label" parent="."]
-position = Vector2(1418, 446)
-size = Vector2(258, 82)
-text = "LAVA GAP!
-Land on the stepping stone
-in the middle to cross."
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.96, 0.98, 0.88, 1)
+[node name="DirtLayer" type="ColorRect" parent="Floor4"]
+offset_left = -150.0
+offset_top = 40.0
+offset_right = 150.0
+offset_bottom = 120.0
+color = Color(0.45, 0.36, 0.22, 0.6)
+
+; sign for stepping stones
+[node name="SignPost4" type="ColorRect" parent="."]
+offset_left = 1928.0
+offset_top = 310.0
+offset_right = 1934.0
+offset_bottom = 530.0
+color = Color(0.42, 0.3, 0.18, 1)
+
+[node name="SignBg4" type="ColorRect" parent="."]
+offset_left = 1900.0
+offset_top = 290.0
+offset_right = 2220.0
+offset_bottom = 420.0
+color = Color(0.58, 0.42, 0.22, 1)
+
+[node name="SignInner4" type="ColorRect" parent="."]
+offset_left = 1908.0
+offset_top = 298.0
+offset_right = 2212.0
+offset_bottom = 412.0
+color = Color(0.14, 0.16, 0.1, 0.88)
+
+[node name="Sign4" type="Label" parent="."]
+offset_left = 1916.0
+offset_top = 306.0
+offset_right = 2204.0
+offset_bottom = 404.0
+text = "STEPPING STONES!
+
+Hop across the stones.
+Short, gentle shots work best!"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.96, 0.94, 0.84, 1)
 autowrap_mode = 2
 
+; ============================================================
+;  SECTION 5 — MOVING PLATFORM (x 2500-3100)
+;  Lava pit with a moving platform
+; ============================================================
+
+; lava under moving section
 [node name="Lava3" type="Area2D" parent="."]
-position = Vector2(2020, 725)
+position = Vector2(2850, 720)
 script = ExtResource("4_lava")
 lava_color = Color(0.95, 0.35, 0.12)
 glow_color = Color(1, 0.7, 0.25)
@@ -255,264 +719,576 @@ bubble_count = 9
 surface_wave_speed = 2.3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Lava3"]
-shape = SubResource("rect_lava_l")
+shape = SubResource("rect_lava_lg")
 
-[node name="MovPlatform1" type="StaticBody2D" parent="."]
-position = Vector2(2020, 538)
+; moving platform 1 — horizontal
+[node name="MovPlat1" type="StaticBody2D" parent="."]
+position = Vector2(2850, 480)
 script = ExtResource("3_moving_platform")
-move_distance = 130.0
-move_speed = 78.0
+move_distance = 140.0
+move_speed = 72.0
 horizontal = true
 collision_layer = 1
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MovPlatform1"]
-shape = SubResource("rect_plat_mov")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MovPlat1"]
+shape = SubResource("rect_plat_md")
 
-[node name="Visual" type="ColorRect" parent="MovPlatform1"]
+[node name="Top" type="ColorRect" parent="MovPlat1"]
 offset_left = -90.0
 offset_top = -10.0
 offset_right = 90.0
-offset_bottom = 10.0
-color = Color(0.3, 0.62, 0.54, 1)
+offset_bottom = 0.0
+color = Color(0.35, 0.68, 0.62, 1)
 
-[node name="VisualSide" type="ColorRect" parent="MovPlatform1"]
+[node name="Body" type="ColorRect" parent="MovPlat1"]
 offset_left = -90.0
-offset_top = 10.0
+offset_top = 0.0
 offset_right = 90.0
-offset_bottom = 20.0
-color = Color(0.2, 0.46, 0.38, 1)
+offset_bottom = 10.0
+color = Color(0.25, 0.52, 0.46, 1)
 
-[node name="Ground4" type="StaticBody2D" parent="."]
-position = Vector2(2360, 720)
+[node name="IndicL" type="ColorRect" parent="MovPlat1"]
+offset_left = -86.0
+offset_top = -6.0
+offset_right = -76.0
+offset_bottom = 6.0
+color = Color(0.9, 0.9, 0.3, 0.5)
+
+[node name="IndicR" type="ColorRect" parent="MovPlat1"]
+offset_left = 76.0
+offset_top = -6.0
+offset_right = 86.0
+offset_bottom = 6.0
+color = Color(0.9, 0.9, 0.3, 0.5)
+
+; floor after moving platform
+[node name="Floor5" type="StaticBody2D" parent="."]
+position = Vector2(3100, 580)
 collision_layer = 1
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground4"]
-shape = SubResource("rect_g400")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor5"]
+shape = SubResource("rect_floor_sm")
 
-[node name="Visual" type="ColorRect" parent="Ground4"]
-offset_left = -200.0
+[node name="Top" type="ColorRect" parent="Floor5"]
+offset_left = -150.0
 offset_top = -20.0
-offset_right = 200.0
-offset_bottom = 80.0
-color = Color(0.35, 0.62, 0.22, 1)
+offset_right = 150.0
+offset_bottom = 0.0
+color = Color(0.52, 0.78, 0.32, 1)
 
+[node name="Body" type="ColorRect" parent="Floor5"]
+offset_left = -150.0
+offset_top = 0.0
+offset_right = 150.0
+offset_bottom = 120.0
+color = Color(0.38, 0.62, 0.24, 1)
+
+[node name="DirtLayer" type="ColorRect" parent="Floor5"]
+offset_left = -150.0
+offset_top = 40.0
+offset_right = 150.0
+offset_bottom = 120.0
+color = Color(0.45, 0.36, 0.22, 0.6)
+
+; sign for moving platform
+[node name="SignPost5" type="ColorRect" parent="."]
+offset_left = 2628.0
+offset_top = 310.0
+offset_right = 2634.0
+offset_bottom = 480.0
+color = Color(0.42, 0.3, 0.18, 1)
+
+[node name="SignBg5" type="ColorRect" parent="."]
+offset_left = 2600.0
+offset_top = 290.0
+offset_right = 2940.0
+offset_bottom = 420.0
+color = Color(0.58, 0.42, 0.22, 1)
+
+[node name="SignInner5" type="ColorRect" parent="."]
+offset_left = 2608.0
+offset_top = 298.0
+offset_right = 2932.0
+offset_bottom = 412.0
+color = Color(0.14, 0.16, 0.1, 0.88)
+
+[node name="Sign5" type="Label" parent="."]
+offset_left = 2616.0
+offset_top = 306.0
+offset_right = 2924.0
+offset_bottom = 404.0
+text = "MOVING PLATFORM!
+
+Wait for the teal platform
+to come near, then shoot!"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.96, 0.94, 0.84, 1)
+autowrap_mode = 2
+
+; ============================================================
+;  SECTION 6 — SPIKE GAUNTLET (x 3100-3700)
+;  Three spike walls to arc over
+; ============================================================
+
+; extended floor under spike section
+[node name="Floor6" type="StaticBody2D" parent="."]
+position = Vector2(3500, 580)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor6"]
+shape = SubResource("rect_floor_lg")
+
+[node name="Top" type="ColorRect" parent="Floor6"]
+offset_left = -400.0
+offset_top = -20.0
+offset_right = 400.0
+offset_bottom = 0.0
+color = Color(0.52, 0.78, 0.32, 1)
+
+[node name="Body" type="ColorRect" parent="Floor6"]
+offset_left = -400.0
+offset_top = 0.0
+offset_right = 400.0
+offset_bottom = 120.0
+color = Color(0.38, 0.62, 0.24, 1)
+
+[node name="DirtLayer" type="ColorRect" parent="Floor6"]
+offset_left = -400.0
+offset_top = 40.0
+offset_right = 400.0
+offset_bottom = 120.0
+color = Color(0.45, 0.36, 0.22, 0.6)
+
+; spike wall 1 (shortest)
+[node name="Spike1" type="StaticBody2D" parent="."]
+position = Vector2(3260, 470)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Spike1"]
+shape = SubResource("rect_wall_short")
+
+[node name="Body" type="ColorRect" parent="Spike1"]
+offset_left = -20.0
+offset_top = -60.0
+offset_right = 20.0
+offset_bottom = 60.0
+color = Color(0.56, 0.18, 0.14, 1)
+
+[node name="TopCap" type="ColorRect" parent="Spike1"]
+offset_left = -22.0
+offset_top = -66.0
+offset_right = 22.0
+offset_bottom = -58.0
+color = Color(0.85, 0.25, 0.15, 1)
+
+[node name="DangerStripe1" type="ColorRect" parent="Spike1"]
+offset_left = -20.0
+offset_top = -40.0
+offset_right = 20.0
+offset_bottom = -30.0
+color = Color(0.9, 0.8, 0.2, 0.5)
+
+[node name="DangerStripe2" type="ColorRect" parent="Spike1"]
+offset_left = -20.0
+offset_top = 0.0
+offset_right = 20.0
+offset_bottom = 10.0
+color = Color(0.9, 0.8, 0.2, 0.5)
+
+[node name="DangerStripe3" type="ColorRect" parent="Spike1"]
+offset_left = -20.0
+offset_top = 40.0
+offset_right = 20.0
+offset_bottom = 50.0
+color = Color(0.9, 0.8, 0.2, 0.5)
+
+; spike wall 2 (taller)
+[node name="Spike2" type="StaticBody2D" parent="."]
+position = Vector2(3460, 450)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Spike2"]
+shape = SubResource("rect_wall_med")
+
+[node name="Body" type="ColorRect" parent="Spike2"]
+offset_left = -20.0
+offset_top = -90.0
+offset_right = 20.0
+offset_bottom = 90.0
+color = Color(0.56, 0.18, 0.14, 1)
+
+[node name="TopCap" type="ColorRect" parent="Spike2"]
+offset_left = -22.0
+offset_top = -96.0
+offset_right = 22.0
+offset_bottom = -88.0
+color = Color(0.85, 0.25, 0.15, 1)
+
+[node name="DangerStripe1" type="ColorRect" parent="Spike2"]
+offset_left = -20.0
+offset_top = -60.0
+offset_right = 20.0
+offset_bottom = -50.0
+color = Color(0.9, 0.8, 0.2, 0.5)
+
+[node name="DangerStripe2" type="ColorRect" parent="Spike2"]
+offset_left = -20.0
+offset_top = 0.0
+offset_right = 20.0
+offset_bottom = 10.0
+color = Color(0.9, 0.8, 0.2, 0.5)
+
+[node name="DangerStripe3" type="ColorRect" parent="Spike2"]
+offset_left = -20.0
+offset_top = 60.0
+offset_right = 20.0
+offset_bottom = 70.0
+color = Color(0.9, 0.8, 0.2, 0.5)
+
+; spike wall 3 (tallest)
+[node name="Spike3" type="StaticBody2D" parent="."]
+position = Vector2(3660, 430)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Spike3"]
+shape = SubResource("rect_wall_tall")
+
+[node name="Body" type="ColorRect" parent="Spike3"]
+offset_left = -20.0
+offset_top = -130.0
+offset_right = 20.0
+offset_bottom = 130.0
+color = Color(0.56, 0.18, 0.14, 1)
+
+[node name="TopCap" type="ColorRect" parent="Spike3"]
+offset_left = -22.0
+offset_top = -136.0
+offset_right = 22.0
+offset_bottom = -128.0
+color = Color(0.85, 0.25, 0.15, 1)
+
+[node name="DangerStripe1" type="ColorRect" parent="Spike3"]
+offset_left = -20.0
+offset_top = -100.0
+offset_right = 20.0
+offset_bottom = -90.0
+color = Color(0.9, 0.8, 0.2, 0.5)
+
+[node name="DangerStripe2" type="ColorRect" parent="Spike3"]
+offset_left = -20.0
+offset_top = -40.0
+offset_right = 20.0
+offset_bottom = -30.0
+color = Color(0.9, 0.8, 0.2, 0.5)
+
+[node name="DangerStripe3" type="ColorRect" parent="Spike3"]
+offset_left = -20.0
+offset_top = 20.0
+offset_right = 20.0
+offset_bottom = 30.0
+color = Color(0.9, 0.8, 0.2, 0.5)
+
+[node name="DangerStripe4" type="ColorRect" parent="Spike3"]
+offset_left = -20.0
+offset_top = 80.0
+offset_right = 20.0
+offset_bottom = 90.0
+color = Color(0.9, 0.8, 0.2, 0.5)
+
+; sign for spike section
+[node name="SignPost6" type="ColorRect" parent="."]
+offset_left = 3128.0
+offset_top = 280.0
+offset_right = 3134.0
+offset_bottom = 470.0
+color = Color(0.42, 0.3, 0.18, 1)
+
+[node name="SignBg6" type="ColorRect" parent="."]
+offset_left = 3100.0
+offset_top = 260.0
+offset_right = 3420.0
+offset_bottom = 390.0
+color = Color(0.58, 0.42, 0.22, 1)
+
+[node name="SignInner6" type="ColorRect" parent="."]
+offset_left = 3108.0
+offset_top = 268.0
+offset_right = 3412.0
+offset_bottom = 382.0
+color = Color(0.14, 0.16, 0.1, 0.88)
+
+[node name="Sign6" type="Label" parent="."]
+offset_left = 3116.0
+offset_top = 276.0
+offset_right = 3404.0
+offset_bottom = 374.0
+text = "SPIKE WALLS!
+
+Shoot HIGH to fly over them!
+Each one is taller than the last."
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.98, 0.82, 0.4, 1)
+autowrap_mode = 2
+
+; ============================================================
+;  SECTION 7 — COMBO CHALLENGE (x 3700-4300)
+;  Lava + moving platform + wall
+; ============================================================
+
+; lava under combo section
 [node name="Lava4" type="Area2D" parent="."]
-position = Vector2(2660, 725)
+position = Vector2(3980, 720)
+script = ExtResource("4_lava")
+lava_color = Color(0.95, 0.35, 0.12)
+glow_color = Color(1, 0.7, 0.25)
+bubble_count = 10
+surface_wave_speed = 2.5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava4"]
+shape = SubResource("rect_lava_lg")
+
+; second lava section
+[node name="Lava4b" type="Area2D" parent="."]
+position = Vector2(4200, 720)
 script = ExtResource("4_lava")
 lava_color = Color(0.95, 0.35, 0.12)
 glow_color = Color(1, 0.7, 0.25)
 bubble_count = 7
-surface_wave_speed = 2.0
+surface_wave_speed = 2.2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava4"]
-shape = SubResource("rect_lava")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava4b"]
+shape = SubResource("rect_lava_md")
 
-[node name="MovPlatform2" type="StaticBody2D" parent="."]
-position = Vector2(2660, 468)
+; moving platform 2 — vertical
+[node name="MovPlat2" type="StaticBody2D" parent="."]
+position = Vector2(3960, 430)
 script = ExtResource("3_moving_platform")
-move_distance = 108.0
-move_speed = 62.0
-horizontal = true
-collision_layer = 1
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MovPlatform2"]
-shape = SubResource("rect_plat_mov")
-
-[node name="Visual" type="ColorRect" parent="MovPlatform2"]
-offset_left = -90.0
-offset_top = -10.0
-offset_right = 90.0
-offset_bottom = 10.0
-color = Color(0.3, 0.62, 0.54, 1)
-
-[node name="VisualSide" type="ColorRect" parent="MovPlatform2"]
-offset_left = -90.0
-offset_top = 10.0
-offset_right = 90.0
-offset_bottom = 20.0
-color = Color(0.2, 0.46, 0.38, 1)
-
-[node name="SignBg4" type="ColorRect" parent="."]
-position = Vector2(1884, 394)
-size = Vector2(298, 96)
-color = Color(0.12, 0.15, 0.08, 0.86)
-
-[node name="Sign4" type="Label" parent="."]
-position = Vector2(1894, 402)
-size = Vector2(278, 82)
-text = "MOVING PLATFORMS!
-Wait for the right moment,
-then shoot onto the platform."
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.96, 0.98, 0.88, 1)
-autowrap_mode = 2
-
-[node name="Ground5" type="StaticBody2D" parent="."]
-position = Vector2(3160, 720)
-collision_layer = 1
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground5"]
-shape = SubResource("rect_g800")
-
-[node name="Visual" type="ColorRect" parent="Ground5"]
-offset_left = -400.0
-offset_top = -20.0
-offset_right = 400.0
-offset_bottom = 80.0
-color = Color(0.35, 0.62, 0.22, 1)
-
-[node name="SpikeWall1" type="StaticBody2D" parent="."]
-position = Vector2(2980, 570)
-collision_layer = 1
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeWall1"]
-shape = SubResource("rect_spike")
-
-[node name="Body" type="ColorRect" parent="SpikeWall1"]
-offset_left = -20.0
-offset_top = -150.0
-offset_right = 20.0
-offset_bottom = 150.0
-color = Color(0.52, 0.16, 0.12, 1)
-
-[node name="TopBar" type="ColorRect" parent="SpikeWall1"]
-offset_left = -22.0
-offset_top = -162.0
-offset_right = 22.0
-offset_bottom = -148.0
-color = Color(0.86, 0.22, 0.1, 1)
-
-[node name="SpikeWall2" type="StaticBody2D" parent="."]
-position = Vector2(3160, 570)
-collision_layer = 1
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeWall2"]
-shape = SubResource("rect_spike")
-
-[node name="Body" type="ColorRect" parent="SpikeWall2"]
-offset_left = -20.0
-offset_top = -150.0
-offset_right = 20.0
-offset_bottom = 150.0
-color = Color(0.52, 0.16, 0.12, 1)
-
-[node name="TopBar" type="ColorRect" parent="SpikeWall2"]
-offset_left = -22.0
-offset_top = -162.0
-offset_right = 22.0
-offset_bottom = -148.0
-color = Color(0.86, 0.22, 0.1, 1)
-
-[node name="SpikeWall3" type="StaticBody2D" parent="."]
-position = Vector2(3340, 570)
-collision_layer = 1
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeWall3"]
-shape = SubResource("rect_spike")
-
-[node name="Body" type="ColorRect" parent="SpikeWall3"]
-offset_left = -20.0
-offset_top = -150.0
-offset_right = 20.0
-offset_bottom = 150.0
-color = Color(0.52, 0.16, 0.12, 1)
-
-[node name="TopBar" type="ColorRect" parent="SpikeWall3"]
-offset_left = -22.0
-offset_top = -162.0
-offset_right = 22.0
-offset_bottom = -148.0
-color = Color(0.86, 0.22, 0.1, 1)
-
-[node name="SignBg5" type="ColorRect" parent="."]
-position = Vector2(2764, 366)
-size = Vector2(282, 96)
-color = Color(0.12, 0.15, 0.08, 0.86)
-
-[node name="Sign5" type="Label" parent="."]
-position = Vector2(2774, 374)
-size = Vector2(262, 82)
-text = "SPIKE WALLS!
-Shoot HIGH to fly over
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.98, 0.8, 0.4, 1)
-autowrap_mode = 2
-
-[node name="Lava5" type="Area2D" parent="."]
-position = Vector2(3660, 725)
-script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12)
-glow_color = Color(1, 0.7, 0.25)
-bubble_count = 8
-surface_wave_speed = 2.4
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava5"]
-shape = SubResource("rect_lava")
-
-[node name="MovPlatform3" type="StaticBody2D" parent="."]
-position = Vector2(3660, 490)
-script = ExtResource("3_moving_platform")
-move_distance = 96.0
-move_speed = 52.0
+move_distance = 100.0
+move_speed = 55.0
 horizontal = false
 collision_layer = 1
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MovPlatform3"]
-shape = SubResource("rect_plat_mov")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MovPlat2"]
+shape = SubResource("rect_plat_md")
 
-[node name="Visual" type="ColorRect" parent="MovPlatform3"]
+[node name="Top" type="ColorRect" parent="MovPlat2"]
 offset_left = -90.0
 offset_top = -10.0
 offset_right = 90.0
-offset_bottom = 10.0
-color = Color(0.3, 0.62, 0.54, 1)
+offset_bottom = 0.0
+color = Color(0.35, 0.68, 0.62, 1)
 
-[node name="VisualSide" type="ColorRect" parent="MovPlatform3"]
+[node name="Body" type="ColorRect" parent="MovPlat2"]
 offset_left = -90.0
-offset_top = 10.0
+offset_top = 0.0
 offset_right = 90.0
-offset_bottom = 20.0
-color = Color(0.2, 0.46, 0.38, 1)
+offset_bottom = 10.0
+color = Color(0.25, 0.52, 0.46, 1)
 
-[node name="Ground6" type="StaticBody2D" parent="."]
-position = Vector2(3960, 720)
+[node name="IndicL" type="ColorRect" parent="MovPlat2"]
+offset_left = -86.0
+offset_top = -6.0
+offset_right = -76.0
+offset_bottom = 6.0
+color = Color(0.9, 0.5, 0.3, 0.5)
+
+[node name="IndicR" type="ColorRect" parent="MovPlat2"]
+offset_left = 76.0
+offset_top = -6.0
+offset_right = 86.0
+offset_bottom = 6.0
+color = Color(0.9, 0.5, 0.3, 0.5)
+
+; wall before goal area
+[node name="Wall2" type="StaticBody2D" parent="."]
+position = Vector2(4180, 480)
 collision_layer = 1
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground6"]
-shape = SubResource("rect_g400")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall2"]
+shape = SubResource("rect_wall_short")
 
-[node name="Visual" type="ColorRect" parent="Ground6"]
-offset_left = -200.0
-offset_top = -20.0
-offset_right = 200.0
-offset_bottom = 80.0
-color = Color(0.35, 0.62, 0.22, 1)
+[node name="Body" type="ColorRect" parent="Wall2"]
+offset_left = -20.0
+offset_top = -60.0
+offset_right = 20.0
+offset_bottom = 60.0
+color = Color(0.52, 0.38, 0.22, 1)
 
-[node name="SignBg6" type="ColorRect" parent="."]
-position = Vector2(3566, 368)
-size = Vector2(278, 96)
-color = Color(0.12, 0.15, 0.08, 0.86)
+[node name="CapTop" type="ColorRect" parent="Wall2"]
+offset_left = -24.0
+offset_top = -66.0
+offset_right = 24.0
+offset_bottom = -58.0
+color = Color(0.62, 0.48, 0.28, 1)
 
-[node name="Sign6" type="Label" parent="."]
-position = Vector2(3576, 376)
-size = Vector2(258, 82)
-text = "FINAL STRETCH!
-One last moving platform --
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.96, 0.98, 0.88, 1)
+[node name="Stripe1" type="ColorRect" parent="Wall2"]
+offset_left = -20.0
+offset_top = -30.0
+offset_right = 20.0
+offset_bottom = -20.0
+color = Color(0.72, 0.25, 0.12, 0.6)
+
+[node name="Stripe2" type="ColorRect" parent="Wall2"]
+offset_left = -20.0
+offset_top = 20.0
+offset_right = 20.0
+offset_bottom = 30.0
+color = Color(0.72, 0.25, 0.12, 0.6)
+
+; small stepping stone in combo section
+[node name="StepStone3" type="StaticBody2D" parent="."]
+position = Vector2(4100, 500)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StepStone3"]
+shape = SubResource("rect_plat_xs")
+
+[node name="Top" type="ColorRect" parent="StepStone3"]
+offset_left = -40.0
+offset_top = -8.0
+offset_right = 40.0
+offset_bottom = 0.0
+color = Color(0.52, 0.78, 0.32, 1)
+
+[node name="Body" type="ColorRect" parent="StepStone3"]
+offset_left = -40.0
+offset_top = 0.0
+offset_right = 40.0
+offset_bottom = 12.0
+color = Color(0.38, 0.62, 0.24, 1)
+
+; sign for combo section
+[node name="SignPost7" type="ColorRect" parent="."]
+offset_left = 3828.0
+offset_top = 260.0
+offset_right = 3834.0
+offset_bottom = 430.0
+color = Color(0.42, 0.3, 0.18, 1)
+
+[node name="SignBg7" type="ColorRect" parent="."]
+offset_left = 3800.0
+offset_top = 240.0
+offset_right = 4140.0
+offset_bottom = 380.0
+color = Color(0.58, 0.42, 0.22, 1)
+
+[node name="SignInner7" type="ColorRect" parent="."]
+offset_left = 3808.0
+offset_top = 248.0
+offset_right = 4132.0
+offset_bottom = 372.0
+color = Color(0.14, 0.16, 0.1, 0.88)
+
+[node name="Sign7" type="Label" parent="."]
+offset_left = 3816.0
+offset_top = 256.0
+offset_right = 4124.0
+offset_bottom = 364.0
+text = "FINAL CHALLENGE!
+
+Moving platform + wall!
+Time your shots carefully.
+The goal is just ahead!"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.96, 0.94, 0.84, 1)
 autowrap_mode = 2
 
+; ============================================================
+;  SECTION 8 — GOAL (x 4300-4800)
+;  Victory platform with goal zone
+; ============================================================
+
+; goal floor
+[node name="FloorGoal" type="StaticBody2D" parent="."]
+position = Vector2(4550, 580)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FloorGoal"]
+shape = SubResource("rect_floor_md")
+
+[node name="Top" type="ColorRect" parent="FloorGoal"]
+offset_left = -250.0
+offset_top = -20.0
+offset_right = 250.0
+offset_bottom = 0.0
+color = Color(0.56, 0.82, 0.38, 1)
+
+[node name="Body" type="ColorRect" parent="FloorGoal"]
+offset_left = -250.0
+offset_top = 0.0
+offset_right = 250.0
+offset_bottom = 120.0
+color = Color(0.42, 0.68, 0.28, 1)
+
+[node name="DirtLayer" type="ColorRect" parent="FloorGoal"]
+offset_left = -250.0
+offset_top = 40.0
+offset_right = 250.0
+offset_bottom = 120.0
+color = Color(0.5, 0.4, 0.24, 0.6)
+
+; victory decorations
+[node name="VictoryBanner1" type="ColorRect" parent="."]
+offset_left = 4440.0
+offset_top = 440.0
+offset_right = 4444.0
+offset_bottom = 560.0
+color = Color(0.52, 0.38, 0.22, 1)
+
+[node name="VictoryFlag1" type="ColorRect" parent="."]
+offset_left = 4444.0
+offset_top = 440.0
+offset_right = 4480.0
+offset_bottom = 470.0
+color = Color(0.95, 0.35, 0.3, 0.8)
+
+[node name="VictoryBanner2" type="ColorRect" parent="."]
+offset_left = 4640.0
+offset_top = 440.0
+offset_right = 4644.0
+offset_bottom = 560.0
+color = Color(0.52, 0.38, 0.22, 1)
+
+[node name="VictoryFlag2" type="ColorRect" parent="."]
+offset_left = 4600.0
+offset_top = 440.0
+offset_right = 4640.0
+offset_bottom = 470.0
+color = Color(0.3, 0.35, 0.95, 0.8)
+
+; goal sign
+[node name="SignBgGoal" type="ColorRect" parent="."]
+offset_left = 4470.0
+offset_top = 390.0
+offset_right = 4710.0
+offset_bottom = 478.0
+color = Color(0.12, 0.32, 0.14, 0.92)
+
+[node name="SignGoal" type="Label" parent="."]
+offset_left = 4478.0
+offset_top = 398.0
+offset_right = 4702.0
+offset_bottom = 470.0
+text = "GOAL!
+Roll into the glowing circle!"
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.84, 0.98, 0.48, 1)
+horizontal_alignment = 1
+autowrap_mode = 2
+
+; goal zone
 [node name="GoalZone" type="Area2D" parent="."]
-position = Vector2(3880, 652)
+position = Vector2(4550, 520)
 script = ExtResource("2_goal")
 goal_color = Color(0.35, 0.92, 0.5)
 goal_radius = 32.0
@@ -520,22 +1296,552 @@ goal_radius = 32.0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone"]
 shape = SubResource("circle_goal")
 
-[node name="SignBgGoal" type="ColorRect" parent="."]
-position = Vector2(3806, 484)
-size = Vector2(220, 72)
-color = Color(0.1, 0.26, 0.12, 0.9)
+; ============================================================
+;  EXTRA ELEVATED WALKWAYS & RAMPS between sections
+;  These give the ball a solid base and make rolling easier
+; ============================================================
 
-[node name="SignGoal" type="Label" parent="."]
-position = Vector2(3812, 492)
-size = Vector2(208, 60)
-text = "GOAL!
-theme_override_font_sizes/font_size = 15
-theme_override_colors/font_color = Color(0.84, 0.98, 0.48, 1)
-horizontal_alignment = 1
+; connecting bridge 1→2 (so ball rolls from intro to first gap)
+[node name="Bridge12" type="StaticBody2D" parent="."]
+position = Vector2(820, 580)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bridge12"]
+shape = SubResource("rect_floor_xs")
+
+[node name="Top" type="ColorRect" parent="Bridge12"]
+offset_left = -80.0
+offset_top = -20.0
+offset_right = 80.0
+offset_bottom = 0.0
+color = Color(0.48, 0.72, 0.3, 1)
+
+[node name="Body" type="ColorRect" parent="Bridge12"]
+offset_left = -80.0
+offset_top = 0.0
+offset_right = 80.0
+offset_bottom = 40.0
+color = Color(0.38, 0.6, 0.22, 1)
+
+; ramp down before lava 1 (visual only, guides player)
+[node name="RampDown1" type="StaticBody2D" parent="."]
+position = Vector2(830, 600)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RampDown1"]
+shape = SubResource("ramp_down")
+
+[node name="Vis" type="ColorRect" parent="RampDown1"]
+offset_left = -40.0
+offset_top = -10.0
+offset_right = 40.0
+offset_bottom = 30.0
+color = Color(0.42, 0.64, 0.26, 0.5)
+
+; connecting bridge 3→4 (wall to stepping stones)
+[node name="Bridge34" type="StaticBody2D" parent="."]
+position = Vector2(1910, 580)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bridge34"]
+shape = SubResource("rect_floor_xs")
+
+[node name="Top" type="ColorRect" parent="Bridge34"]
+offset_left = -80.0
+offset_top = -20.0
+offset_right = 80.0
+offset_bottom = 0.0
+color = Color(0.48, 0.72, 0.3, 1)
+
+[node name="Body" type="ColorRect" parent="Bridge34"]
+offset_left = -80.0
+offset_top = 0.0
+offset_right = 80.0
+offset_bottom = 40.0
+color = Color(0.38, 0.6, 0.22, 1)
+
+; connecting bridge 4→5 (stepping stones to moving platform)
+[node name="Bridge45" type="StaticBody2D" parent="."]
+position = Vector2(2710, 580)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bridge45"]
+shape = SubResource("rect_floor_xs")
+
+[node name="Top" type="ColorRect" parent="Bridge45"]
+offset_left = -80.0
+offset_top = -20.0
+offset_right = 80.0
+offset_bottom = 0.0
+color = Color(0.48, 0.72, 0.3, 1)
+
+[node name="Body" type="ColorRect" parent="Bridge45"]
+offset_left = -80.0
+offset_top = 0.0
+offset_right = 80.0
+offset_bottom = 40.0
+color = Color(0.38, 0.6, 0.22, 1)
+
+; connecting bridge 6→7 (spike gauntlet to combo)
+[node name="Bridge67" type="StaticBody2D" parent="."]
+position = Vector2(3830, 580)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bridge67"]
+shape = SubResource("rect_floor_xs")
+
+[node name="Top" type="ColorRect" parent="Bridge67"]
+offset_left = -80.0
+offset_top = -20.0
+offset_right = 80.0
+offset_bottom = 0.0
+color = Color(0.48, 0.72, 0.3, 1)
+
+[node name="Body" type="ColorRect" parent="Bridge67"]
+offset_left = -80.0
+offset_top = 0.0
+offset_right = 80.0
+offset_bottom = 40.0
+color = Color(0.38, 0.6, 0.22, 1)
+
+; connecting bridge 7→goal
+[node name="Bridge7G" type="StaticBody2D" parent="."]
+position = Vector2(4330, 580)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bridge7G"]
+shape = SubResource("rect_floor_xs")
+
+[node name="Top" type="ColorRect" parent="Bridge7G"]
+offset_left = -80.0
+offset_top = -20.0
+offset_right = 80.0
+offset_bottom = 0.0
+color = Color(0.48, 0.72, 0.3, 1)
+
+[node name="Body" type="ColorRect" parent="Bridge7G"]
+offset_left = -80.0
+offset_top = 0.0
+offset_right = 80.0
+offset_bottom = 40.0
+color = Color(0.38, 0.6, 0.22, 1)
+
+; ============================================================
+;  DECORATIVE PILLARS scattered throughout
+; ============================================================
+
+[node name="Pillar1" type="StaticBody2D" parent="."]
+position = Vector2(760, 510)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Pillar1"]
+shape = SubResource("rect_pillar")
+
+[node name="Body" type="ColorRect" parent="Pillar1"]
+offset_left = -15.0
+offset_top = -50.0
+offset_right = 15.0
+offset_bottom = 50.0
+color = Color(0.48, 0.38, 0.24, 0.8)
+
+[node name="Cap" type="ColorRect" parent="Pillar1"]
+offset_left = -18.0
+offset_top = -56.0
+offset_right = 18.0
+offset_bottom = -48.0
+color = Color(0.58, 0.48, 0.3, 0.8)
+
+[node name="Pillar2" type="StaticBody2D" parent="."]
+position = Vector2(1840, 510)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Pillar2"]
+shape = SubResource("rect_pillar")
+
+[node name="Body" type="ColorRect" parent="Pillar2"]
+offset_left = -15.0
+offset_top = -50.0
+offset_right = 15.0
+offset_bottom = 50.0
+color = Color(0.48, 0.38, 0.24, 0.8)
+
+[node name="Cap" type="ColorRect" parent="Pillar2"]
+offset_left = -18.0
+offset_top = -56.0
+offset_right = 18.0
+offset_bottom = -48.0
+color = Color(0.58, 0.48, 0.3, 0.8)
+
+[node name="Pillar3" type="StaticBody2D" parent="."]
+position = Vector2(3040, 510)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Pillar3"]
+shape = SubResource("rect_pillar")
+
+[node name="Body" type="ColorRect" parent="Pillar3"]
+offset_left = -15.0
+offset_top = -50.0
+offset_right = 15.0
+offset_bottom = 50.0
+color = Color(0.48, 0.38, 0.24, 0.8)
+
+[node name="Cap" type="ColorRect" parent="Pillar3"]
+offset_left = -18.0
+offset_top = -56.0
+offset_right = 18.0
+offset_bottom = -48.0
+color = Color(0.58, 0.48, 0.3, 0.8)
+
+[node name="Pillar4" type="StaticBody2D" parent="."]
+position = Vector2(4280, 510)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Pillar4"]
+shape = SubResource("rect_pillar")
+
+[node name="Body" type="ColorRect" parent="Pillar4"]
+offset_left = -15.0
+offset_top = -50.0
+offset_right = 15.0
+offset_bottom = 50.0
+color = Color(0.48, 0.38, 0.24, 0.8)
+
+[node name="Cap" type="ColorRect" parent="Pillar4"]
+offset_left = -18.0
+offset_top = -56.0
+offset_right = 18.0
+offset_bottom = -48.0
+color = Color(0.58, 0.48, 0.3, 0.8)
+
+; ============================================================
+;  ADDITIONAL DECORATIONS — bushes, rocks, etc.
+; ============================================================
+
+; bush cluster 1
+[node name="Bush1a" type="ColorRect" parent="."]
+offset_left = 340.0
+offset_top = 538.0
+offset_right = 380.0
+offset_bottom = 560.0
+color = Color(0.32, 0.56, 0.2, 0.8)
+
+[node name="Bush1b" type="ColorRect" parent="."]
+offset_left = 362.0
+offset_top = 532.0
+offset_right = 400.0
+offset_bottom = 560.0
+color = Color(0.36, 0.6, 0.24, 0.7)
+
+; bush cluster 2
+[node name="Bush2a" type="ColorRect" parent="."]
+offset_left = 1580.0
+offset_top = 540.0
+offset_right = 1616.0
+offset_bottom = 560.0
+color = Color(0.32, 0.56, 0.2, 0.8)
+
+[node name="Bush2b" type="ColorRect" parent="."]
+offset_left = 1600.0
+offset_top = 534.0
+offset_right = 1634.0
+offset_bottom = 560.0
+color = Color(0.36, 0.6, 0.24, 0.7)
+
+; bush cluster 3
+[node name="Bush3a" type="ColorRect" parent="."]
+offset_left = 3140.0
+offset_top = 542.0
+offset_right = 3174.0
+offset_bottom = 560.0
+color = Color(0.32, 0.56, 0.2, 0.8)
+
+[node name="Bush3b" type="ColorRect" parent="."]
+offset_left = 3160.0
+offset_top = 536.0
+offset_right = 3192.0
+offset_bottom = 560.0
+color = Color(0.36, 0.6, 0.24, 0.7)
+
+; rock 1
+[node name="Rock1" type="ColorRect" parent="."]
+offset_left = 480.0
+offset_top = 548.0
+offset_right = 510.0
+offset_bottom = 560.0
+color = Color(0.52, 0.5, 0.46, 0.6)
+
+; rock 2
+[node name="Rock2" type="ColorRect" parent="."]
+offset_left = 1720.0
+offset_top = 550.0
+offset_right = 1748.0
+offset_bottom = 560.0
+color = Color(0.52, 0.5, 0.46, 0.6)
+
+; rock 3
+[node name="Rock3" type="ColorRect" parent="."]
+offset_left = 2620.0
+offset_top = 549.0
+offset_right = 2646.0
+offset_bottom = 560.0
+color = Color(0.52, 0.5, 0.46, 0.6)
+
+; rock 4
+[node name="Rock4" type="ColorRect" parent="."]
+offset_left = 4420.0
+offset_top = 550.0
+offset_right = 4450.0
+offset_bottom = 560.0
+color = Color(0.52, 0.5, 0.46, 0.6)
+
+; ============================================================
+;  EXTRA TIP SIGNS throughout
+; ============================================================
+
+; tip sign: "You can drag even while moving!"
+[node name="TipPost1" type="ColorRect" parent="."]
+offset_left = 1548.0
+offset_top = 380.0
+offset_right = 1554.0
+offset_bottom = 560.0
+color = Color(0.42, 0.3, 0.18, 0.7)
+
+[node name="TipBg1" type="ColorRect" parent="."]
+offset_left = 1520.0
+offset_top = 360.0
+offset_right = 1820.0
+offset_bottom = 460.0
+color = Color(0.22, 0.42, 0.55, 0.9)
+
+[node name="TipInner1" type="ColorRect" parent="."]
+offset_left = 1526.0
+offset_top = 366.0
+offset_right = 1814.0
+offset_bottom = 454.0
+color = Color(0.1, 0.12, 0.16, 0.9)
+
+[node name="Tip1" type="Label" parent="."]
+offset_left = 1534.0
+offset_top = 374.0
+offset_right = 1806.0
+offset_bottom = 446.0
+text = "TIP: You can click and drag
+the ball even while it's moving!
+It will slow down automatically."
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.7, 0.88, 0.98, 1)
 autowrap_mode = 2
 
+; tip sign: "Press R to reset"
+[node name="TipPost2" type="ColorRect" parent="."]
+offset_left = 2448.0
+offset_top = 400.0
+offset_right = 2454.0
+offset_bottom = 560.0
+color = Color(0.42, 0.3, 0.18, 0.7)
+
+[node name="TipBg2" type="ColorRect" parent="."]
+offset_left = 2420.0
+offset_top = 380.0
+offset_right = 2690.0
+offset_bottom = 470.0
+color = Color(0.22, 0.42, 0.55, 0.9)
+
+[node name="TipInner2" type="ColorRect" parent="."]
+offset_left = 2426.0
+offset_top = 386.0
+offset_right = 2684.0
+offset_bottom = 464.0
+color = Color(0.1, 0.12, 0.16, 0.9)
+
+[node name="Tip2" type="Label" parent="."]
+offset_left = 2434.0
+offset_top = 394.0
+offset_right = 2676.0
+offset_bottom = 456.0
+text = "TIP: Press R to reset
+your ball to the start!"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.7, 0.88, 0.98, 1)
+autowrap_mode = 2
+
+; tip about power control
+[node name="TipPost3" type="ColorRect" parent="."]
+offset_left = 3398.0
+offset_top = 340.0
+offset_right = 3404.0
+offset_bottom = 470.0
+color = Color(0.42, 0.3, 0.18, 0.7)
+
+[node name="TipBg3" type="ColorRect" parent="."]
+offset_left = 3370.0
+offset_top = 320.0
+offset_right = 3680.0
+offset_bottom = 420.0
+color = Color(0.22, 0.42, 0.55, 0.9)
+
+[node name="TipInner3" type="ColorRect" parent="."]
+offset_left = 3376.0
+offset_top = 326.0
+offset_right = 3674.0
+offset_bottom = 414.0
+color = Color(0.1, 0.12, 0.16, 0.9)
+
+[node name="Tip3" type="Label" parent="."]
+offset_left = 3384.0
+offset_top = 334.0
+offset_right = 3666.0
+offset_bottom = 406.0
+text = "TIP: Drag FURTHER from the
+ball for MORE power!
+Watch the ring indicator."
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.7, 0.88, 0.98, 1)
+autowrap_mode = 2
+
+; ============================================================
+;  GROUND-LEVEL SAFETY FLOOR
+;  (underneath elevated platforms so ball can recover)
+; ============================================================
+
+[node name="GroundFloorA" type="StaticBody2D" parent="."]
+position = Vector2(600, 700)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundFloorA"]
+shape = SubResource("rect_floor_xl")
+
+[node name="GroundFloorB" type="StaticBody2D" parent="."]
+position = Vector2(1800, 700)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundFloorB"]
+shape = SubResource("rect_floor_xl")
+
+[node name="GroundFloorC" type="StaticBody2D" parent="."]
+position = Vector2(3000, 700)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundFloorC"]
+shape = SubResource("rect_floor_xl")
+
+[node name="GroundFloorD" type="StaticBody2D" parent="."]
+position = Vector2(4200, 700)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundFloorD"]
+shape = SubResource("rect_floor_xl")
+
+; ============================================================
+;  EXTRA SMALL OBSTACLES & BUMPERS
+; ============================================================
+
+; small bumper on floor1 to bounce off
+[node name="Bumper1" type="StaticBody2D" parent="."]
+position = Vector2(550, 546)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bumper1"]
+shape = SubResource("rect_plat_xs")
+
+[node name="Top" type="ColorRect" parent="Bumper1"]
+offset_left = -40.0
+offset_top = -8.0
+offset_right = 40.0
+offset_bottom = 0.0
+color = Color(0.62, 0.78, 0.42, 1)
+
+[node name="Body" type="ColorRect" parent="Bumper1"]
+offset_left = -40.0
+offset_top = 0.0
+offset_right = 40.0
+offset_bottom = 14.0
+color = Color(0.48, 0.62, 0.32, 1)
+
+; small step up ledge in section 3
+[node name="Ledge1" type="StaticBody2D" parent="."]
+position = Vector2(1500, 540)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ledge1"]
+shape = SubResource("rect_plat_sm")
+
+[node name="Top" type="ColorRect" parent="Ledge1"]
+offset_left = -60.0
+offset_top = -9.0
+offset_right = 60.0
+offset_bottom = 0.0
+color = Color(0.52, 0.74, 0.34, 1)
+
+[node name="Body" type="ColorRect" parent="Ledge1"]
+offset_left = -60.0
+offset_top = 0.0
+offset_right = 60.0
+offset_bottom = 20.0
+color = Color(0.4, 0.6, 0.26, 1)
+
+; elevated platform in section 5 for resting
+[node name="RestPlat1" type="StaticBody2D" parent="."]
+position = Vector2(2750, 520)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RestPlat1"]
+shape = SubResource("rect_plat_sm")
+
+[node name="Top" type="ColorRect" parent="RestPlat1"]
+offset_left = -60.0
+offset_top = -9.0
+offset_right = 60.0
+offset_bottom = 0.0
+color = Color(0.52, 0.74, 0.34, 1)
+
+[node name="Body" type="ColorRect" parent="RestPlat1"]
+offset_left = -60.0
+offset_top = 0.0
+offset_right = 60.0
+offset_bottom = 20.0
+color = Color(0.4, 0.6, 0.26, 1)
+
+; short wall bumper between spikes 1 and 2
+[node name="MiniWall1" type="StaticBody2D" parent="."]
+position = Vector2(3360, 530)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MiniWall1"]
+shape = SubResource("rect_pillar")
+
+[node name="Body" type="ColorRect" parent="MiniWall1"]
+offset_left = -15.0
+offset_top = -50.0
+offset_right = 15.0
+offset_bottom = 50.0
+color = Color(0.56, 0.42, 0.24, 0.7)
+
+; ============================================================
+;  WORLD BOUNDARIES
+; ============================================================
+
 [node name="BoundaryTop" type="StaticBody2D" parent="."]
-position = Vector2(2000, -200)
+position = Vector2(2400, -200)
 collision_layer = 1
 collision_mask = 3
 
@@ -543,7 +1849,7 @@ collision_mask = 3
 shape = SubResource("rect_bnd_h")
 
 [node name="BoundaryBottom" type="StaticBody2D" parent="."]
-position = Vector2(2000, 1000)
+position = Vector2(2400, 1000)
 collision_layer = 1
 collision_mask = 3
 
@@ -559,9 +1865,713 @@ collision_mask = 3
 shape = SubResource("rect_bnd_v")
 
 [node name="BoundaryRight" type="StaticBody2D" parent="."]
-position = Vector2(4200, 400)
+position = Vector2(5000, 400)
 collision_layer = 1
 collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BoundaryRight"]
 shape = SubResource("rect_bnd_v")
+
+; ============================================================
+;  ADDITIONAL SCENERY - Trees (background decorations)
+; ============================================================
+
+; tree 1 — trunk + canopy
+[node name="Tree1Trunk" type="ColorRect" parent="."]
+offset_left = 80.0
+offset_top = 480.0
+offset_right = 100.0
+offset_bottom = 560.0
+color = Color(0.42, 0.3, 0.18, 0.6)
+
+[node name="Tree1Canopy" type="ColorRect" parent="."]
+offset_left = 48.0
+offset_top = 430.0
+offset_right = 132.0
+offset_bottom = 490.0
+color = Color(0.28, 0.52, 0.18, 0.45)
+
+; tree 2
+[node name="Tree2Trunk" type="ColorRect" parent="."]
+offset_left = 680.0
+offset_top = 490.0
+offset_right = 698.0
+offset_bottom = 560.0
+color = Color(0.42, 0.3, 0.18, 0.6)
+
+[node name="Tree2Canopy" type="ColorRect" parent="."]
+offset_left = 650.0
+offset_top = 440.0
+offset_right = 728.0
+offset_bottom = 498.0
+color = Color(0.28, 0.52, 0.18, 0.45)
+
+; tree 3
+[node name="Tree3Trunk" type="ColorRect" parent="."]
+offset_left = 1350.0
+offset_top = 485.0
+offset_right = 1370.0
+offset_bottom = 560.0
+color = Color(0.42, 0.3, 0.18, 0.6)
+
+[node name="Tree3Canopy" type="ColorRect" parent="."]
+offset_left = 1318.0
+offset_top = 435.0
+offset_right = 1402.0
+offset_bottom = 494.0
+color = Color(0.28, 0.52, 0.18, 0.45)
+
+; tree 4
+[node name="Tree4Trunk" type="ColorRect" parent="."]
+offset_left = 2480.0
+offset_top = 488.0
+offset_right = 2498.0
+offset_bottom = 560.0
+color = Color(0.42, 0.3, 0.18, 0.6)
+
+[node name="Tree4Canopy" type="ColorRect" parent="."]
+offset_left = 2450.0
+offset_top = 438.0
+offset_right = 2528.0
+offset_bottom = 496.0
+color = Color(0.28, 0.52, 0.18, 0.45)
+
+; tree 5
+[node name="Tree5Trunk" type="ColorRect" parent="."]
+offset_left = 3780.0
+offset_top = 490.0
+offset_right = 3798.0
+offset_bottom = 560.0
+color = Color(0.42, 0.3, 0.18, 0.6)
+
+[node name="Tree5Canopy" type="ColorRect" parent="."]
+offset_left = 3748.0
+offset_top = 440.0
+offset_right = 3830.0
+offset_bottom = 498.0
+color = Color(0.28, 0.52, 0.18, 0.45)
+
+; tree 6 near goal
+[node name="Tree6Trunk" type="ColorRect" parent="."]
+offset_left = 4700.0
+offset_top = 485.0
+offset_right = 4720.0
+offset_bottom = 560.0
+color = Color(0.42, 0.3, 0.18, 0.6)
+
+[node name="Tree6Canopy" type="ColorRect" parent="."]
+offset_left = 4668.0
+offset_top = 432.0
+offset_right = 4752.0
+offset_bottom = 494.0
+color = Color(0.28, 0.52, 0.18, 0.45)
+
+; ============================================================
+;  ADDITIONAL MOVING PLATFORMS for variety
+; ============================================================
+
+; slow moving platform before spike section (helps cross)
+[node name="MovPlat3" type="StaticBody2D" parent="."]
+position = Vector2(3180, 460)
+script = ExtResource("3_moving_platform")
+move_distance = 80.0
+move_speed = 40.0
+horizontal = false
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MovPlat3"]
+shape = SubResource("rect_plat_sm")
+
+[node name="Top" type="ColorRect" parent="MovPlat3"]
+offset_left = -60.0
+offset_top = -9.0
+offset_right = 60.0
+offset_bottom = 0.0
+color = Color(0.35, 0.68, 0.62, 1)
+
+[node name="Body" type="ColorRect" parent="MovPlat3"]
+offset_left = -60.0
+offset_top = 0.0
+offset_right = 60.0
+offset_bottom = 9.0
+color = Color(0.25, 0.52, 0.46, 1)
+
+; helper platform after spike3 to reach combo
+[node name="HelperPlat1" type="StaticBody2D" parent="."]
+position = Vector2(3740, 540)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HelperPlat1"]
+shape = SubResource("rect_plat_md")
+
+[node name="Top" type="ColorRect" parent="HelperPlat1"]
+offset_left = -90.0
+offset_top = -10.0
+offset_right = 90.0
+offset_bottom = 0.0
+color = Color(0.5, 0.76, 0.34, 1)
+
+[node name="Body" type="ColorRect" parent="HelperPlat1"]
+offset_left = -90.0
+offset_top = 0.0
+offset_right = 90.0
+offset_bottom = 16.0
+color = Color(0.4, 0.62, 0.26, 1)
+
+; ============================================================
+;  EXTRA LAVA DETAILS (glow rects underneath)
+; ============================================================
+
+; lava glow under section 4
+[node name="LavaGlow2" type="ColorRect" parent="."]
+offset_left = 1910.0
+offset_top = 680.0
+offset_right = 2510.0
+offset_bottom = 750.0
+color = Color(1, 0.45, 0.15, 0.15)
+
+; lava glow under section 5
+[node name="LavaGlow3" type="ColorRect" parent="."]
+offset_left = 2680.0
+offset_top = 680.0
+offset_right = 3020.0
+offset_bottom = 750.0
+color = Color(1, 0.45, 0.15, 0.15)
+
+; lava glow under section 7
+[node name="LavaGlow4" type="ColorRect" parent="."]
+offset_left = 3810.0
+offset_top = 680.0
+offset_right = 4340.0
+offset_bottom = 750.0
+color = Color(1, 0.45, 0.15, 0.15)
+
+; lava glow under section 2
+[node name="LavaGlow1" type="ColorRect" parent="."]
+offset_left = 830.0
+offset_top = 685.0
+offset_right = 1010.0
+offset_bottom = 750.0
+color = Color(1, 0.45, 0.15, 0.15)
+
+; ============================================================
+;  ADDITIONAL ATMOSPHERE — distant birds, vines etc.
+; ============================================================
+
+; floating "bird" decoration 1
+[node name="Bird1" type="ColorRect" parent="."]
+offset_left = 300.0
+offset_top = 160.0
+offset_right = 318.0
+offset_bottom = 166.0
+color = Color(0.2, 0.22, 0.28, 0.3)
+
+[node name="Bird2" type="ColorRect" parent="."]
+offset_left = 1200.0
+offset_top = 140.0
+offset_right = 1216.0
+offset_bottom = 146.0
+color = Color(0.2, 0.22, 0.28, 0.25)
+
+[node name="Bird3" type="ColorRect" parent="."]
+offset_left = 2400.0
+offset_top = 170.0
+offset_right = 2420.0
+offset_bottom = 176.0
+color = Color(0.2, 0.22, 0.28, 0.28)
+
+[node name="Bird4" type="ColorRect" parent="."]
+offset_left = 3600.0
+offset_top = 145.0
+offset_right = 3618.0
+offset_bottom = 151.0
+color = Color(0.2, 0.22, 0.28, 0.3)
+
+[node name="Bird5" type="ColorRect" parent="."]
+offset_left = 4400.0
+offset_top = 155.0
+offset_right = 4416.0
+offset_bottom = 161.0
+color = Color(0.2, 0.22, 0.28, 0.22)
+
+; ============================================================
+;  MILESTONE MARKERS — visual checkpoints
+; ============================================================
+
+; milestone 1 (after first gap)
+[node name="Milestone1Post" type="ColorRect" parent="."]
+offset_left = 1098.0
+offset_top = 520.0
+offset_right = 1106.0
+offset_bottom = 580.0
+color = Color(0.62, 0.52, 0.32, 1)
+
+[node name="Milestone1Flag" type="ColorRect" parent="."]
+offset_left = 1106.0
+offset_top = 520.0
+offset_right = 1140.0
+offset_bottom = 542.0
+color = Color(0.2, 0.7, 0.3, 0.8)
+
+; milestone 2 (after wall)
+[node name="Milestone2Post" type="ColorRect" parent="."]
+offset_left = 1768.0
+offset_top = 520.0
+offset_right = 1776.0
+offset_bottom = 580.0
+color = Color(0.62, 0.52, 0.32, 1)
+
+[node name="Milestone2Flag" type="ColorRect" parent="."]
+offset_left = 1776.0
+offset_top = 520.0
+offset_right = 1808.0
+offset_bottom = 542.0
+color = Color(0.2, 0.3, 0.7, 0.8)
+
+; milestone 3 (after stepping stones)
+[node name="Milestone3Post" type="ColorRect" parent="."]
+offset_left = 2628.0
+offset_top = 520.0
+offset_right = 2636.0
+offset_bottom = 580.0
+color = Color(0.62, 0.52, 0.32, 1)
+
+[node name="Milestone3Flag" type="ColorRect" parent="."]
+offset_left = 2636.0
+offset_top = 520.0
+offset_right = 2668.0
+offset_bottom = 542.0
+color = Color(0.7, 0.3, 0.2, 0.8)
+
+; milestone 4 (after moving platform)
+[node name="Milestone4Post" type="ColorRect" parent="."]
+offset_left = 3208.0
+offset_top = 520.0
+offset_right = 3216.0
+offset_bottom = 580.0
+color = Color(0.62, 0.52, 0.32, 1)
+
+[node name="Milestone4Flag" type="ColorRect" parent="."]
+offset_left = 3216.0
+offset_top = 520.0
+offset_right = 3248.0
+offset_bottom = 542.0
+color = Color(0.7, 0.6, 0.2, 0.8)
+
+; ============================================================
+;  "HOW TO AIM" visual guide near spawn
+; ============================================================
+
+; dotted arc guide
+[node name="AimGuide1" type="ColorRect" parent="."]
+offset_left = 226.0
+offset_top = 510.0
+offset_right = 234.0
+offset_bottom = 518.0
+color = Color(1, 1, 1, 0.25)
+
+[node name="AimGuide2" type="ColorRect" parent="."]
+offset_left = 250.0
+offset_top = 490.0
+offset_right = 258.0
+offset_bottom = 498.0
+color = Color(1, 1, 1, 0.22)
+
+[node name="AimGuide3" type="ColorRect" parent="."]
+offset_left = 278.0
+offset_top = 475.0
+offset_right = 286.0
+offset_bottom = 483.0
+color = Color(1, 1, 1, 0.19)
+
+[node name="AimGuide4" type="ColorRect" parent="."]
+offset_left = 310.0
+offset_top = 465.0
+offset_right = 318.0
+offset_bottom = 473.0
+color = Color(1, 1, 1, 0.16)
+
+[node name="AimGuide5" type="ColorRect" parent="."]
+offset_left = 346.0
+offset_top = 460.0
+offset_right = 354.0
+offset_bottom = 468.0
+color = Color(1, 1, 1, 0.13)
+
+[node name="AimGuide6" type="ColorRect" parent="."]
+offset_left = 386.0
+offset_top = 462.0
+offset_right = 394.0
+offset_bottom = 470.0
+color = Color(1, 1, 1, 0.1)
+
+[node name="AimGuide7" type="ColorRect" parent="."]
+offset_left = 426.0
+offset_top = 470.0
+offset_right = 434.0
+offset_bottom = 478.0
+color = Color(1, 1, 1, 0.08)
+
+; ============================================================
+;  DISTANCE MARKERS on ground
+; ============================================================
+
+[node name="DistMark500" type="ColorRect" parent="."]
+offset_left = 498.0
+offset_top = 692.0
+offset_right = 502.0
+offset_bottom = 700.0
+color = Color(0.8, 0.8, 0.7, 0.3)
+
+[node name="DistMark1000" type="ColorRect" parent="."]
+offset_left = 998.0
+offset_top = 692.0
+offset_right = 1002.0
+offset_bottom = 700.0
+color = Color(0.8, 0.8, 0.7, 0.3)
+
+[node name="DistMark1500" type="ColorRect" parent="."]
+offset_left = 1498.0
+offset_top = 692.0
+offset_right = 1502.0
+offset_bottom = 700.0
+color = Color(0.8, 0.8, 0.7, 0.3)
+
+[node name="DistMark2000" type="ColorRect" parent="."]
+offset_left = 1998.0
+offset_top = 692.0
+offset_right = 2002.0
+offset_bottom = 700.0
+color = Color(0.8, 0.8, 0.7, 0.3)
+
+[node name="DistMark2500" type="ColorRect" parent="."]
+offset_left = 2498.0
+offset_top = 692.0
+offset_right = 2502.0
+offset_bottom = 700.0
+color = Color(0.8, 0.8, 0.7, 0.3)
+
+[node name="DistMark3000" type="ColorRect" parent="."]
+offset_left = 2998.0
+offset_top = 692.0
+offset_right = 3002.0
+offset_bottom = 700.0
+color = Color(0.8, 0.8, 0.7, 0.3)
+
+[node name="DistMark3500" type="ColorRect" parent="."]
+offset_left = 3498.0
+offset_top = 692.0
+offset_right = 3502.0
+offset_bottom = 700.0
+color = Color(0.8, 0.8, 0.7, 0.3)
+
+[node name="DistMark4000" type="ColorRect" parent="."]
+offset_left = 3998.0
+offset_top = 692.0
+offset_right = 4002.0
+offset_bottom = 700.0
+color = Color(0.8, 0.8, 0.7, 0.3)
+
+[node name="DistMark4500" type="ColorRect" parent="."]
+offset_left = 4498.0
+offset_top = 692.0
+offset_right = 4502.0
+offset_bottom = 700.0
+color = Color(0.8, 0.8, 0.7, 0.3)
+
+; ============================================================
+;  MORE VISUAL POLISH — ground texture lines
+; ============================================================
+
+[node name="GroundLine1" type="ColorRect" parent="."]
+offset_left = -600.0
+offset_top = 730.0
+offset_right = 5600.0
+offset_bottom = 734.0
+color = Color(0.3, 0.5, 0.16, 0.5)
+
+[node name="GroundLine2" type="ColorRect" parent="."]
+offset_left = -600.0
+offset_top = 760.0
+offset_right = 5600.0
+offset_bottom = 763.0
+color = Color(0.28, 0.48, 0.15, 0.35)
+
+[node name="GroundLine3" type="ColorRect" parent="."]
+offset_left = -600.0
+offset_top = 790.0
+offset_right = 5600.0
+offset_bottom = 792.0
+color = Color(0.26, 0.44, 0.14, 0.25)
+
+; ============================================================
+;  EXTRA SMALL PLATFORMS FOR VARIETY
+; ============================================================
+
+; floating coin-catch platform above section 2
+[node name="FloatPlat1" type="StaticBody2D" parent="."]
+position = Vector2(1080, 440)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FloatPlat1"]
+shape = SubResource("rect_plat_xs")
+
+[node name="Top" type="ColorRect" parent="FloatPlat1"]
+offset_left = -40.0
+offset_top = -8.0
+offset_right = 40.0
+offset_bottom = 0.0
+color = Color(0.58, 0.82, 0.38, 1)
+
+[node name="Body" type="ColorRect" parent="FloatPlat1"]
+offset_left = -40.0
+offset_top = 0.0
+offset_right = 40.0
+offset_bottom = 12.0
+color = Color(0.46, 0.66, 0.28, 1)
+
+; floating platform above section 4
+[node name="FloatPlat2" type="StaticBody2D" parent="."]
+position = Vector2(2200, 400)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FloatPlat2"]
+shape = SubResource("rect_plat_xs")
+
+[node name="Top" type="ColorRect" parent="FloatPlat2"]
+offset_left = -40.0
+offset_top = -8.0
+offset_right = 40.0
+offset_bottom = 0.0
+color = Color(0.58, 0.82, 0.38, 1)
+
+[node name="Body" type="ColorRect" parent="FloatPlat2"]
+offset_left = -40.0
+offset_top = 0.0
+offset_right = 40.0
+offset_bottom = 12.0
+color = Color(0.46, 0.66, 0.28, 1)
+
+; elevated lookout near combo section
+[node name="FloatPlat3" type="StaticBody2D" parent="."]
+position = Vector2(4050, 380)
+collision_layer = 1
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FloatPlat3"]
+shape = SubResource("rect_plat_sm")
+
+[node name="Top" type="ColorRect" parent="FloatPlat3"]
+offset_left = -60.0
+offset_top = -9.0
+offset_right = 60.0
+offset_bottom = 0.0
+color = Color(0.58, 0.82, 0.38, 1)
+
+[node name="Body" type="ColorRect" parent="FloatPlat3"]
+offset_left = -60.0
+offset_top = 0.0
+offset_right = 60.0
+offset_bottom = 16.0
+color = Color(0.46, 0.66, 0.28, 1)
+
+; ============================================================
+;  FENCE / RAILING decorations on platforms
+; ============================================================
+
+; fence on floor1
+[node name="Fence1a" type="ColorRect" parent="."]
+offset_left = 100.0
+offset_top = 544.0
+offset_right = 104.0
+offset_bottom = 560.0
+color = Color(0.48, 0.36, 0.22, 0.5)
+
+[node name="Fence1b" type="ColorRect" parent="."]
+offset_left = 130.0
+offset_top = 544.0
+offset_right = 134.0
+offset_bottom = 560.0
+color = Color(0.48, 0.36, 0.22, 0.5)
+
+[node name="Fence1c" type="ColorRect" parent="."]
+offset_left = 160.0
+offset_top = 544.0
+offset_right = 164.0
+offset_bottom = 560.0
+color = Color(0.48, 0.36, 0.22, 0.5)
+
+[node name="Fence1Rail" type="ColorRect" parent="."]
+offset_left = 98.0
+offset_top = 546.0
+offset_right = 166.0
+offset_bottom = 548.0
+color = Color(0.48, 0.36, 0.22, 0.5)
+
+; fence on floor5
+[node name="Fence2a" type="ColorRect" parent="."]
+offset_left = 2960.0
+offset_top = 544.0
+offset_right = 2964.0
+offset_bottom = 560.0
+color = Color(0.48, 0.36, 0.22, 0.5)
+
+[node name="Fence2b" type="ColorRect" parent="."]
+offset_left = 2990.0
+offset_top = 544.0
+offset_right = 2994.0
+offset_bottom = 560.0
+color = Color(0.48, 0.36, 0.22, 0.5)
+
+[node name="Fence2c" type="ColorRect" parent="."]
+offset_left = 3020.0
+offset_top = 544.0
+offset_right = 3024.0
+offset_bottom = 560.0
+color = Color(0.48, 0.36, 0.22, 0.5)
+
+[node name="Fence2Rail" type="ColorRect" parent="."]
+offset_left = 2958.0
+offset_top = 546.0
+offset_right = 3026.0
+offset_bottom = 548.0
+color = Color(0.48, 0.36, 0.22, 0.5)
+
+; fence near goal
+[node name="Fence3a" type="ColorRect" parent="."]
+offset_left = 4380.0
+offset_top = 544.0
+offset_right = 4384.0
+offset_bottom = 560.0
+color = Color(0.48, 0.36, 0.22, 0.5)
+
+[node name="Fence3b" type="ColorRect" parent="."]
+offset_left = 4410.0
+offset_top = 544.0
+offset_right = 4414.0
+offset_bottom = 560.0
+color = Color(0.48, 0.36, 0.22, 0.5)
+
+[node name="Fence3c" type="ColorRect" parent="."]
+offset_left = 4440.0
+offset_top = 544.0
+offset_right = 4444.0
+offset_bottom = 560.0
+color = Color(0.48, 0.36, 0.22, 0.5)
+
+[node name="Fence3Rail" type="ColorRect" parent="."]
+offset_left = 4378.0
+offset_top = 546.0
+offset_right = 4446.0
+offset_bottom = 548.0
+color = Color(0.48, 0.36, 0.22, 0.5)
+
+; ============================================================
+;  ARROW INDICATORS between sections
+; ============================================================
+
+[node name="ArrowBg2" type="ColorRect" parent="."]
+offset_left = 1060.0
+offset_top = 498.0
+offset_right = 1190.0
+offset_bottom = 528.0
+color = Color(0.14, 0.16, 0.1, 0.65)
+
+[node name="Arrow2" type="Label" parent="."]
+offset_left = 1068.0
+offset_top = 502.0
+offset_right = 1182.0
+offset_bottom = 524.0
+text = ">>>  >>>"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 0.8)
+horizontal_alignment = 1
+
+[node name="ArrowBg3" type="ColorRect" parent="."]
+offset_left = 1660.0
+offset_top = 498.0
+offset_right = 1790.0
+offset_bottom = 528.0
+color = Color(0.14, 0.16, 0.1, 0.65)
+
+[node name="Arrow3" type="Label" parent="."]
+offset_left = 1668.0
+offset_top = 502.0
+offset_right = 1782.0
+offset_bottom = 524.0
+text = ">>>  >>>"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 0.8)
+horizontal_alignment = 1
+
+[node name="ArrowBg4" type="ColorRect" parent="."]
+offset_left = 2540.0
+offset_top = 498.0
+offset_right = 2670.0
+offset_bottom = 528.0
+color = Color(0.14, 0.16, 0.1, 0.65)
+
+[node name="Arrow4" type="Label" parent="."]
+offset_left = 2548.0
+offset_top = 502.0
+offset_right = 2662.0
+offset_bottom = 524.0
+text = ">>>  >>>"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 0.8)
+horizontal_alignment = 1
+
+[node name="ArrowBg5" type="ColorRect" parent="."]
+offset_left = 3070.0
+offset_top = 498.0
+offset_right = 3200.0
+offset_bottom = 528.0
+color = Color(0.14, 0.16, 0.1, 0.65)
+
+[node name="Arrow5" type="Label" parent="."]
+offset_left = 3078.0
+offset_top = 502.0
+offset_right = 3192.0
+offset_bottom = 524.0
+text = ">>>  >>>"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 0.8)
+horizontal_alignment = 1
+
+[node name="ArrowBg6" type="ColorRect" parent="."]
+offset_left = 3710.0
+offset_top = 498.0
+offset_right = 3840.0
+offset_bottom = 528.0
+color = Color(0.14, 0.16, 0.1, 0.65)
+
+[node name="Arrow6" type="Label" parent="."]
+offset_left = 3718.0
+offset_top = 502.0
+offset_right = 3832.0
+offset_bottom = 524.0
+text = ">>>  >>>"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 0.8)
+horizontal_alignment = 1
+
+[node name="ArrowBg7" type="ColorRect" parent="."]
+offset_left = 4260.0
+offset_top = 498.0
+offset_right = 4390.0
+offset_bottom = 528.0
+color = Color(0.14, 0.16, 0.1, 0.65)
+
+[node name="Arrow7" type="Label" parent="."]
+offset_left = 4268.0
+offset_top = 502.0
+offset_right = 4382.0
+offset_bottom = 524.0
+text = ">>>  >>>"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 0.8)
+horizontal_alignment = 1

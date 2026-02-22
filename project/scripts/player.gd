@@ -52,6 +52,7 @@ func _ready() -> void:
 	contact_monitor = true
 	max_contacts_reported = 4
 	body_entered.connect(_on_collision)
+	print("[Player] Ready at %s | drag_radius=%s | world_bounds=%s" % [str(global_position), drag_radius, str(world_bounds)])
 
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
@@ -61,7 +62,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		if state.linear_velocity.length() < REST_THRESHOLD:
 			state.linear_velocity = Vector2.ZERO
 			_drag_slow_mode = false
-			freeze = true
+			call_deferred("set", "freeze", true)
 
 	# Cap velocity to prevent tunneling through walls
 	var vel := state.linear_velocity
@@ -247,7 +248,10 @@ func _draw_power_ring() -> void:
 # ===========================================================================
 
 func _start_drag(mpos: Vector2) -> void:
-	if global_position.distance_to(mpos) > drag_radius:
+	var dist := global_position.distance_to(mpos)
+	print("[Player] _start_drag: mouse_world=%s ball=%s dist=%.1f radius=%s resting=%s" % [str(mpos), str(global_position), dist, drag_radius, _is_resting()])
+	if dist > drag_radius:
+		print("[Player] Drag rejected — too far (%.1f > %s)" % [dist, drag_radius])
 		return
 	is_dragging = true
 	drag_start = mpos
@@ -277,6 +281,7 @@ func _end_drag() -> void:
 	if power < 10.0:
 		return
 
+	print("[Player] SHOT #%d — dir=%s power=%.1f impulse=%s" % [shot_count + 1, str(dir), power, str(dir * power)])
 	apply_central_impulse(dir * power)
 	shot_count += 1
 	shot_fired.emit(shot_count)
