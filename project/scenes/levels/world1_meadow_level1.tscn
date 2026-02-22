@@ -5,10 +5,6 @@
 [ext_resource type="Script" path="res://scripts/moving_platform.gd" id="3_moving_platform"]
 [ext_resource type="Script" path="res://scripts/mechanics/lava_hazard.gd" id="4_lava"]
 
-; ============================================================
-;  SUB-RESOURCES — collision shapes
-; ============================================================
-
 [sub_resource type="CircleShape2D" id="circle_goal"]
 radius = 35.0
 
@@ -348,8 +344,8 @@ color = Color(0.95, 0.7, 0.4, 0.7)
 [node name="Lava1" type="Area2D" parent="."]
 position = Vector2(920, 720)
 script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12)
-glow_color = Color(1, 0.7, 0.25)
+lava_color = Color(0.95, 0.35, 0.12, 1)
+glow_color = Color(1, 0.7, 0.25, 1)
 bubble_count = 5
 surface_wave_speed = 2.2
 
@@ -559,8 +555,8 @@ color = Color(0.95, 0.85, 0.3, 0.7)
 [node name="Lava2" type="Area2D" parent="."]
 position = Vector2(2100, 720)
 script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12)
-glow_color = Color(1, 0.7, 0.25)
+lava_color = Color(0.95, 0.35, 0.12, 1)
+glow_color = Color(1, 0.7, 0.25, 1)
 bubble_count = 10
 surface_wave_speed = 2.4
 
@@ -571,8 +567,8 @@ shape = SubResource("rect_lava_lg")
 [node name="Lava2b" type="Area2D" parent="."]
 position = Vector2(2350, 720)
 script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12)
-glow_color = Color(1, 0.7, 0.25)
+lava_color = Color(0.95, 0.35, 0.12, 1)
+glow_color = Color(1, 0.7, 0.25, 1)
 bubble_count = 8
 surface_wave_speed = 2.0
 
@@ -713,8 +709,8 @@ autowrap_mode = 2
 [node name="Lava3" type="Area2D" parent="."]
 position = Vector2(2850, 720)
 script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12)
-glow_color = Color(1, 0.7, 0.25)
+lava_color = Color(0.95, 0.35, 0.12, 1)
+glow_color = Color(1, 0.7, 0.25, 1)
 bubble_count = 9
 surface_wave_speed = 2.3
 
@@ -1045,8 +1041,8 @@ autowrap_mode = 2
 [node name="Lava4" type="Area2D" parent="."]
 position = Vector2(3980, 720)
 script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12)
-glow_color = Color(1, 0.7, 0.25)
+lava_color = Color(0.95, 0.35, 0.12, 1)
+glow_color = Color(1, 0.7, 0.25, 1)
 bubble_count = 10
 surface_wave_speed = 2.5
 
@@ -1057,8 +1053,8 @@ shape = SubResource("rect_lava_lg")
 [node name="Lava4b" type="Area2D" parent="."]
 position = Vector2(4200, 720)
 script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12)
-glow_color = Color(1, 0.7, 0.25)
+lava_color = Color(0.95, 0.35, 0.12, 1)
+glow_color = Color(1, 0.7, 0.25, 1)
 bubble_count = 7
 surface_wave_speed = 2.2
 
@@ -1290,7 +1286,7 @@ autowrap_mode = 2
 [node name="GoalZone" type="Area2D" parent="."]
 position = Vector2(4550, 520)
 script = ExtResource("2_goal")
-goal_color = Color(0.35, 0.92, 0.5)
+goal_color = Color(0.35, 0.92, 0.5, 1)
 goal_radius = 32.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone"]
