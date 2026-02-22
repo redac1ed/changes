@@ -1,3 +1,5 @@
 /.vscode
-/project/.godot# ignore Godot UID files
-gd.uid*
+/project/.godot
+
+# ignore Godot UID files
+*.gd.uid
