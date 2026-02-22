@@ -913,7 +913,7 @@ func _on_button_hover(btn: Button) -> void:
 func _on_play_pressed() -> void:
 	_fade_out_and_load(func() -> void:
 		GameState.reset()
-		LevelManager.load_world(0)
+		LevelManager.load_world(1)
 	)
 
 
