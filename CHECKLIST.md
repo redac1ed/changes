@@ -111,7 +111,7 @@
 ## 🎯 Phase 4: Menus & UX
 
 ### Main Menu
-- [ ] Create main_menu.tscn
+- [x] Create main_menu.tscn
 - [ ] Add "Start" button
 - [ ] Add "Quit" button
 - [ ] Add subtle content warning about grief themes

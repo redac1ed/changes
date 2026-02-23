@@ -19,9 +19,7 @@ const WORLDS = [
 
 # ─── Node References ─────────────────────────────────────────
 var bg_layer: Control
-var bg_orbs: Array[Dictionary] = []
-var ball_preview: ColorRect
-var ball_trail: Array[ColorRect] = []
+var falling_balls: Array[Dictionary] = []
 var title_label: Label
 var subtitle_label: Label
 var version_label: Label
@@ -30,14 +28,12 @@ var world_panel: Control
 var settings_panel: Control
 var credits_panel: Control
 var panels: Dictionary = {}
+var visualizer_bars: Array[ColorRect] = []
 
 # ─── Animation State ─────────────────────────────────────────
 var time_elapsed: float = 0.0
 var is_transitioning: bool = false
 var title_bob_offset: float = 0.0
-var ball_pos: Vector2 = Vector2(200, 300)
-var ball_vel: Vector2 = Vector2(130, -90)
-var trail_positions: Array[Vector2] = []
 var menu_buttons: Array[Button] = []
 
 # ─── Settings State ──────────────────────────────────────────
@@ -50,19 +46,26 @@ var fullscreen: bool = false
 # ─── Constants ───────────────────────────────────────────────
 const SCREEN_W: float = 1200.0
 const SCREEN_H: float = 800.0
-const BG_ORB_COUNT: int = 35
-const BALL_RADIUS: float = 12.0
-const TRAIL_LENGTH: int = 8
+const FALLING_BALL_COUNT: int = 18
+const BALL_RADIUS: float = 10.0
+const VISUALIZER_BAR_COUNT: int = 22
 
 
 func _ready() -> void:
 	_build_background()
-	_build_ball_preview()
 	_build_main_panel()
 	_build_world_panel()
 	_build_settings_panel()
 	_build_credits_panel()
 	_show_panel("main")
+	# Add spectrum analyzer to music bus
+	var spectrum := AudioEffectSpectrumAnalyzer.new()
+	spectrum.fft_size = AudioEffectSpectrumAnalyzer.FFT_SIZE_256
+	spectrum.tap_back_pos = 0.1
+	AudioServer.add_bus_effect(AudioServer.get_bus_index("Music"), spectrum, 0)
+	# Play the song
+	if AudioManager:
+		AudioManager.play_music("res://assets/audio/lobby.mp3")
 	# Entrance fade-in
 	modulate.a = 0.0
 	var tween := create_tween()
@@ -72,7 +75,6 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	time_elapsed += delta
 	_update_background(delta)
-	_update_ball_preview(delta)
 	_update_title_animation(delta)
 
 
@@ -86,144 +88,109 @@ func _build_background() -> void:
 	bg_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg_layer)
 
-	# Base dark colour
+	# ── Pixel art starfield background image ──
 	var bg := ColorRect.new()
-	bg.color = Color(0.05, 0.055, 0.09, 1.0)
+	bg.color = Color(0.02, 0.02, 0.06, 1.0)  # Deep space black
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg_layer.add_child(bg)
 
-	# Top gradient overlay for depth
-	var grad_top := ColorRect.new()
-	grad_top.color = Color(0.1, 0.07, 0.16, 0.35)
-	grad_top.position = Vector2.ZERO
-	grad_top.size = Vector2(SCREEN_W, SCREEN_H * 0.45)
-	grad_top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bg_layer.add_child(grad_top)
+	var starfield_tex := TextureRect.new()
+	starfield_tex.texture = load("res://assets/sprites/pixelart_starfield.png")
+	starfield_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	starfield_tex.set_anchors_preset(Control.PRESET_FULL_RECT)
+	starfield_tex.modulate = Color(1, 1, 1, 0.9)
+	starfield_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bg_layer.add_child(starfield_tex)
 
-	# Bottom subtle glow
-	var grad_bot := ColorRect.new()
-	grad_bot.color = Color(0.08, 0.12, 0.1, 0.2)
-	grad_bot.position = Vector2(0, SCREEN_H * 0.6)
-	grad_bot.size = Vector2(SCREEN_W, SCREEN_H * 0.4)
-	grad_bot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bg_layer.add_child(grad_bot)
+	# Diagonal diffraction spikes overlay for extra flair
+	var spikes_tex := TextureRect.new()
+	spikes_tex.texture = load("res://assets/sprites/pixelart_starfield_diagonal_diffraction_spikes.png")
+	spikes_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	spikes_tex.set_anchors_preset(Control.PRESET_FULL_RECT)
+	spikes_tex.modulate = Color(1, 1, 1, 0.4)
+	spikes_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bg_layer.add_child(spikes_tex)
 
-	# Create floating orbs (one per world colour cycling)
-	for i in BG_ORB_COUNT:
-		var orb := ColorRect.new()
-		var orb_size := randf_range(2.0, 10.0)
-		orb.size = Vector2(orb_size, orb_size)
-		orb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Dark overlay to keep UI readable
+	var overlay := ColorRect.new()
+	overlay.color = Color(0.0, 0.0, 0.05, 0.55)
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bg_layer.add_child(overlay)
 
-		var world_idx := i % WORLDS.size()
-		var base_color: Color = WORLDS[world_idx]["color"]
-		orb.color = Color(base_color.r, base_color.g, base_color.b, randf_range(0.06, 0.25))
+	# Create visualizer bars (spread across full screen width)
+	var bar_total_w := SCREEN_W - 100.0
+	var bar_spacing := bar_total_w / VISUALIZER_BAR_COUNT
+	for i in VISUALIZER_BAR_COUNT:
+		var bar := ColorRect.new()
+		bar.size = Vector2(bar_spacing - 4, 50)
+		bar.color = Color(0.95, 0.88, 0.72, 0.35)
+		bar.position = Vector2(50 + i * bar_spacing, SCREEN_H - 50)
+		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		visualizer_bars.append(bar)
+		bg_layer.add_child(bar)
 
-		var data := {
-			"node": orb,
-			"x": randf_range(0, SCREEN_W),
-			"y": randf_range(0, SCREEN_H),
-			"speed_x": randf_range(-12, 12),
-			"speed_y": randf_range(-20, -4),
-			"phase": randf_range(0, TAU),
-			"wobble": randf_range(8, 35),
-			"base_alpha": orb.color.a,
-		}
-		bg_orbs.append(data)
-		bg_layer.add_child(orb)
+	# Create falling balls (diagonal) with varied speeds
+	var ball_colors := [
+		Color(0.95, 0.88, 0.72, 0.7),
+		Color(0.45, 0.82, 0.45, 0.6),
+		Color(0.55, 0.78, 0.95, 0.6),
+		Color(0.75, 0.7, 0.85, 0.6),
+		Color(0.95, 0.35, 0.2, 0.6),
+	]
+	for i in FALLING_BALL_COUNT:
+		var ball := ColorRect.new()
+		var r := randf_range(0.5, 1.5)
+		ball.size = Vector2(BALL_RADIUS * 2 * r, BALL_RADIUS * 2 * r)
+		ball.color = ball_colors[i % ball_colors.size()]
+		ball.position = Vector2(randf_range(0, SCREEN_W), randf_range(-400, 0))
+		ball.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var speed_y := randf_range(70.0, 160.0)
+		var speed_x := randf_range(20.0, 60.0) * (1.0 if randf() > 0.5 else -1.0)
+		falling_balls.append({"node": ball, "vy": speed_y, "vx": speed_x})
+		bg_layer.add_child(ball)
 
 
 func _update_background(delta: float) -> void:
-	for orb_data in bg_orbs:
-		var node: ColorRect = orb_data["node"]
-		orb_data["y"] -= orb_data["speed_y"] * delta
-		orb_data["x"] += orb_data["speed_x"] * delta
-		orb_data["x"] += sin(time_elapsed + orb_data["phase"]) * orb_data["wobble"] * delta
+	# Update falling balls (diagonal)
+	for bd in falling_balls:
+		var ball: ColorRect = bd["node"]
+		ball.position.y += bd["vy"] * delta
+		ball.position.x += bd["vx"] * delta
+		if ball.position.y > SCREEN_H + 50:
+			ball.position.y = randf_range(-120, -20)
+			ball.position.x = randf_range(0, SCREEN_W)
+		elif ball.position.x < -50:
+			ball.position.x = SCREEN_W + 50
+		elif ball.position.x > SCREEN_W + 50:
+			ball.position.x = -50
+		# Slight rotation by updating pivot offset – colour rect workaround
+		ball.rotation = time_elapsed * 1.5 + bd["vy"] * 0.01
 
-		# Wrap around screen edges
-		if orb_data["y"] < -20:
-			orb_data["y"] = SCREEN_H + 20
-			orb_data["x"] = randf_range(0, SCREEN_W)
-		if orb_data["x"] < -20:
-			orb_data["x"] = SCREEN_W + 20
-		elif orb_data["x"] > SCREEN_W + 20:
-			orb_data["x"] = -20
-
-		node.position = Vector2(orb_data["x"], orb_data["y"])
-
-		# Gentle alpha pulse
-		var alpha_pulse: float = orb_data["base_alpha"] + sin(time_elapsed * 2.0 + orb_data["phase"]) * 0.06
-		node.color.a = clampf(alpha_pulse, 0.02, 0.35)
-
-
-# ═══════════════════════════════════════════════════════════════
-# BOUNCING BALL PREVIEW
-# ═══════════════════════════════════════════════════════════════
-
-func _build_ball_preview() -> void:
-	# Trail dots (oldest → newest, drawn behind the ball)
-	for i in TRAIL_LENGTH:
-		var trail := ColorRect.new()
-		var t_size := BALL_RADIUS * 2.0 * (1.0 - float(i) / float(TRAIL_LENGTH))
-		trail.size = Vector2(t_size, t_size)
-		trail.color = Color(0.95, 0.88, 0.72, 0.12 * (1.0 - float(i) / float(TRAIL_LENGTH)))
-		trail.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		trail.visible = false
-		add_child(trail)
-		ball_trail.append(trail)
-
-	# Main ball square (acts as the ball visually)
-	ball_preview = ColorRect.new()
-	ball_preview.size = Vector2(BALL_RADIUS * 2, BALL_RADIUS * 2)
-	ball_preview.color = Color(0.95, 0.88, 0.72, 0.18)
-	ball_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	ball_preview.pivot_offset = Vector2(BALL_RADIUS, BALL_RADIUS)
-	add_child(ball_preview)
-
-	# Seed the trail positions
-	for i in TRAIL_LENGTH:
-		trail_positions.append(ball_pos)
+	# Update visualizer bars
+	var spectrum_inst := AudioServer.get_bus_effect_instance(AudioServer.get_bus_index("Music"), 0) as AudioEffectSpectrumAnalyzerInstance
+	var bar_total_w := SCREEN_W - 100.0
+	var bar_spacing := bar_total_w / VISUALIZER_BAR_COUNT
+	for i in visualizer_bars.size():
+		var bar: ColorRect = visualizer_bars[i]
+		var height: float
+		if spectrum_inst:
+			var freq_lo := 40.0 + i * 80.0
+			var freq_hi := freq_lo + 80.0
+			var magnitude := spectrum_inst.get_magnitude_for_frequency_range(freq_lo, freq_hi).length()
+			height = clampf(magnitude * 600.0, 4.0, 220.0)
+		else:
+			# Animated placeholder when no music
+			height = 20.0 + sin(time_elapsed * 3.0 + i * 0.4) * 15.0
+		bar.size.x = bar_spacing - 4
+		bar.size.y = height
+		bar.position.y = SCREEN_H - height
+		# Color shifts with frequency
+		var hue := fmod(float(i) / float(VISUALIZER_BAR_COUNT) + time_elapsed * 0.05, 1.0)
+		bar.color = Color.from_hsv(hue, 0.6, 1.0, 0.4)
 
 
-func _update_ball_preview(delta: float) -> void:
-	# Simple gravity
-	ball_vel.y += 280.0 * delta
-	ball_pos += ball_vel * delta
 
-	# Bounce off left / right walls
-	if ball_pos.x < BALL_RADIUS:
-		ball_pos.x = BALL_RADIUS
-		ball_vel.x = absf(ball_vel.x) * 0.88
-	elif ball_pos.x > SCREEN_W - BALL_RADIUS:
-		ball_pos.x = SCREEN_W - BALL_RADIUS
-		ball_vel.x = -absf(ball_vel.x) * 0.88
-
-	# Bounce off floor / ceiling
-	if ball_pos.y > SCREEN_H - BALL_RADIUS:
-		ball_pos.y = SCREEN_H - BALL_RADIUS
-		ball_vel.y = -absf(ball_vel.y) * 0.82
-		ball_vel.x += randf_range(-35, 35)
-	elif ball_pos.y < BALL_RADIUS:
-		ball_pos.y = BALL_RADIUS
-		ball_vel.y = absf(ball_vel.y) * 0.88
-
-	# Prevent the ball from going to sleep
-	if ball_vel.length() < 60:
-		ball_vel += Vector2(randf_range(-80, 80), randf_range(-150, -50))
-
-	ball_preview.position = ball_pos - Vector2(BALL_RADIUS, BALL_RADIUS)
-
-	# Update trail history
-	trail_positions.insert(0, ball_pos)
-	if trail_positions.size() > TRAIL_LENGTH:
-		trail_positions.resize(TRAIL_LENGTH)
-
-	for i in ball_trail.size():
-		if i < trail_positions.size():
-			var t_node: ColorRect = ball_trail[i]
-			t_node.visible = true
-			var offset := t_node.size * 0.5
-			t_node.position = trail_positions[i] - offset
 
 
 func _update_title_animation(_delta: float) -> void:
@@ -248,30 +215,59 @@ func _build_main_panel() -> void:
 	add_child(main_panel)
 	panels["main"] = main_panel
 
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	main_panel.add_child(center)
+	var hbox := HBoxContainer.new()
+	hbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	hbox.add_theme_constant_override("separation", 50)
+	main_panel.add_child(hbox)
 
-	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 10)
-	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	center.add_child(vbox)
+	# Left side: Title and Illustration
+	var left_vbox := VBoxContainer.new()
+	left_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	left_vbox.custom_minimum_size = Vector2(400, 0)
+	hbox.add_child(left_vbox)
 
-	# ── Title ──
+	# ── Title (tilted) ──
+	var title_container := Control.new()
+	title_container.custom_minimum_size = Vector2(420, 120)
+	title_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	# Shadow layer
+	var title_shadow := Label.new()
+	title_shadow.text = "Changes"
+	title_shadow.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	title_shadow.add_theme_font_size_override("font_size", 82)
+	title_shadow.add_theme_color_override("font_color", Color(0.0, 0.0, 0.0, 0.6))
+	title_shadow.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
+	title_shadow.position = Vector2(4, 4)
+	title_container.add_child(title_shadow)
+
 	title_label = Label.new()
 	title_label.text = "Changes"
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	title_label.add_theme_font_size_override("font_size", 82)
 	title_label.add_theme_color_override("font_color", Color(0.95, 0.88, 0.72))
-	vbox.add_child(title_label)
+	title_label.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
+	title_container.add_child(title_label)
+
+	title_container.rotation = -0.12  # Tilt ~7 degrees left
+	# Compensate for layout
+	title_container.position = Vector2(10, 30)
+	left_vbox.add_child(title_container)
 
 	# ── Subtitle ──
 	subtitle_label = Label.new()
 	subtitle_label.text = "A physics puzzle journey through changing worlds"
-	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	subtitle_label.add_theme_font_size_override("font_size", 16)
 	subtitle_label.add_theme_color_override("font_color", Color(0.5, 0.48, 0.45))
-	vbox.add_child(subtitle_label)
+	subtitle_label.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
+	left_vbox.add_child(subtitle_label)
+
+	# Right side: Buttons
+	var right_vbox := VBoxContainer.new()
+	right_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	right_vbox.custom_minimum_size = Vector2(400, 0)
+	hbox.add_child(right_vbox)
 
 	# ── Decorative divider ──
 	var divider_wrap := CenterContainer.new()
@@ -280,15 +276,15 @@ func _build_main_panel() -> void:
 	divider.custom_minimum_size = Vector2(280, 2)
 	divider.color = Color(0.95, 0.88, 0.72, 0.25)
 	divider_wrap.add_child(divider)
-	vbox.add_child(divider_wrap)
+	right_vbox.add_child(divider_wrap)
 
-	_add_spacer(vbox, 18)
+	_add_spacer(right_vbox, 18)
 
 	# ── Play button (prominent) ──
 	var btn_play := _create_menu_button("Play", Color(0.45, 0.82, 0.45), 24)
 	btn_play.custom_minimum_size = Vector2(380, 58)
 	btn_play.pressed.connect(_on_play_pressed)
-	vbox.add_child(btn_play)
+	right_vbox.add_child(btn_play)
 
 	# ── Continue (disabled when no save) ──
 	var btn_continue := _create_menu_button("Continue", Color(0.55, 0.78, 0.95), 20)
@@ -297,42 +293,43 @@ func _build_main_panel() -> void:
 	if GameState.levels_completed == 0:
 		btn_continue.disabled = true
 		btn_continue.modulate.a = 0.4
-	vbox.add_child(btn_continue)
+	right_vbox.add_child(btn_continue)
 
 	# ── World Select ──
 	var btn_worlds := _create_menu_button("World Select", Color(0.75, 0.7, 0.85), 20)
 	btn_worlds.custom_minimum_size = Vector2(380, 50)
 	btn_worlds.pressed.connect(_on_worlds_pressed)
-	vbox.add_child(btn_worlds)
+	right_vbox.add_child(btn_worlds)
 
 	# ── Settings ──
 	var btn_settings := _create_menu_button("Settings", Color(0.7, 0.68, 0.65), 20)
 	btn_settings.custom_minimum_size = Vector2(380, 50)
 	btn_settings.pressed.connect(_on_settings_pressed)
-	vbox.add_child(btn_settings)
+	right_vbox.add_child(btn_settings)
 
 	# ── Credits ──
 	var btn_credits := _create_menu_button("Credits", Color(0.6, 0.58, 0.65), 18)
 	btn_credits.custom_minimum_size = Vector2(380, 46)
 	btn_credits.pressed.connect(_on_credits_pressed)
-	vbox.add_child(btn_credits)
+	right_vbox.add_child(btn_credits)
 
-	_add_spacer(vbox, 10)
+	_add_spacer(right_vbox, 10)
 
 	# ── Quit ──
 	var btn_quit := _create_menu_button("Quit", Color(0.7, 0.38, 0.38), 18)
 	btn_quit.custom_minimum_size = Vector2(380, 44)
 	btn_quit.pressed.connect(_on_quit_pressed)
-	vbox.add_child(btn_quit)
+	right_vbox.add_child(btn_quit)
 
 	# ── Version footer ──
-	_add_spacer(vbox, 8)
+	_add_spacer(right_vbox, 8)
 	version_label = Label.new()
 	version_label.text = "v0.2.0  •  Godot 4.2"
 	version_label.add_theme_font_size_override("font_size", 11)
 	version_label.add_theme_color_override("font_color", Color(0.3, 0.28, 0.26))
 	version_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(version_label)
+	version_label.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
+	right_vbox.add_child(version_label)
 
 	# Cache base Y for bobbing after layout settles
 	await get_tree().process_frame
@@ -362,6 +359,7 @@ func _build_world_panel() -> void:
 	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	header.add_theme_font_size_override("font_size", 40)
 	header.add_theme_color_override("font_color", Color(0.95, 0.88, 0.72))
+	header.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	world_panel.add_child(header)
 
 	var sub_header := Label.new()
@@ -371,6 +369,7 @@ func _build_world_panel() -> void:
 	sub_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub_header.add_theme_font_size_override("font_size", 14)
 	sub_header.add_theme_color_override("font_color", Color(0.45, 0.43, 0.4))
+	sub_header.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	world_panel.add_child(sub_header)
 
 	# Grid layout: 3 cols × 2 rows
@@ -434,6 +433,7 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	icon_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	icon_lbl.add_theme_font_size_override("font_size", 34)
 	icon_lbl.add_theme_color_override("font_color", data["color"])
+	icon_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(icon_lbl)
 
 	# World name
@@ -444,6 +444,7 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.add_theme_font_size_override("font_size", 22)
 	name_lbl.add_theme_color_override("font_color", Color.WHITE)
+	name_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(name_lbl)
 
 	# Subtitle description
@@ -454,6 +455,7 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	sub_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub_lbl.add_theme_font_size_override("font_size", 12)
 	sub_lbl.add_theme_color_override("font_color", Color(0.5, 0.48, 0.45))
+	sub_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(sub_lbl)
 
 	# Progress bar background
@@ -483,6 +485,7 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	count_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	count_lbl.add_theme_font_size_override("font_size", 11)
 	count_lbl.add_theme_color_override("font_color", Color(0.45, 0.43, 0.4))
+	count_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(count_lbl)
 
 	# Enter world button
@@ -557,6 +560,7 @@ func _build_settings_panel() -> void:
 	stitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	stitle.add_theme_font_size_override("font_size", 32)
 	stitle.add_theme_color_override("font_color", Color(0.95, 0.88, 0.72))
+	stitle.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(stitle)
 
 	# Divider
@@ -573,6 +577,7 @@ func _build_settings_panel() -> void:
 	audio_hdr.size = Vector2(200, 25)
 	audio_hdr.add_theme_font_size_override("font_size", 18)
 	audio_hdr.add_theme_color_override("font_color", Color(0.7, 0.68, 0.65))
+	audio_hdr.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(audio_hdr)
 
 	_build_slider(card, "Master Volume", 120, master_vol, "_on_master_vol_changed")
@@ -586,6 +591,7 @@ func _build_settings_panel() -> void:
 	disp_hdr.size = Vector2(200, 25)
 	disp_hdr.add_theme_font_size_override("font_size", 18)
 	disp_hdr.add_theme_color_override("font_color", Color(0.7, 0.68, 0.65))
+	disp_hdr.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(disp_hdr)
 
 	# Fullscreen toggle
@@ -595,6 +601,7 @@ func _build_settings_panel() -> void:
 	fs_label.size = Vector2(200, 25)
 	fs_label.add_theme_font_size_override("font_size", 15)
 	fs_label.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
+	fs_label.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(fs_label)
 
 	var fs_btn := CheckButton.new()
@@ -610,6 +617,7 @@ func _build_settings_panel() -> void:
 	shake_label.size = Vector2(200, 25)
 	shake_label.add_theme_font_size_override("font_size", 15)
 	shake_label.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
+	shake_label.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(shake_label)
 
 	var shake_btn := CheckButton.new()
@@ -624,6 +632,7 @@ func _build_settings_panel() -> void:
 	reset_btn.position = Vector2(125, 430)
 	reset_btn.size = Vector2(250, 38)
 	reset_btn.add_theme_font_size_override("font_size", 14)
+	reset_btn.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 
 	var rs := StyleBoxFlat.new()
 	rs.bg_color = Color(0.3, 0.12, 0.12, 0.6)
@@ -662,6 +671,7 @@ func _build_slider(parent: Control, label_text: String, y_pos: float, initial: f
 	lbl.size = Vector2(150, 25)
 	lbl.add_theme_font_size_override("font_size", 15)
 	lbl.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
+	lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	parent.add_child(lbl)
 
 	var slider := HSlider.new()
@@ -680,6 +690,7 @@ func _build_slider(parent: Control, label_text: String, y_pos: float, initial: f
 	val_lbl.size = Vector2(60, 25)
 	val_lbl.add_theme_font_size_override("font_size", 14)
 	val_lbl.add_theme_color_override("font_color", Color(0.5, 0.48, 0.45))
+	val_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	parent.add_child(val_lbl)
 
 	# Live-update the percentage label
@@ -729,6 +740,7 @@ func _build_credits_panel() -> void:
 	cr_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cr_title.add_theme_font_size_override("font_size", 34)
 	cr_title.add_theme_color_override("font_color", Color(0.95, 0.88, 0.72))
+	cr_title.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(cr_title)
 
 	# Divider
@@ -759,6 +771,7 @@ func _build_credits_panel() -> void:
 		role_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		role_lbl.add_theme_font_size_override("font_size", 12)
 		role_lbl.add_theme_color_override("font_color", Color(0.5, 0.48, 0.55))
+		role_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 		card.add_child(role_lbl)
 
 		var name_lbl := Label.new()
@@ -768,6 +781,7 @@ func _build_credits_panel() -> void:
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name_lbl.add_theme_font_size_override("font_size", 18)
 		name_lbl.add_theme_color_override("font_color", Color(0.85, 0.82, 0.78))
+		name_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 		card.add_child(name_lbl)
 
 		y_offset += 52.0
@@ -780,6 +794,7 @@ func _build_credits_panel() -> void:
 	love_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	love_lbl.add_theme_font_size_override("font_size", 13)
 	love_lbl.add_theme_color_override("font_color", Color(0.45, 0.42, 0.4))
+	love_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(love_lbl)
 
 	# Back button
@@ -804,6 +819,7 @@ func _create_menu_button(text: String, color: Color, font_size: int) -> Button:
 	btn.text = text
 	btn.custom_minimum_size = Vector2(380, 50)
 	btn.add_theme_font_size_override("font_size", font_size)
+	btn.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 
 	# Normal style — dark with coloured left accent
 	var style_n := StyleBoxFlat.new()
