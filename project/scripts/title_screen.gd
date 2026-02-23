@@ -237,7 +237,6 @@ func _build_main_panel() -> void:
 	title_shadow.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	title_shadow.add_theme_font_size_override("font_size", 82)
 	title_shadow.add_theme_color_override("font_color", Color(0.0, 0.0, 0.0, 0.6))
-	title_shadow.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	title_shadow.position = Vector2(4, 4)
 	title_container.add_child(title_shadow)
 
@@ -246,7 +245,6 @@ func _build_main_panel() -> void:
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	title_label.add_theme_font_size_override("font_size", 82)
 	title_label.add_theme_color_override("font_color", Color(0.95, 0.88, 0.72))
-	title_label.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	title_container.add_child(title_label)
 
 	title_container.rotation = -0.12  # Tilt ~7 degrees left
@@ -260,7 +258,6 @@ func _build_main_panel() -> void:
 	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	subtitle_label.add_theme_font_size_override("font_size", 16)
 	subtitle_label.add_theme_color_override("font_color", Color(0.5, 0.48, 0.45))
-	subtitle_label.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	left_vbox.add_child(subtitle_label)
 
 	# Right side: Buttons
@@ -328,7 +325,6 @@ func _build_main_panel() -> void:
 	version_label.add_theme_font_size_override("font_size", 11)
 	version_label.add_theme_color_override("font_color", Color(0.3, 0.28, 0.26))
 	version_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	version_label.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	right_vbox.add_child(version_label)
 
 	# Cache base Y for bobbing after layout settles
@@ -359,7 +355,6 @@ func _build_world_panel() -> void:
 	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	header.add_theme_font_size_override("font_size", 40)
 	header.add_theme_color_override("font_color", Color(0.95, 0.88, 0.72))
-	header.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	world_panel.add_child(header)
 
 	var sub_header := Label.new()
@@ -369,7 +364,6 @@ func _build_world_panel() -> void:
 	sub_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub_header.add_theme_font_size_override("font_size", 14)
 	sub_header.add_theme_color_override("font_color", Color(0.45, 0.43, 0.4))
-	sub_header.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	world_panel.add_child(sub_header)
 
 	# Grid layout: 3 cols × 2 rows
@@ -433,7 +427,6 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	icon_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	icon_lbl.add_theme_font_size_override("font_size", 34)
 	icon_lbl.add_theme_color_override("font_color", data["color"])
-	icon_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(icon_lbl)
 
 	# World name
@@ -444,7 +437,6 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.add_theme_font_size_override("font_size", 22)
 	name_lbl.add_theme_color_override("font_color", Color.WHITE)
-	name_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(name_lbl)
 
 	# Subtitle description
@@ -455,7 +447,6 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	sub_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub_lbl.add_theme_font_size_override("font_size", 12)
 	sub_lbl.add_theme_color_override("font_color", Color(0.5, 0.48, 0.45))
-	sub_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(sub_lbl)
 
 	# Progress bar background
@@ -485,7 +476,6 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	count_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	count_lbl.add_theme_font_size_override("font_size", 11)
 	count_lbl.add_theme_color_override("font_color", Color(0.45, 0.43, 0.4))
-	count_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(count_lbl)
 
 	# Enter world button
@@ -560,7 +550,6 @@ func _build_settings_panel() -> void:
 	stitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	stitle.add_theme_font_size_override("font_size", 32)
 	stitle.add_theme_color_override("font_color", Color(0.95, 0.88, 0.72))
-	stitle.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(stitle)
 
 	# Divider
@@ -577,7 +566,6 @@ func _build_settings_panel() -> void:
 	audio_hdr.size = Vector2(200, 25)
 	audio_hdr.add_theme_font_size_override("font_size", 18)
 	audio_hdr.add_theme_color_override("font_color", Color(0.7, 0.68, 0.65))
-	audio_hdr.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(audio_hdr)
 
 	_build_slider(card, "Master Volume", 120, master_vol, "_on_master_vol_changed")
@@ -591,7 +579,6 @@ func _build_settings_panel() -> void:
 	disp_hdr.size = Vector2(200, 25)
 	disp_hdr.add_theme_font_size_override("font_size", 18)
 	disp_hdr.add_theme_color_override("font_color", Color(0.7, 0.68, 0.65))
-	disp_hdr.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(disp_hdr)
 
 	# Fullscreen toggle
@@ -601,7 +588,6 @@ func _build_settings_panel() -> void:
 	fs_label.size = Vector2(200, 25)
 	fs_label.add_theme_font_size_override("font_size", 15)
 	fs_label.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
-	fs_label.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(fs_label)
 
 	var fs_btn := CheckButton.new()
@@ -617,7 +603,6 @@ func _build_settings_panel() -> void:
 	shake_label.size = Vector2(200, 25)
 	shake_label.add_theme_font_size_override("font_size", 15)
 	shake_label.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
-	shake_label.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(shake_label)
 
 	var shake_btn := CheckButton.new()
@@ -632,7 +617,6 @@ func _build_settings_panel() -> void:
 	reset_btn.position = Vector2(125, 430)
 	reset_btn.size = Vector2(250, 38)
 	reset_btn.add_theme_font_size_override("font_size", 14)
-	reset_btn.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 
 	var rs := StyleBoxFlat.new()
 	rs.bg_color = Color(0.3, 0.12, 0.12, 0.6)
@@ -671,7 +655,6 @@ func _build_slider(parent: Control, label_text: String, y_pos: float, initial: f
 	lbl.size = Vector2(150, 25)
 	lbl.add_theme_font_size_override("font_size", 15)
 	lbl.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
-	lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	parent.add_child(lbl)
 
 	var slider := HSlider.new()
@@ -690,7 +673,6 @@ func _build_slider(parent: Control, label_text: String, y_pos: float, initial: f
 	val_lbl.size = Vector2(60, 25)
 	val_lbl.add_theme_font_size_override("font_size", 14)
 	val_lbl.add_theme_color_override("font_color", Color(0.5, 0.48, 0.45))
-	val_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	parent.add_child(val_lbl)
 
 	# Live-update the percentage label
@@ -740,7 +722,6 @@ func _build_credits_panel() -> void:
 	cr_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cr_title.add_theme_font_size_override("font_size", 34)
 	cr_title.add_theme_color_override("font_color", Color(0.95, 0.88, 0.72))
-	cr_title.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(cr_title)
 
 	# Divider
@@ -771,7 +752,6 @@ func _build_credits_panel() -> void:
 		role_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		role_lbl.add_theme_font_size_override("font_size", 12)
 		role_lbl.add_theme_color_override("font_color", Color(0.5, 0.48, 0.55))
-		role_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 		card.add_child(role_lbl)
 
 		var name_lbl := Label.new()
@@ -781,7 +761,6 @@ func _build_credits_panel() -> void:
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name_lbl.add_theme_font_size_override("font_size", 18)
 		name_lbl.add_theme_color_override("font_color", Color(0.85, 0.82, 0.78))
-		name_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 		card.add_child(name_lbl)
 
 		y_offset += 52.0
@@ -794,7 +773,6 @@ func _build_credits_panel() -> void:
 	love_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	love_lbl.add_theme_font_size_override("font_size", 13)
 	love_lbl.add_theme_color_override("font_color", Color(0.45, 0.42, 0.4))
-	love_lbl.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	card.add_child(love_lbl)
 
 	# Back button
@@ -819,7 +797,6 @@ func _create_menu_button(text: String, color: Color, font_size: int) -> Button:
 	btn.text = text
 	btn.custom_minimum_size = Vector2(380, 50)
 	btn.add_theme_font_size_override("font_size", font_size)
-	btn.font_antialiasing = TextServer.FONT_ANTIALIASING_NONE
 
 	# Normal style — dark with coloured left accent
 	var style_n := StyleBoxFlat.new()
