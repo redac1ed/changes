@@ -58,14 +58,19 @@ func _ready() -> void:
 	_build_settings_panel()
 	_build_credits_panel()
 	_show_panel("main")
-	# Add spectrum analyzer to music bus
-	var spectrum := AudioEffectSpectrumAnalyzer.new()
-	spectrum.fft_size = AudioEffectSpectrumAnalyzer.FFT_SIZE_256
-	spectrum.tap_back_pos = 0.1
-	AudioServer.add_bus_effect(AudioServer.get_bus_index("Music"), spectrum, 0)
+	
+	# Add spectrum analyzer to music bus (if it exists)
+	var music_bus_idx := AudioServer.get_bus_index("Music")
+	if music_bus_idx >= 0:
+		var spectrum := AudioEffectSpectrumAnalyzer.new()
+		spectrum.fft_size = AudioEffectSpectrumAnalyzer.FFT_SIZE_256
+		spectrum.tap_back_pos = 0.1
+		AudioServer.add_bus_effect(music_bus_idx, spectrum, 0)
+	
 	# Play the song
 	if AudioManager:
 		AudioManager.play_music("res://assets/audio/lobby.mp3")
+	
 	# Entrance fade-in
 	modulate.a = 0.0
 	var tween := create_tween()
@@ -168,7 +173,11 @@ func _update_background(delta: float) -> void:
 		ball.rotation = time_elapsed * 1.5 + bd["vy"] * 0.01
 
 	# Update visualizer bars
-	var spectrum_inst := AudioServer.get_bus_effect_instance(AudioServer.get_bus_index("Music"), 0) as AudioEffectSpectrumAnalyzerInstance
+	var spectrum_inst: AudioEffectSpectrumAnalyzerInstance = null
+	var music_bus_idx := AudioServer.get_bus_index("Music")
+	if music_bus_idx >= 0:
+		spectrum_inst = AudioServer.get_bus_effect_instance(music_bus_idx, 0) as AudioEffectSpectrumAnalyzerInstance
+	
 	var bar_total_w := SCREEN_W - 100.0
 	var bar_spacing := bar_total_w / VISUALIZER_BAR_COUNT
 	for i in visualizer_bars.size():
