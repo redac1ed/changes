@@ -224,117 +224,142 @@ func _build_main_panel() -> void:
 	add_child(main_panel)
 	panels["main"] = main_panel
 
-	var hbox := HBoxContainer.new()
-	hbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-	hbox.add_theme_constant_override("separation", 50)
-	main_panel.add_child(hbox)
+	# ── Centered pill-shaped title container ──
+	var pill := Panel.new()
+	pill.custom_minimum_size = Vector2(620, 180)
+	pill.position = Vector2(SCREEN_W / 2.0 - 310, 180)
+	pill.size = Vector2(620, 180)
 
-	# Left side: Title and Illustration
-	var left_vbox := VBoxContainer.new()
-	left_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	left_vbox.custom_minimum_size = Vector2(400, 0)
-	hbox.add_child(left_vbox)
+	var pill_style := StyleBoxFlat.new()
+	pill_style.bg_color = Color(0.25, 0.65, 0.92, 0.7)  # Blue-ish pill
+	pill_style.corner_radius_top_left = 60
+	pill_style.corner_radius_top_right = 60
+	pill_style.corner_radius_bottom_left = 60
+	pill_style.corner_radius_bottom_right = 60
+	pill_style.border_width_left = 4
+	pill_style.border_width_top = 4
+	pill_style.border_width_right = 4
+	pill_style.border_width_bottom = 4
+	pill_style.border_color = Color(0.4, 0.8, 1.0, 0.9)  # Cyan border
+	pill_style.shadow_color = Color(0.2, 0.5, 0.8, 0.3)
+	pill_style.shadow_size = 8
+	pill.add_theme_stylebox_override("panel", pill_style)
+	main_panel.add_child(pill)
 
-	# ── Title (tilted) ──
-	var title_container := Control.new()
-	title_container.custom_minimum_size = Vector2(420, 120)
-	title_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	# Shadow layer
+	# Shadow for "CHANGES" (top line)
 	var title_shadow := Label.new()
-	title_shadow.text = "Changes"
-	title_shadow.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	title_shadow.add_theme_font_size_override("font_size", 82)
-	title_shadow.add_theme_color_override("font_color", Color(0.0, 0.0, 0.0, 0.6))
-	title_shadow.position = Vector2(4, 4)
-	title_container.add_child(title_shadow)
+	title_shadow.text = "CHANGES"
+	title_shadow.position = Vector2(0, 8)
+	title_shadow.size = Vector2(620, 90)
+	title_shadow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_shadow.add_theme_font_size_override("font_size", 72)
+	title_shadow.add_theme_color_override("font_color", Color(0.0, 0.0, 0.0, 0.5))
+	pill.add_child(title_shadow)
 
+	# "CHANGES" title (yellow, pixelated look)
 	title_label = Label.new()
-	title_label.text = "Changes"
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	title_label.add_theme_font_size_override("font_size", 82)
-	title_label.add_theme_color_override("font_color", Color(0.95, 0.88, 0.72))
-	title_container.add_child(title_label)
+	title_label.text = "CHANGES"
+	title_label.position = Vector2(0, 4)
+	title_label.size = Vector2(620, 90)
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_label.add_theme_font_size_override("font_size", 72)
+	title_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.1))  # Yellow
+	pill.add_child(title_label)
 
-	title_container.rotation = -0.12  # Tilt ~7 degrees left
-	# Compensate for layout
-	title_container.position = Vector2(10, 30)
-	left_vbox.add_child(title_container)
-
-	# ── Subtitle ──
+	# Subtitle inside pill
 	subtitle_label = Label.new()
-	subtitle_label.text = "A physics puzzle journey through changing worlds"
-	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	subtitle_label.add_theme_font_size_override("font_size", 16)
-	subtitle_label.add_theme_color_override("font_color", Color(0.5, 0.48, 0.45))
-	left_vbox.add_child(subtitle_label)
+	subtitle_label.text = "THE GAME"
+	subtitle_label.position = Vector2(0, 90)
+	subtitle_label.size = Vector2(620, 60)
+	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle_label.add_theme_font_size_override("font_size", 48)
+	subtitle_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
+	pill.add_child(subtitle_label)
 
-	# Right side: Buttons
-	var right_vbox := VBoxContainer.new()
-	right_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	right_vbox.custom_minimum_size = Vector2(400, 0)
-	hbox.add_child(right_vbox)
+	# ── Play button (big green, centered below pill) ──
+	var play_btn := Button.new()
+	play_btn.text = "Play!"
+	play_btn.custom_minimum_size = Vector2(200, 55)
+	play_btn.position = Vector2(SCREEN_W / 2.0 - 100, 395)
+	play_btn.size = Vector2(200, 55)
+	play_btn.add_theme_font_size_override("font_size", 28)
 
-	# ── Decorative divider ──
-	var divider_wrap := CenterContainer.new()
-	divider_wrap.custom_minimum_size = Vector2(0, 14)
-	var divider := ColorRect.new()
-	divider.custom_minimum_size = Vector2(280, 2)
-	divider.color = Color(0.95, 0.88, 0.72, 0.25)
-	divider_wrap.add_child(divider)
-	right_vbox.add_child(divider_wrap)
+	var play_style := StyleBoxFlat.new()
+	play_style.bg_color = Color(0.3, 0.78, 0.22, 0.95)
+	play_style.corner_radius_top_left = 16
+	play_style.corner_radius_top_right = 16
+	play_style.corner_radius_bottom_left = 16
+	play_style.corner_radius_bottom_right = 16
+	play_style.border_width_left = 3
+	play_style.border_width_top = 3
+	play_style.border_width_right = 3
+	play_style.border_width_bottom = 3
+	play_style.border_color = Color(0.2, 0.6, 0.15, 0.9)
+	play_style.shadow_color = Color(0.1, 0.4, 0.1, 0.4)
+	play_style.shadow_size = 4
 
-	_add_spacer(right_vbox, 18)
+	var play_hover := play_style.duplicate()
+	play_hover.bg_color = Color(0.35, 0.85, 0.28, 1.0)
+	play_hover.shadow_size = 6
 
-	# ── Play button (prominent) ──
-	var btn_play := _create_menu_button("Play", Color(0.45, 0.82, 0.45), 24)
-	btn_play.custom_minimum_size = Vector2(380, 58)
-	btn_play.pressed.connect(_on_play_pressed)
-	right_vbox.add_child(btn_play)
+	var play_pressed := play_style.duplicate()
+	play_pressed.bg_color = Color(0.25, 0.65, 0.18, 1.0)
 
-	# ── Continue (disabled when no save) ──
-	var btn_continue := _create_menu_button("Continue", Color(0.55, 0.78, 0.95), 20)
-	btn_continue.custom_minimum_size = Vector2(380, 50)
+	play_btn.add_theme_stylebox_override("normal", play_style)
+	play_btn.add_theme_stylebox_override("hover", play_hover)
+	play_btn.add_theme_stylebox_override("pressed", play_pressed)
+	play_btn.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
+	play_btn.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 1.0))
+	play_btn.pressed.connect(_on_play_pressed)
+	play_btn.mouse_entered.connect(_on_button_hover.bind(play_btn))
+	menu_buttons.append(play_btn)
+	main_panel.add_child(play_btn)
+
+	# ── Row of smaller buttons below ──
+	var btn_row := HBoxContainer.new()
+	btn_row.position = Vector2(SCREEN_W / 2.0 - 340, 480)
+	btn_row.size = Vector2(680, 50)
+	btn_row.add_theme_constant_override("separation", 12)
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	main_panel.add_child(btn_row)
+
+	var btn_continue := _create_menu_button("Continue", Color(0.55, 0.78, 0.95), 18)
+	btn_continue.custom_minimum_size = Vector2(155, 46)
 	btn_continue.pressed.connect(_on_continue_pressed)
 	if GameState.levels_completed == 0:
 		btn_continue.disabled = true
 		btn_continue.modulate.a = 0.4
-	right_vbox.add_child(btn_continue)
+	btn_row.add_child(btn_continue)
 
-	# ── World Select ──
-	var btn_worlds := _create_menu_button("World Select", Color(0.75, 0.7, 0.85), 20)
-	btn_worlds.custom_minimum_size = Vector2(380, 50)
+	var btn_worlds := _create_menu_button("Worlds", Color(0.75, 0.7, 0.85), 18)
+	btn_worlds.custom_minimum_size = Vector2(130, 46)
 	btn_worlds.pressed.connect(_on_worlds_pressed)
-	right_vbox.add_child(btn_worlds)
+	btn_row.add_child(btn_worlds)
 
-	# ── Settings ──
-	var btn_settings := _create_menu_button("Settings", Color(0.7, 0.68, 0.65), 20)
-	btn_settings.custom_minimum_size = Vector2(380, 50)
+	var btn_settings := _create_menu_button("Settings", Color(0.7, 0.68, 0.65), 18)
+	btn_settings.custom_minimum_size = Vector2(140, 46)
 	btn_settings.pressed.connect(_on_settings_pressed)
-	right_vbox.add_child(btn_settings)
+	btn_row.add_child(btn_settings)
 
-	# ── Credits ──
 	var btn_credits := _create_menu_button("Credits", Color(0.6, 0.58, 0.65), 18)
-	btn_credits.custom_minimum_size = Vector2(380, 46)
+	btn_credits.custom_minimum_size = Vector2(130, 46)
 	btn_credits.pressed.connect(_on_credits_pressed)
-	right_vbox.add_child(btn_credits)
+	btn_row.add_child(btn_credits)
 
-	_add_spacer(right_vbox, 10)
-
-	# ── Quit ──
 	var btn_quit := _create_menu_button("Quit", Color(0.7, 0.38, 0.38), 18)
-	btn_quit.custom_minimum_size = Vector2(380, 44)
+	btn_quit.custom_minimum_size = Vector2(100, 46)
 	btn_quit.pressed.connect(_on_quit_pressed)
-	right_vbox.add_child(btn_quit)
+	btn_row.add_child(btn_quit)
 
 	# ── Version footer ──
-	_add_spacer(right_vbox, 8)
 	version_label = Label.new()
 	version_label.text = "v0.2.0  •  Godot 4.2"
+	version_label.position = Vector2(0, SCREEN_H - 30)
+	version_label.size = Vector2(SCREEN_W, 20)
 	version_label.add_theme_font_size_override("font_size", 11)
-	version_label.add_theme_color_override("font_color", Color(0.3, 0.28, 0.26))
+	version_label.add_theme_color_override("font_color", Color(0.4, 0.38, 0.36))
 	version_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	right_vbox.add_child(version_label)
+	main_panel.add_child(version_label)
 
 	# Cache base Y for bobbing after layout settles
 	await get_tree().process_frame
