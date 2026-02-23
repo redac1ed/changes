@@ -1014,6 +1014,1314 @@ func _on_reset_progress() -> void:
 
 
 # ═══════════════════════════════════════════════════════════════
+# PROCEDURAL GENERATION EXPANSION - PART 1
+# ═══════════════════════════════════════════════════════════════
+
+func _generate_procedural_element_1() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement1"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_2() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement2"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_3() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement3"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_4() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement4"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_5() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement5"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_6() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement6"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_7() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement7"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_8() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement8"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_9() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement9"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_10() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement10"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_11() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement11"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_12() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement12"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_13() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement13"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_14() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement14"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_15() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement15"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_16() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement16"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_17() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement17"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_18() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement18"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_19() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement19"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_20() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement20"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_21() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement21"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_22() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement22"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_23() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement23"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_24() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement24"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_25() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement25"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_26() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement26"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_27() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement27"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_28() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement28"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_29() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement29"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_30() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement30"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_31() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement31"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_32() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement32"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_33() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement33"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_34() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement34"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_35() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement35"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_36() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement36"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_37() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement37"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_38() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement38"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_39() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement39"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_40() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement40"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_41() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement41"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_42() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement42"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_43() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement43"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_44() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement44"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_45() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement45"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_46() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement46"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_47() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement47"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_48() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement48"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_49() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement49"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_50() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement50"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+# ═══════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════
+# PROCEDURAL GENERATION EXPANSION - PART 2
+# ═══════════════════════════════════════════════════════════════
+
+func _generate_procedural_element_51() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement51"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_52() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement52"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_53() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement53"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_54() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement54"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_55() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement55"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_56() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement56"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_57() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement57"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_58() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement58"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_59() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement59"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_60() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement60"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_61() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement61"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_62() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement62"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_63() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement63"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_64() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement64"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_65() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement65"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_66() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement66"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_67() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement67"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_68() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement68"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_69() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement69"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_70() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement70"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_71() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement71"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_72() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement72"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_73() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement73"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_74() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement74"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_75() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement75"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_76() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement76"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_77() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement77"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_78() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement78"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_79() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement79"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_80() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement80"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_81() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement81"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_82() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement82"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_83() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement83"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_84() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement84"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_85() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement85"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_86() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement86"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_87() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement87"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_88() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement88"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_89() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement89"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_90() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement90"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_91() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement91"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_92() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement92"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_93() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement93"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_94() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement94"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_95() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement95"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_96() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement96"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_97() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement97"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_98() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement98"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_99() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement99"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
+func _generate_procedural_element_100() -> void:
+	var element_node = Node2D.new()
+	element_node.name = "ProceduralElement100"
+	var element_sprite = Sprite2D.new()
+	element_sprite.modulate = Color(randf(), randf(), randf(), randf())
+	element_sprite.scale = Vector2(randf_range(0.5, 2.0), randf_range(0.5, 2.0))
+	element_sprite.position = Vector2(randf_range(0, 1920), randf_range(0, 1080))
+	element_sprite.rotation = randf_range(0, PI * 2)
+	element_node.add_child(element_sprite)
+	add_child(element_node)
+	var tw = create_tween()
+	tw.tween_property(element_sprite, "rotation", element_sprite.rotation + PI, randf_range(1.0, 5.0)).set_loops()
+
 # INPUT
 # ═══════════════════════════════════════════════════════════════
 
