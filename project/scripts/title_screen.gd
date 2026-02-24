@@ -46,6 +46,14 @@ var time_elapsed: float = 0.0
 var is_transitioning: bool = false
 var title_bob_offset: float = 0.0
 
+# ─── Spectrum Analyzer ───────────────────────────────────────
+var _spectrum_bus_idx: int = -1
+var _spectrum_effect_idx: int = -1
+var _spectrum_inst: AudioEffectSpectrumAnalyzerInstance = null
+
+# ─── Mute Button ─────────────────────────────────────────────
+var mute_btn: Button
+
 # ─── Settings State ──────────────────────────────────────────
 var master_vol: float = 1.0
 var music_vol: float = 0.8
@@ -77,12 +85,8 @@ func _ready() -> void:
 	_build_tv_overlay()
 	_show_panel("main")
 
-	var music_bus_idx := AudioServer.get_bus_index("Music")
-	if music_bus_idx >= 0:
-		var spectrum := AudioEffectSpectrumAnalyzer.new()
-		spectrum.fft_size = AudioEffectSpectrumAnalyzer.FFT_SIZE_256
-		spectrum.tap_back_pos = 0.1
-		AudioServer.add_bus_effect(music_bus_idx, spectrum, 0)
+	_setup_spectrum()
+	_build_mute_button()
 
 	if AudioManager:
 		AudioManager.play_music("res://assets/audio/lobby.mp3")
@@ -109,68 +113,81 @@ func _build_background() -> void:
 	bg_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg_layer)
 
+	# Pure black base
 	var bg := ColorRect.new()
-	bg.color = Color(0.02, 0.02, 0.06, 1.0)
+	bg.color = Color(0.0, 0.0, 0.0, 1.0)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg_layer.add_child(bg)
 
+	# Starfield — greyscale, subtle
 	var starfield_tex := TextureRect.new()
 	starfield_tex.texture = load("res://assets/sprites/pixelart_starfield.png")
 	starfield_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	starfield_tex.set_anchors_preset(Control.PRESET_FULL_RECT)
-	starfield_tex.modulate = Color(1, 1, 1, 0.9)
+	starfield_tex.modulate = Color(0.55, 0.55, 0.55, 0.75)
 	starfield_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bg_layer.add_child(starfield_tex)
 
-	var spikes_tex := TextureRect.new()
-	spikes_tex.texture = load("res://assets/sprites/pixelart_starfield_diagonal_diffraction_spikes.png")
-	spikes_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	spikes_tex.set_anchors_preset(Control.PRESET_FULL_RECT)
-	spikes_tex.modulate = Color(1, 1, 1, 0.4)
-	spikes_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bg_layer.add_child(spikes_tex)
-
-	var overlay := ColorRect.new()
-	overlay.color = Color(0.0, 0.0, 0.05, 0.55)
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bg_layer.add_child(overlay)
-
-	var bar_total_w := SCREEN_W - 100.0
+	# Visualizer bars — white, anchored to bottom
+	var bar_total_w := SCREEN_W - 80.0
 	var bar_spacing := bar_total_w / VISUALIZER_BAR_COUNT
 	for i in VISUALIZER_BAR_COUNT:
 		var bar := ColorRect.new()
-		bar.size = Vector2(bar_spacing - 4, 50)
-		bar.color = Color(0.95, 0.88, 0.72, 0.35)
-		bar.position = Vector2(50 + i * bar_spacing, SCREEN_H - 50)
+		bar.size = Vector2(bar_spacing - 3, 4)
+		bar.color = Color(1.0, 1.0, 1.0, 0.55)
+		bar.position = Vector2(40.0 + i * bar_spacing, SCREEN_H - 4)
 		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		visualizer_bars.append(bar)
 		bg_layer.add_child(bar)
 
 
-func _update_background(_delta: float) -> void:
-	var spectrum_inst: AudioEffectSpectrumAnalyzerInstance = null
-	var music_bus_idx := AudioServer.get_bus_index("Music")
-	if music_bus_idx >= 0:
-		spectrum_inst = AudioServer.get_bus_effect_instance(music_bus_idx, 0) as AudioEffectSpectrumAnalyzerInstance
+func _setup_spectrum() -> void:
+	# Find Music bus, fall back to Master
+	var bus_idx := AudioServer.get_bus_index("Music")
+	if bus_idx < 0:
+		bus_idx = AudioServer.get_bus_index("Master")
+	if bus_idx < 0:
+		return
+	# Remove duplicate spectrum effects from previous loads
+	for i in range(AudioServer.get_bus_effect_count(bus_idx) - 1, -1, -1):
+		if AudioServer.get_bus_effect(bus_idx, i) is AudioEffectSpectrumAnalyzer:
+			AudioServer.remove_bus_effect(bus_idx, i)
+	var spectrum := AudioEffectSpectrumAnalyzer.new()
+	spectrum.fft_size = AudioEffectSpectrumAnalyzer.FFT_SIZE_1024
+	spectrum.tap_back_pos = 0.3
+	AudioServer.add_bus_effect(bus_idx, spectrum)
+	_spectrum_bus_idx = bus_idx
+	_spectrum_effect_idx = AudioServer.get_bus_effect_count(bus_idx) - 1
 
-	var bar_total_w := SCREEN_W - 100.0
+
+func _update_background(_delta: float) -> void:
+	# Lazily resolve the instance (only valid after the bus effect is added)
+	if _spectrum_inst == null and _spectrum_bus_idx >= 0 and _spectrum_effect_idx >= 0:
+		_spectrum_inst = AudioServer.get_bus_effect_instance(
+			_spectrum_bus_idx, _spectrum_effect_idx) as AudioEffectSpectrumAnalyzerInstance
+
+	var bar_total_w := SCREEN_W - 80.0
 	var bar_spacing := bar_total_w / VISUALIZER_BAR_COUNT
 	for i in visualizer_bars.size():
 		var bar: ColorRect = visualizer_bars[i]
 		var height: float
-		if spectrum_inst:
-			var freq_lo := 40.0 + i * 80.0
-			var freq_hi := freq_lo + 80.0
-			var magnitude := spectrum_inst.get_magnitude_for_frequency_range(freq_lo, freq_hi).length()
-			height = clampf(magnitude * 600.0, 4.0, 220.0)
+		if _spectrum_inst:
+			# Spread frequencies logarithmically for better visual response
+			var t := float(i) / float(VISUALIZER_BAR_COUNT)
+			var freq_lo := 40.0 * pow(500.0, t)
+			var freq_hi := freq_lo * (1.0 + 1.5 / VISUALIZER_BAR_COUNT * 20.0)
+			var mag := _spectrum_inst.get_magnitude_for_frequency_range(
+				freq_lo, freq_hi, AudioEffectSpectrumAnalyzerInstance.MAGNITUDE_AVERAGE)
+			var db := linear_to_db(mag.length())
+			height = clampf(remap(db, -80.0, -10.0, 3.0, 200.0), 3.0, 200.0)
 		else:
-			height = 20.0 + sin(time_elapsed * 3.0 + i * 0.4) * 15.0
-		bar.size.x = bar_spacing - 4
+			height = 6.0 + sin(time_elapsed * 2.5 + i * 0.35) * 4.0
+		bar.size.x = bar_spacing - 3
 		bar.size.y = height
 		bar.position.y = SCREEN_H - height
-		var hue := fmod(float(i) / float(VISUALIZER_BAR_COUNT) + time_elapsed * 0.05, 1.0)
-		bar.color = Color.from_hsv(hue, 0.6, 1.0, 0.4)
+		# White but dims slightly on silence
+		var brightness := clampf(height / 80.0, 0.3, 1.0)
+		bar.color = Color(brightness, brightness, brightness, 0.7)
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -180,7 +197,7 @@ func _update_background(_delta: float) -> void:
 func _build_rolling_ball() -> void:
 	rolling_ball = ColorRect.new()
 	rolling_ball.size = Vector2(BALL_SIZE, BALL_SIZE)
-	rolling_ball.color = Color(0.95, 0.88, 0.72, 0.85)
+	rolling_ball.color = Color(1.0, 1.0, 1.0, 0.9)
 	rolling_ball.pivot_offset = Vector2(BALL_SIZE / 2.0, BALL_SIZE / 2.0)
 	rolling_ball.position = Vector2(ball_x, BALL_Y)
 	rolling_ball.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -197,10 +214,32 @@ func _update_rolling_ball(delta: float) -> void:
 	rolling_ball.rotation = ball_rotation
 
 
-# ═══════════════════════════════════════════════════════════════
-# TITLE ANIMATION
-# ═══════════════════════════════════════════════════════════════
+func _build_mute_button() -> void:
+	mute_btn = Button.new()
+	mute_btn.text = "[♪]"
+	mute_btn.position = Vector2(SCREEN_W - 70, 18)
+	mute_btn.size = Vector2(52, 32)
+	mute_btn.add_theme_font_size_override("font_size", 14)
+	var ms := StyleBoxFlat.new()
+	ms.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+	ms.border_width_left = 1
+	ms.border_width_top = 1
+	ms.border_width_right = 1
+	ms.border_width_bottom = 1
+	ms.border_color = Color(1.0, 1.0, 1.0, 0.3)
+	var mh := ms.duplicate()
+	mh.bg_color = Color(1.0, 1.0, 1.0, 0.1)
+	mh.border_color = Color(1.0, 1.0, 1.0, 0.8)
+	mute_btn.add_theme_stylebox_override("normal", ms)
+	mute_btn.add_theme_stylebox_override("hover", mh)
+	mute_btn.add_theme_stylebox_override("pressed", ms)
+	mute_btn.add_theme_color_override("font_color", Color(0.75, 0.75, 0.75))
+	mute_btn.add_theme_color_override("font_hover_color", Color.WHITE)
+	mute_btn.pressed.connect(_on_mute_pressed)
+	add_child(mute_btn)
 
+
+# ═══════════════════════════════════════════════════════════════
 func _update_title_animation(_delta: float) -> void:
 	if title_label and title_label.has_meta("base_y"):
 		title_bob_offset = sin(time_elapsed * 1.5) * 3.0
@@ -222,90 +261,55 @@ func _build_main_panel() -> void:
 	add_child(main_panel)
 	panels["main"] = main_panel
 
-	# ── Left-side pill title container ──
-	var pill := Panel.new()
-	var pill_w: float = 460.0
-	var pill_h: float = 170.0
-	pill.position = Vector2(LEFT_MARGIN, TITLE_Y)
-	pill.size = Vector2(pill_w, pill_h)
-
-	var pill_style := StyleBoxFlat.new()
-	pill_style.bg_color = Color(0.25, 0.65, 0.92, 0.7)
-	pill_style.corner_radius_top_left = 50
-	pill_style.corner_radius_top_right = 50
-	pill_style.corner_radius_bottom_left = 50
-	pill_style.corner_radius_bottom_right = 50
-	pill_style.border_width_left = 4
-	pill_style.border_width_top = 4
-	pill_style.border_width_right = 4
-	pill_style.border_width_bottom = 4
-	pill_style.border_color = Color(0.4, 0.8, 1.0, 0.9)
-	pill_style.shadow_color = Color(0.2, 0.5, 0.8, 0.3)
-	pill_style.shadow_size = 8
-	pill.add_theme_stylebox_override("panel", pill_style)
-	main_panel.add_child(pill)
-
-	# Shadow text
-	var title_shadow := Label.new()
-	title_shadow.text = "CHANGES"
-	title_shadow.position = Vector2(0, 8)
-	title_shadow.size = Vector2(pill_w, 90)
-	title_shadow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_shadow.add_theme_font_size_override("font_size", 68)
-	title_shadow.add_theme_color_override("font_color", Color(0.0, 0.0, 0.0, 0.5))
-	pill.add_child(title_shadow)
-
-	# Title text
+	# ── Title block — plain text, left-aligned, B&W ──
 	title_label = Label.new()
 	title_label.text = "CHANGES"
-	title_label.position = Vector2(0, 4)
-	title_label.size = Vector2(pill_w, 90)
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 68)
-	title_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.1))
-	pill.add_child(title_label)
+	title_label.position = Vector2(LEFT_MARGIN, TITLE_Y)
+	title_label.size = Vector2(500, 100)
+	title_label.add_theme_font_size_override("font_size", 80)
+	title_label.add_theme_color_override("font_color", Color.WHITE)
+	main_panel.add_child(title_label)
 
-	# Subtitle
 	subtitle_label = Label.new()
-	subtitle_label.text = "THE GAME"
-	subtitle_label.position = Vector2(0, 88)
-	subtitle_label.size = Vector2(pill_w, 55)
-	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle_label.add_theme_font_size_override("font_size", 42)
-	subtitle_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
-	pill.add_child(subtitle_label)
+	subtitle_label.text = "the game"
+	subtitle_label.position = Vector2(LEFT_MARGIN + 4, TITLE_Y + 92)
+	subtitle_label.size = Vector2(500, 40)
+	subtitle_label.add_theme_font_size_override("font_size", 22)
+	subtitle_label.add_theme_color_override("font_color", Color(0.45, 0.45, 0.45))
+	main_panel.add_child(subtitle_label)
+
+	# thin horizontal rule under title
+	var rule := ColorRect.new()
+	rule.position = Vector2(LEFT_MARGIN, TITLE_Y + 140)
+	rule.size = Vector2(320, 1)
+	rule.color = Color(1.0, 1.0, 1.0, 0.18)
+	main_panel.add_child(rule)
 
 	# ── Play button ──
 	var play_btn := Button.new()
-	play_btn.text = "Play!"
-	play_btn.custom_minimum_size = Vector2(200, 52)
+	play_btn.text = "PLAY"
+	play_btn.custom_minimum_size = Vector2(200, 48)
 	play_btn.position = Vector2(LEFT_MARGIN, BUTTONS_START_Y)
-	play_btn.size = Vector2(200, 52)
-	play_btn.add_theme_font_size_override("font_size", 26)
+	play_btn.size = Vector2(200, 48)
+	play_btn.add_theme_font_size_override("font_size", 22)
 
-	var play_style := StyleBoxFlat.new()
-	play_style.bg_color = Color(0.3, 0.78, 0.22, 0.95)
-	play_style.corner_radius_top_left = 14
-	play_style.corner_radius_top_right = 14
-	play_style.corner_radius_bottom_left = 14
-	play_style.corner_radius_bottom_right = 14
-	play_style.border_width_left = 3
-	play_style.border_width_top = 3
-	play_style.border_width_right = 3
-	play_style.border_width_bottom = 3
-	play_style.border_color = Color(0.2, 0.6, 0.15, 0.9)
-	play_style.shadow_color = Color(0.1, 0.4, 0.1, 0.4)
-	play_style.shadow_size = 4
-	var play_hover := play_style.duplicate()
-	play_hover.bg_color = Color(0.35, 0.85, 0.28, 1.0)
-	play_hover.shadow_size = 6
-	var play_pressed := play_style.duplicate()
-	play_pressed.bg_color = Color(0.25, 0.65, 0.18, 1.0)
-	play_btn.add_theme_stylebox_override("normal", play_style)
-	play_btn.add_theme_stylebox_override("hover", play_hover)
-	play_btn.add_theme_stylebox_override("pressed", play_pressed)
-	play_btn.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
-	play_btn.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 1.0))
+	var play_n := StyleBoxFlat.new()
+	play_n.bg_color = Color(1.0, 1.0, 1.0, 1.0)
+	play_n.border_width_left = 0
+	play_n.border_width_top = 0
+	play_n.border_width_right = 0
+	play_n.border_width_bottom = 0
+	play_n.content_margin_left = 20
+	play_n.content_margin_right = 20
+	var play_h := play_n.duplicate()
+	play_h.bg_color = Color(0.82, 0.82, 0.82, 1.0)
+	var play_p := play_n.duplicate()
+	play_p.bg_color = Color(0.65, 0.65, 0.65, 1.0)
+	play_btn.add_theme_stylebox_override("normal", play_n)
+	play_btn.add_theme_stylebox_override("hover", play_h)
+	play_btn.add_theme_stylebox_override("pressed", play_p)
+	play_btn.add_theme_color_override("font_color", Color(0.0, 0.0, 0.0))
+	play_btn.add_theme_color_override("font_hover_color", Color(0.0, 0.0, 0.0))
 	play_btn.pressed.connect(_on_play_pressed)
 	play_btn.mouse_entered.connect(_on_button_hover.bind(play_btn))
 	menu_buttons.append(play_btn)
@@ -313,16 +317,16 @@ func _build_main_panel() -> void:
 
 	# ── Vertical button column ──
 	var btn_data := [
-		{"text": "Continue", "color": Color(0.55, 0.78, 0.95), "cb": "_on_continue_pressed"},
-		{"text": "Worlds",   "color": Color(0.75, 0.7,  0.85), "cb": "_on_worlds_pressed"},
-		{"text": "Settings", "color": Color(0.7,  0.68, 0.65), "cb": "_on_settings_pressed"},
-		{"text": "Credits",  "color": Color(0.6,  0.58, 0.65), "cb": "_on_credits_pressed"},
-		{"text": "Quit",     "color": Color(0.7,  0.38, 0.38), "cb": "_on_quit_pressed"},
+		{"text": "Continue", "cb": "_on_continue_pressed"},
+		{"text": "Worlds",   "cb": "_on_worlds_pressed"},
+		{"text": "Settings", "cb": "_on_settings_pressed"},
+		{"text": "Credits",  "cb": "_on_credits_pressed"},
+		{"text": "Quit",     "cb": "_on_quit_pressed"},
 	]
 
-	var btn_y := BUTTONS_START_Y + 66.0
+	var btn_y := BUTTONS_START_Y + 62.0
 	for d in btn_data:
-		var btn := _create_menu_button(d["text"], d["color"], 17)
+		var btn := _create_menu_button(d["text"], 15)
 		btn.custom_minimum_size = Vector2(280, 42)
 		btn.position = Vector2(LEFT_MARGIN, btn_y)
 		btn.size = Vector2(280, 42)
@@ -335,11 +339,11 @@ func _build_main_panel() -> void:
 
 	# ── Version footer ──
 	version_label = Label.new()
-	version_label.text = "v0.2.0  •  Godot 4.2"
-	version_label.position = Vector2(LEFT_MARGIN, SCREEN_H - 32)
+	version_label.text = "v0.2.0 / godot 4.2"
+	version_label.position = Vector2(LEFT_MARGIN, SCREEN_H - 30)
 	version_label.size = Vector2(300, 20)
 	version_label.add_theme_font_size_override("font_size", 11)
-	version_label.add_theme_color_override("font_color", Color(0.4, 0.38, 0.36))
+	version_label.add_theme_color_override("font_color", Color(0.3, 0.3, 0.3))
 	version_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	main_panel.add_child(version_label)
 
@@ -368,16 +372,16 @@ func _build_world_panel() -> void:
 	header.size = Vector2(SCREEN_W, 50)
 	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	header.add_theme_font_size_override("font_size", 40)
-	header.add_theme_color_override("font_color", Color(0.95, 0.88, 0.72))
+	header.add_theme_color_override("font_color", Color.WHITE)
 	world_panel.add_child(header)
 
 	var sub_header := Label.new()
-	sub_header.text = "Choose your next destination"
+	sub_header.text = "choose your world"
 	sub_header.position = Vector2(0, 72)
 	sub_header.size = Vector2(SCREEN_W, 25)
 	sub_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub_header.add_theme_font_size_override("font_size", 14)
-	sub_header.add_theme_color_override("font_color", Color(0.45, 0.43, 0.4))
+	sub_header.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4))
 	world_panel.add_child(sub_header)
 
 	var card_w: float = 300.0
@@ -395,7 +399,7 @@ func _build_world_panel() -> void:
 		var cy: float = start_y + (card_h + gap_y) * row
 		_build_world_card(WORLDS[i], i, cx, cy, card_w, card_h)
 
-	var back_btn := _create_menu_button("<- Back to Menu", Color(0.6, 0.58, 0.65), 18)
+	var back_btn := _create_menu_button("<- back", 16)
 	back_btn.position = Vector2(SCREEN_W / 2.0 - 190, SCREEN_H - 65)
 	back_btn.pressed.connect(_on_back_to_main)
 	world_panel.add_child(back_btn)
@@ -407,103 +411,85 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	card.size = Vector2(w, h)
 
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.09, 0.1, 0.15, 0.92)
-	style.corner_radius_top_left = 10
-	style.corner_radius_top_right = 10
-	style.corner_radius_bottom_left = 10
-	style.corner_radius_bottom_right = 10
-	style.border_width_left = 2
+	style.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+	style.border_width_left = 1
 	style.border_width_top = 1
 	style.border_width_right = 1
 	style.border_width_bottom = 1
-	style.border_color = Color(data["color"].r, data["color"].g, data["color"].b, 0.6)
-	style.shadow_color = Color(data["color"].r, data["color"].g, data["color"].b, 0.1)
-	style.shadow_size = 6
+	style.border_color = Color(1.0, 1.0, 1.0, 0.2)
 	card.add_theme_stylebox_override("panel", style)
 	world_panel.add_child(card)
-
-	var accent := ColorRect.new()
-	accent.position = Vector2(10, 0)
-	accent.size = Vector2(w - 20, 3)
-	accent.color = data["color"]
-	card.add_child(accent)
 
 	var icon_lbl := Label.new()
 	icon_lbl.text = data["icon"]
 	icon_lbl.position = Vector2(0, 12)
 	icon_lbl.size = Vector2(w, 45)
 	icon_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	icon_lbl.add_theme_font_size_override("font_size", 34)
-	icon_lbl.add_theme_color_override("font_color", data["color"])
+	icon_lbl.add_theme_font_size_override("font_size", 30)
+	icon_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 	card.add_child(icon_lbl)
 
 	var name_lbl := Label.new()
 	name_lbl.text = data["name"]
-	name_lbl.position = Vector2(0, 58)
+	name_lbl.position = Vector2(0, 55)
 	name_lbl.size = Vector2(w, 30)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_lbl.add_theme_font_size_override("font_size", 22)
+	name_lbl.add_theme_font_size_override("font_size", 20)
 	name_lbl.add_theme_color_override("font_color", Color.WHITE)
 	card.add_child(name_lbl)
 
 	var sub_lbl := Label.new()
 	sub_lbl.text = data["subtitle"]
-	sub_lbl.position = Vector2(0, 88)
+	sub_lbl.position = Vector2(0, 84)
 	sub_lbl.size = Vector2(w, 22)
 	sub_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sub_lbl.add_theme_font_size_override("font_size", 12)
-	sub_lbl.add_theme_color_override("font_color", Color(0.5, 0.48, 0.45))
+	sub_lbl.add_theme_font_size_override("font_size", 11)
+	sub_lbl.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4))
 	card.add_child(sub_lbl)
 
 	var bar_x: float = 20.0
 	var bar_w: float = w - 40.0
 	var bar_bg := ColorRect.new()
-	bar_bg.position = Vector2(bar_x, 125)
-	bar_bg.size = Vector2(bar_w, 6)
-	bar_bg.color = Color(0.14, 0.15, 0.2)
+	bar_bg.position = Vector2(bar_x, 118)
+	bar_bg.size = Vector2(bar_w, 2)
+	bar_bg.color = Color(1.0, 1.0, 1.0, 0.1)
 	card.add_child(bar_bg)
 
-	var pct: float = 0.0
-	if idx == 0:
-		pct = 1.0
+	var pct: float = 1.0 if idx == 0 else 0.0
 	var bar_fill := ColorRect.new()
-	bar_fill.position = Vector2(bar_x, 125)
-	bar_fill.size = Vector2(bar_w * pct, 6)
-	bar_fill.color = data["color"]
+	bar_fill.position = Vector2(bar_x, 118)
+	bar_fill.size = Vector2(bar_w * pct, 2)
+	bar_fill.color = Color(1.0, 1.0, 1.0, 0.7)
 	card.add_child(bar_fill)
 
 	var count_lbl := Label.new()
-	count_lbl.text = "0 / %d levels" % data["levels"]
-	count_lbl.position = Vector2(0, 138)
+	count_lbl.text = "0 / %d" % data["levels"]
+	count_lbl.position = Vector2(0, 130)
 	count_lbl.size = Vector2(w, 18)
 	count_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	count_lbl.add_theme_font_size_override("font_size", 11)
-	count_lbl.add_theme_color_override("font_color", Color(0.45, 0.43, 0.4))
+	count_lbl.add_theme_color_override("font_color", Color(0.35, 0.35, 0.35))
 	card.add_child(count_lbl)
 
 	var pbtn := Button.new()
-	pbtn.text = "Enter World"
-	pbtn.position = Vector2(w / 2.0 - 65, h - 50)
-	pbtn.size = Vector2(130, 36)
-	pbtn.add_theme_font_size_override("font_size", 15)
-
+	pbtn.text = "Enter"
+	pbtn.position = Vector2(w / 2.0 - 50, h - 48)
+	pbtn.size = Vector2(100, 34)
+	pbtn.add_theme_font_size_override("font_size", 13)
 	var bs := StyleBoxFlat.new()
-	bs.bg_color = Color(data["color"].r, data["color"].g, data["color"].b, 0.2)
-	bs.corner_radius_top_left = 6
-	bs.corner_radius_top_right = 6
-	bs.corner_radius_bottom_left = 6
-	bs.corner_radius_bottom_right = 6
+	bs.bg_color = Color(0.0, 0.0, 0.0, 0.0)
 	bs.border_width_left = 1
 	bs.border_width_top = 1
 	bs.border_width_right = 1
 	bs.border_width_bottom = 1
-	bs.border_color = data["color"]
+	bs.border_color = Color(1.0, 1.0, 1.0, 0.4)
 	var bh := bs.duplicate()
-	bh.bg_color = Color(data["color"].r, data["color"].g, data["color"].b, 0.4)
+	bh.bg_color = Color(1.0, 1.0, 1.0, 0.15)
+	bh.border_color = Color(1.0, 1.0, 1.0, 0.9)
 	pbtn.add_theme_stylebox_override("normal", bs)
 	pbtn.add_theme_stylebox_override("hover", bh)
 	pbtn.add_theme_stylebox_override("pressed", bs)
-	pbtn.add_theme_color_override("font_color", data["color"])
+	pbtn.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
 	pbtn.add_theme_color_override("font_hover_color", Color.WHITE)
 	pbtn.pressed.connect(_on_world_play.bind(idx))
 	card.add_child(pbtn)
@@ -525,18 +511,12 @@ func _build_settings_panel() -> void:
 	card.position = Vector2(SCREEN_W / 2.0 - 250, 100)
 	card.size = Vector2(500, 520)
 	var card_style := StyleBoxFlat.new()
-	card_style.bg_color = Color(0.08, 0.09, 0.13, 0.95)
-	card_style.corner_radius_top_left = 14
-	card_style.corner_radius_top_right = 14
-	card_style.corner_radius_bottom_left = 14
-	card_style.corner_radius_bottom_right = 14
+	card_style.bg_color = Color(0.0, 0.0, 0.0, 0.0)
 	card_style.border_width_left = 1
 	card_style.border_width_top = 1
 	card_style.border_width_right = 1
 	card_style.border_width_bottom = 1
-	card_style.border_color = Color(0.25, 0.24, 0.3)
-	card_style.shadow_color = Color(0, 0, 0, 0.3)
-	card_style.shadow_size = 12
+	card_style.border_color = Color(1.0, 1.0, 1.0, 0.2)
 	card.add_theme_stylebox_override("panel", card_style)
 	settings_panel.add_child(card)
 
@@ -546,13 +526,13 @@ func _build_settings_panel() -> void:
 	stitle.size = Vector2(500, 40)
 	stitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	stitle.add_theme_font_size_override("font_size", 32)
-	stitle.add_theme_color_override("font_color", Color(0.95, 0.88, 0.72))
+	stitle.add_theme_color_override("font_color", Color.WHITE)
 	card.add_child(stitle)
 
 	var sdiv := ColorRect.new()
 	sdiv.position = Vector2(50, 65)
 	sdiv.size = Vector2(400, 1)
-	sdiv.color = Color(0.3, 0.28, 0.35, 0.5)
+	sdiv.color = Color(1.0, 1.0, 1.0, 0.12)
 	card.add_child(sdiv)
 
 	var audio_hdr := Label.new()
@@ -560,7 +540,7 @@ func _build_settings_panel() -> void:
 	audio_hdr.position = Vector2(40, 85)
 	audio_hdr.size = Vector2(200, 25)
 	audio_hdr.add_theme_font_size_override("font_size", 18)
-	audio_hdr.add_theme_color_override("font_color", Color(0.7, 0.68, 0.65))
+	audio_hdr.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	card.add_child(audio_hdr)
 
 	_build_slider(card, "Master Volume", 120, master_vol, "_on_master_vol_changed")
@@ -572,7 +552,7 @@ func _build_settings_panel() -> void:
 	disp_hdr.position = Vector2(40, 295)
 	disp_hdr.size = Vector2(200, 25)
 	disp_hdr.add_theme_font_size_override("font_size", 18)
-	disp_hdr.add_theme_color_override("font_color", Color(0.7, 0.68, 0.65))
+	disp_hdr.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	card.add_child(disp_hdr)
 
 	var fs_label := Label.new()
@@ -580,7 +560,7 @@ func _build_settings_panel() -> void:
 	fs_label.position = Vector2(40, 330)
 	fs_label.size = Vector2(200, 25)
 	fs_label.add_theme_font_size_override("font_size", 15)
-	fs_label.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
+	fs_label.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	card.add_child(fs_label)
 	var fs_btn := CheckButton.new()
 	fs_btn.position = Vector2(380, 328)
@@ -593,7 +573,7 @@ func _build_settings_panel() -> void:
 	shake_label.position = Vector2(40, 370)
 	shake_label.size = Vector2(200, 25)
 	shake_label.add_theme_font_size_override("font_size", 15)
-	shake_label.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
+	shake_label.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	card.add_child(shake_label)
 	var shake_btn := CheckButton.new()
 	shake_btn.position = Vector2(380, 368)
@@ -607,27 +587,24 @@ func _build_settings_panel() -> void:
 	reset_btn.size = Vector2(250, 38)
 	reset_btn.add_theme_font_size_override("font_size", 14)
 	var rs := StyleBoxFlat.new()
-	rs.bg_color = Color(0.3, 0.12, 0.12, 0.6)
-	rs.corner_radius_top_left = 6
-	rs.corner_radius_top_right = 6
-	rs.corner_radius_bottom_left = 6
-	rs.corner_radius_bottom_right = 6
+	rs.bg_color = Color(0.0, 0.0, 0.0, 0.0)
 	rs.border_width_left = 1
 	rs.border_width_top = 1
 	rs.border_width_right = 1
 	rs.border_width_bottom = 1
-	rs.border_color = Color(0.6, 0.25, 0.25)
+	rs.border_color = Color(1.0, 1.0, 1.0, 0.25)
 	var rh := rs.duplicate()
-	rh.bg_color = Color(0.45, 0.15, 0.15, 0.7)
+	rh.bg_color = Color(1.0, 1.0, 1.0, 0.08)
+	rh.border_color = Color(1.0, 1.0, 1.0, 0.6)
 	reset_btn.add_theme_stylebox_override("normal", rs)
 	reset_btn.add_theme_stylebox_override("hover", rh)
 	reset_btn.add_theme_stylebox_override("pressed", rs)
-	reset_btn.add_theme_color_override("font_color", Color(0.85, 0.4, 0.4))
-	reset_btn.add_theme_color_override("font_hover_color", Color(1.0, 0.5, 0.5))
+	reset_btn.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
+	reset_btn.add_theme_color_override("font_hover_color", Color(0.85, 0.85, 0.85))
 	reset_btn.pressed.connect(_on_reset_progress)
 	card.add_child(reset_btn)
 
-	var back_btn := _create_menu_button("<- Back to Menu", Color(0.6, 0.58, 0.65), 18)
+	var back_btn := _create_menu_button("<- back", 16)
 	back_btn.position = Vector2(SCREEN_W / 2.0 - 190, SCREEN_H - 65)
 	back_btn.pressed.connect(_on_back_to_main)
 	settings_panel.add_child(back_btn)
@@ -639,7 +616,7 @@ func _build_slider(parent: Control, label_text: String, y_pos: float, initial: f
 	lbl.position = Vector2(40, y_pos)
 	lbl.size = Vector2(150, 25)
 	lbl.add_theme_font_size_override("font_size", 15)
-	lbl.add_theme_color_override("font_color", Color(0.6, 0.58, 0.55))
+	lbl.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	parent.add_child(lbl)
 
 	var slider := HSlider.new()
@@ -657,7 +634,7 @@ func _build_slider(parent: Control, label_text: String, y_pos: float, initial: f
 	val_lbl.position = Vector2(395, y_pos)
 	val_lbl.size = Vector2(60, 25)
 	val_lbl.add_theme_font_size_override("font_size", 14)
-	val_lbl.add_theme_color_override("font_color", Color(0.5, 0.48, 0.45))
+	val_lbl.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 	parent.add_child(val_lbl)
 
 	slider.value_changed.connect(func(val: float) -> void:
@@ -681,18 +658,12 @@ func _build_credits_panel() -> void:
 	card.position = Vector2(SCREEN_W / 2.0 - 280, 80)
 	card.size = Vector2(560, 560)
 	var cs := StyleBoxFlat.new()
-	cs.bg_color = Color(0.08, 0.09, 0.13, 0.95)
-	cs.corner_radius_top_left = 14
-	cs.corner_radius_top_right = 14
-	cs.corner_radius_bottom_left = 14
-	cs.corner_radius_bottom_right = 14
+	cs.bg_color = Color(0.0, 0.0, 0.0, 0.0)
 	cs.border_width_left = 1
 	cs.border_width_top = 1
 	cs.border_width_right = 1
 	cs.border_width_bottom = 1
-	cs.border_color = Color(0.25, 0.24, 0.3)
-	cs.shadow_color = Color(0, 0, 0, 0.3)
-	cs.shadow_size = 12
+	cs.border_color = Color(1.0, 1.0, 1.0, 0.2)
 	card.add_theme_stylebox_override("panel", cs)
 	credits_panel.add_child(card)
 
@@ -702,13 +673,13 @@ func _build_credits_panel() -> void:
 	cr_title.size = Vector2(560, 45)
 	cr_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cr_title.add_theme_font_size_override("font_size", 34)
-	cr_title.add_theme_color_override("font_color", Color(0.95, 0.88, 0.72))
+	cr_title.add_theme_color_override("font_color", Color.WHITE)
 	card.add_child(cr_title)
 
 	var cdiv := ColorRect.new()
 	cdiv.position = Vector2(60, 75)
 	cdiv.size = Vector2(440, 1)
-	cdiv.color = Color(0.3, 0.28, 0.35, 0.5)
+	cdiv.color = Color(1.0, 1.0, 1.0, 0.12)
 	card.add_child(cdiv)
 
 	var entries := [
@@ -730,7 +701,7 @@ func _build_credits_panel() -> void:
 		role_lbl.size = Vector2(480, 20)
 		role_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		role_lbl.add_theme_font_size_override("font_size", 12)
-		role_lbl.add_theme_color_override("font_color", Color(0.5, 0.48, 0.55))
+		role_lbl.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4))
 		card.add_child(role_lbl)
 
 		var name_lbl := Label.new()
@@ -739,7 +710,7 @@ func _build_credits_panel() -> void:
 		name_lbl.size = Vector2(480, 25)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name_lbl.add_theme_font_size_override("font_size", 18)
-		name_lbl.add_theme_color_override("font_color", Color(0.85, 0.82, 0.78))
+		name_lbl.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
 		card.add_child(name_lbl)
 		y_offset += 52.0
 
@@ -749,10 +720,10 @@ func _build_credits_panel() -> void:
 	love_lbl.size = Vector2(560, 25)
 	love_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	love_lbl.add_theme_font_size_override("font_size", 13)
-	love_lbl.add_theme_color_override("font_color", Color(0.45, 0.42, 0.4))
+	love_lbl.add_theme_color_override("font_color", Color(0.35, 0.35, 0.35))
 	card.add_child(love_lbl)
 
-	var back_btn := _create_menu_button("<- Back to Menu", Color(0.6, 0.58, 0.65), 18)
+	var back_btn := _create_menu_button("<- back", 16)
 	back_btn.position = Vector2(SCREEN_W / 2.0 - 190, SCREEN_H - 65)
 	back_btn.pressed.connect(_on_back_to_main)
 	credits_panel.add_child(back_btn)
@@ -762,47 +733,39 @@ func _build_credits_panel() -> void:
 # UI HELPERS
 # ═══════════════════════════════════════════════════════════════
 
-func _create_menu_button(text: String, color: Color, font_size: int) -> Button:
+func _create_menu_button(text: String, font_size: int) -> Button:
 	var btn := Button.new()
 	btn.text = text
 	btn.custom_minimum_size = Vector2(280, 42)
 	btn.add_theme_font_size_override("font_size", font_size)
 
 	var style_n := StyleBoxFlat.new()
-	style_n.bg_color = Color(0.12, 0.13, 0.18, 0.85)
-	style_n.corner_radius_top_left = 8
-	style_n.corner_radius_top_right = 8
-	style_n.corner_radius_bottom_left = 8
-	style_n.corner_radius_bottom_right = 8
-	style_n.border_width_left = 2
+	style_n.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+	style_n.border_width_left = 1
 	style_n.border_width_top = 0
 	style_n.border_width_right = 0
 	style_n.border_width_bottom = 0
-	style_n.border_color = color
-	style_n.content_margin_left = 20
-	style_n.content_margin_right = 20
+	style_n.border_color = Color(1.0, 1.0, 1.0, 0.5)
+	style_n.content_margin_left = 16
+	style_n.content_margin_right = 16
 
 	var style_h := style_n.duplicate()
-	style_h.bg_color = Color(0.18, 0.19, 0.26, 0.9)
-	style_h.border_width_left = 4
-	style_h.shadow_color = Color(color.r, color.g, color.b, 0.12)
-	style_h.shadow_size = 4
+	style_h.bg_color = Color(1.0, 1.0, 1.0, 0.12)
+	style_h.border_color = Color(1.0, 1.0, 1.0, 1.0)
 
 	var style_p := style_n.duplicate()
-	style_p.bg_color = Color(0.1, 0.1, 0.14, 0.9)
+	style_p.bg_color = Color(1.0, 1.0, 1.0, 0.06)
 
 	var style_d := style_n.duplicate()
-	style_d.bg_color = Color(0.1, 0.1, 0.12, 0.5)
+	style_d.border_color = Color(1.0, 1.0, 1.0, 0.15)
 
 	btn.add_theme_stylebox_override("normal", style_n)
 	btn.add_theme_stylebox_override("hover", style_h)
 	btn.add_theme_stylebox_override("pressed", style_p)
 	btn.add_theme_stylebox_override("disabled", style_d)
-	btn.add_theme_color_override("font_color", color)
-	btn.add_theme_color_override("font_hover_color", Color(
-		minf(color.r + 0.3, 1.0), minf(color.g + 0.3, 1.0), minf(color.b + 0.3, 1.0)
-	))
-	btn.add_theme_color_override("font_disabled_color", Color(0.35, 0.33, 0.3))
+	btn.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+	btn.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 1.0))
+	btn.add_theme_color_override("font_disabled_color", Color(0.3, 0.3, 0.3))
 	btn.mouse_entered.connect(_on_button_hover.bind(btn))
 	menu_buttons.append(btn)
 	return btn
@@ -940,6 +903,12 @@ func _on_world_play(world_index: int) -> void:
 	_play_tv_close_and_load(func() -> void:
 		LevelManager.load_world(world_index)
 	)
+
+
+func _on_mute_pressed() -> void:
+	if AudioManager:
+		AudioManager.music_muted = not AudioManager.music_muted
+		mute_btn.text = "[✕]" if AudioManager.music_muted else "[♪]"
 
 
 func _on_master_vol_changed(val: float) -> void:

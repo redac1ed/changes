@@ -19,6 +19,12 @@ var camera: Camera2D
 
 func _ready() -> void:
 	print("[LevelTemplate] _ready() — world=%d level=%d" % [world_number, level_number])
+
+	# Tutorial (world 0) has no background music
+	if world_number == 0:
+		if AudioManager:
+			AudioManager.stop_music(0.5)
+
 	# Spawn ball at spawn point
 	if ball_spawn:
 		ball = ball_scene.instantiate()
