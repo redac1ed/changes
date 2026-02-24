@@ -4,6 +4,9 @@
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="2_goal"]
 [ext_resource type="Script" uid="uid://btfs6tvq53fxc" path="res://scripts/moving_platform.gd" id="3_moving_platform"]
 [ext_resource type="Script" uid="uid://cowswmrclhjrt" path="res://scripts/mechanics/lava_hazard.gd" id="4_lava"]
+[ext_resource type="PackedScene" path="res://scenes/tree_1.tscn" id="6_tree1"]
+[ext_resource type="PackedScene" path="res://scenes/tree_2.tscn" id="7_tree2"]
+[ext_resource type="PackedScene" path="res://scenes/tree_3.tscn" id="8_tree3"]
 
 [sub_resource type="RectangleShape2D" id="rect_floor_lg"]
 size = Vector2(800, 40)
@@ -121,6 +124,24 @@ offset_top = 85.0
 offset_right = 4380.0
 offset_bottom = 118.0
 color = Color(1, 1, 1, 0.12)
+
+[node name="Tree1" parent="." instance=ExtResource("6_tree1")]
+position = Vector2(400, 690)
+scale = Vector2(0.3, 0.3)
+
+[node name="Tree2" parent="." instance=ExtResource("7_tree2")]
+position = Vector2(1200, 690)
+scale = Vector2(0.4, 0.4)
+
+[node name="Tree3" parent="." instance=ExtResource("8_tree3")]
+position = Vector2(2500, 690)
+scale = Vector2(0.35, 0.35)
+
+[node name="Tree4" parent="." instance=ExtResource("6_tree1")]
+position = Vector2(3500, 690)
+scale = Vector2(0.45, 0.45)
+
+
 
 [node name="HillBg5" type="ColorRect" parent="." unique_id=2019620139]
 offset_left = 3500.0
