@@ -158,7 +158,7 @@ func _create_particle_emitter(preset_name: String) -> CPUParticles2D:
 		push_error("[ParticleManager] Invalid preset: %s" % preset_name)
 		return CPUParticles2D.new()
 	
-	var preset := PRESETS[preset_name]
+	var preset: Dictionary = PRESETS[preset_name]
 	var particles := CPUParticles2D.new()
 	
 	particles.lifetime = preset.get("lifetime", 0.6)
@@ -213,7 +213,7 @@ func emit_at(preset: String, position: Vector2) -> void:
 	particles.finished.connect(func():
 		if particles in _active_particles:
 			_active_particles.erase(particles)
-		if not pool.is_full():
+		if pool.size() < _pool_size:
 			pool.append(particles)
 	)
 
@@ -268,10 +268,10 @@ func emit_explosion(position: Vector2, intensity: float = 1.0) -> void:
 
 func create_collision_effect(impact_position: Vector2, impact_force: float) -> void:
 	"""Create dynamic collision effect based on impact force"""
-	var intensity := clampf(impact_force / 500.0, 0.5, 3.0)
+	var intensity: float = clampf(impact_force / 500.0, 0.5, 3.0)
 	
 	# Select preset based on force
-	var preset := "bounce_impact" if impact_force < 300 else "wind_burst"
+	var preset: String = "bounce_impact" if impact_force < 300 else "wind_burst"
 	
 	var particles := _create_particle_emitter(preset)
 	particles.global_position = impact_position

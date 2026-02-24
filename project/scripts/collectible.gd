@@ -583,8 +583,7 @@ static var PRESET_SPECS: Dictionary = {
 }
 
 
-@staticmethod
-func create_from_preset(preset_name: String, position: Vector2) -> Node:
+static func create_from_preset(preset_name: String, position: Vector2) -> Node:
 	"""Factory method to create collectible from preset"""
 	if not PRESET_SPECS.has(preset_name):
 		push_error("Unknown preset: %s" % preset_name)
@@ -615,8 +614,7 @@ func create_from_preset(preset_name: String, position: Vector2) -> Node:
 	return collectible
 
 
-@staticmethod
-func create_batch(preset_name: String, positions: Array[Vector2]) -> Array[Node]:
+static func create_batch(preset_name: String, positions: Array[Vector2]) -> Array[Node]:
 	"""Create multiple collectibles from preset"""
 	var collectibles: Array[Node] = []
 	for pos in positions:

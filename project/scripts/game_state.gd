@@ -291,9 +291,13 @@ func is_game_completed() -> bool:
 func print_session_report() -> void:
 	"""Print comprehensive session statistics"""
 	var stats := get_statistics_summary()
-	print("\n" + "═" * 50)
+	var divider := ""
+	for i in range(50):
+		divider += "═"
+	
+	print("\n" + divider)
 	print("GAME SESSION REPORT")
-	print("═" * 50)
+	print(divider)
 	print("Duration: %.1f minutes" % (stats["session_duration"] / 60.0))
 	print("Levels Completed: %d" % stats["levels_completed"])
 	print("Total Shots: %d (avg %.1f per level)" % [stats["shots_fired"], get_average_shots_per_level()])
@@ -301,4 +305,4 @@ func print_session_report() -> void:
 	print("Total Score: %d" % stats["total_score"])
 	print("Deaths: %d" % stats["deaths"])
 	print("Achievements: %d/%d" % [stats["achievements"]["unlocked"], stats["achievements"]["total"]])
-	print("═" * 50 + "\n")
+	print(divider + "\n")

@@ -242,9 +242,9 @@ func apply_springboard_bounce(ball: RigidBody2D, direction: Vector2 = Vector2.UP
 
 func apply_soft_bounce(ball: RigidBody2D) -> void:
 	"""Gentle bounce (cloud-like)"""
-	var current_speed := ball.linear_velocity.length()
-	var reduced_speed := max(current_speed * 0.4, 100.0)
-	var normal := (ball.global_position - global_position).normalized()
+	var current_speed: float = ball.linear_velocity.length()
+	var reduced_speed: float = max(current_speed * 0.4, 100.0)
+	var normal: Vector2 = (ball.global_position - global_position).normalized()
 	ball.linear_velocity = normal * reduced_speed
 	_squash = 0.3
 	_spawn_bounce_particles(ball.global_position)
@@ -252,9 +252,9 @@ func apply_soft_bounce(ball: RigidBody2D) -> void:
 
 func apply_explosive_bounce(ball: RigidBody2D) -> void:
 	"""Maximum power bounce (rocket-like)"""
-	var current_speed := ball.linear_velocity.length()
-	var boosted_speed := min(current_speed * 2.5, 2000.0)
-	var normal := (ball.global_position - global_position).normalized()
+	var current_speed: float = ball.linear_velocity.length()
+	var boosted_speed: float = min(current_speed * 2.5, 2000.0)
+	var normal: Vector2 = (ball.global_position - global_position).normalized()
 	ball.linear_velocity = normal * boosted_speed
 	_squash = 1.0
 	
