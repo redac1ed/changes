@@ -350,3 +350,234 @@ func _on_collision(body: Node) -> void:
 
 func _is_resting() -> bool:
 	return linear_velocity.length() < REST_THRESHOLD or freeze
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TRAJECTORY PREDICTION SYSTEM
+# ═══════════════════════════════════════════════════════════════════════════
+
+func get_trajectory_path(initial_velocity: Vector2, max_points: int = 60) -> PackedVector2Array:
+	"""Predict ball trajectory path given initial velocity"""
+	var path := PackedVector2Array()
+	var pos := global_position
+	var vel := initial_velocity
+	var gravity := get_gravity()
+	var dt := 0.016  # Approximate 60 FPS frame time
+	var friction_factor := 0.99
+	
+	path.append(pos)
+	
+	for i in range(max_points):
+		# Apply gravity
+		vel += gravity * dt
+		
+		# Apply friction over time
+		vel *= friction_factor
+		
+		# Update position
+		pos += vel * dt
+		
+		# Stop if out of bounds or velocity negligible
+		if not world_bounds.has_point(pos) or vel.length() < 5.0:
+			break
+		
+		path.append(pos)
+	
+	return path
+
+
+func get_trajectory_endpoints() -> Dictionary:
+	"""Get start, peak, and landing points of trajectory"""
+	var drag_force := (drag_current - drag_start).normalized()
+	var power := (drag_current - drag_start).length() / drag_radius
+	power = clampf(power, 0.0, 1.0)
+	var launch_velocity := drag_force * max_power * power
+	
+	var path := get_trajectory_path(launch_velocity)
+	
+	var peak := global_position
+	var peak_y := global_position.y
+	var landing := global_position
+	
+	for point in path:
+		if point.y < peak_y:
+			peak = point
+			peak_y = point.y
+		landing = point
+	
+	return {
+		"start": global_position,
+		"peak": peak,
+		"landing": landing,
+		"peak_height": global_position.y - peak_y,
+		"distance": global_position.distance_to(landing),
+	}
+
+
+func predict_landing_zone(launch_velocity: Vector2) -> Rect2:
+	"""Predict rectangular zone where ball might land"""
+	var path := get_trajectory_path(launch_velocity, 120)
+	if path.is_empty():
+		return Rect2(global_position, Vector2(100, 100))
+	
+	var min_x := global_position.x
+	var max_x := global_position.x
+	var min_y := global_position.y
+	var max_y := global_position.y
+	
+	for point in path:
+		min_x = minf(min_x, point.x)
+		max_x = maxf(max_x, point.x)
+		min_y = minf(min_y, point.y)
+		max_y = maxf(max_y, point.y)
+	
+	return Rect2(Vector2(min_x, min_y), Vector2(max_x - min_x, max_y - min_y))
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# POWER & MOMENTUM ANALYTICS
+# ═══════════════════════════════════════════════════════════════════════════
+
+func get_current_power() -> float:
+	"""Get current drag power as 0-1"""
+	if not is_dragging:
+		return 0.0
+	return (drag_current - drag_start).length() / drag_radius
+
+
+func get_momentum() -> float:
+	"""Return current kinetic energy indicator"""
+	return linear_velocity.length()
+
+
+func get_momentum_ratio() -> float:
+	"""Return momentum as ratio to max_power"""
+	return get_momentum() / max_power
+
+
+func get_impact_force() -> float:
+	"""Calculate impact force from last collision"""
+	return _prev_speed
+
+
+func get_shot_statistics() -> Dictionary:
+	"""Return comprehensive shot statistics"""
+	return {
+		"shot_count": shot_count,
+		"current_velocity": linear_velocity.length(),
+		"max_velocity": max_power,
+		"momentum_ratio": get_momentum_ratio(),
+		"impact_force": get_impact_force(),
+		"is_moving": not _is_resting(),
+		"is_dragging": is_dragging,
+	}
+
+
+func get_velocity_direction() -> Vector2:
+	"""Get normalized velocity direction"""
+	var vel := linear_velocity
+	if vel.length() < 0.1:
+		return Vector2.ZERO
+	return vel.normalized()
+
+
+func get_velocity_angle() -> float:
+	"""Get velocity angle in degrees (0 = right, 90 = up)"""
+	return rad_to_deg(get_velocity_direction().angle())
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ADVANCED PHYSICS HELPERS
+# ═══════════════════════════════════════════════════════════════════════════
+
+func apply_force_impulse(direction: Vector2, magnitude: float) -> void:
+	"""Apply instant velocity boost in direction"""
+	linear_velocity += direction.normalized() * magnitude
+
+
+func apply_directional_boost(angle_degrees: float, magnitude: float) -> void:
+	"""Boost ball in specific angle"""
+	var direction := Vector2(cos(deg_to_rad(angle_degrees)), -sin(deg_to_rad(angle_degrees)))
+	apply_force_impulse(direction, magnitude)
+
+
+func clamp_velocity(max_speed: float) -> void:
+	"""Limit maximum velocity"""
+	if linear_velocity.length() > max_speed:
+		linear_velocity = linear_velocity.normalized() * max_speed
+
+
+func apply_damping(damping_factor: float) -> void:
+	"""Apply velocity damping (0.9 = 10% reduction per frame)"""
+	linear_velocity *= damping_factor
+
+
+func reverse_velocity() -> void:
+	"""Reverse direction of ball"""
+	linear_velocity = -linear_velocity
+
+
+func reflect_off_surface(surface_normal: Vector2) -> void:
+	"""Bounce ball off surface with proper reflection"""
+	linear_velocity = linear_velocity.reflect(surface_normal)
+
+
+func set_velocity_toward_target(target: Vector2, speed: float) -> void:
+	"""Aim ball toward specific target at speed"""
+	var direction := (target - global_position).normalized()
+	linear_velocity = direction * speed
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# VISUAL FEEDBACK ENHANCEMENTS
+# ═══════════════════════════════════════════════════════════════════════════
+
+func draw_trajectory_preview(positions: PackedVector2Array) -> void:
+	"""Helper to queue redraw of trajectory"""
+	queue_redraw()
+
+
+func get_power_ring_scale() -> float:
+	"""Get visual scale for power/charge ring"""
+	return get_current_power()
+
+
+func get_glow_intensity() -> float:
+	"""Get glow intensity based on velocity"""
+	var ratio := get_momentum_ratio()
+	return 0.2 + (ratio * 0.8)  # Range 0.2 - 1.0
+
+
+func get_trail_color() -> Color:
+	"""Get trail color based on speed"""
+	var ratio := clampf(get_momentum_ratio(), 0.0, 1.0)
+	# Gradient from cool to hot as speed increases
+	return Color(ratio, 0.5, 1.0 - ratio).lerp(Color.WHITE, ratio * 0.3)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# STATE QUERYING
+# ═══════════════════════════════════════════════════════════════════════════
+
+func is_in_slow_mode() -> bool:
+	"""Check if ball can be dragged while moving"""
+	return _drag_slow_mode
+
+
+func can_be_launched() -> bool:
+	"""Determine if ball is in state to be launched"""
+	return _is_resting() and not freeze
+
+
+func get_state_info() -> Dictionary:
+	"""Return comprehensive state information"""
+	return {
+		"position": global_position,
+		"velocity": linear_velocity,
+		"resting": _is_resting(),
+		"frozen": freeze,
+		"dragging": is_dragging,
+		"slow_mode": _drag_slow_mode,
+		"rotation": rotation,
+		"squash": _squash,
+	}

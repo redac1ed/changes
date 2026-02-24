@@ -160,6 +160,10 @@ position = Vector2(200, 460)
 ; ── Goal (on right platform) ──
 [node name="GoalZone" type="Area2D" parent="."]
 position = Vector2(900, 420)
+collision_layer = 1
+collision_mask = 0
+monitoring = true
+monitorable = true
 script = ExtResource("2_goal")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone"]

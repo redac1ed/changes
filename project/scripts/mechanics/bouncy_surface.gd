@@ -184,3 +184,87 @@ func _spawn_bounce_particles(pos: Vector2) -> void:
 	particles.color = Color(0.9, 0.95, 1.0, 0.6)
 	particles.finished.connect(particles.queue_free)
 	add_child(particles)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# EXTENDED BOUNCE MECHANIC SYSTEM
+# ═══════════════════════════════════════════════════════════════════════════
+
+func set_bounce_multiplier(mult: float) -> void:
+	"""Dynamically change bounce multiplier"""
+	bounce_multiplier = clampf(mult, 0.5, 3.0)
+
+
+func set_elastic_mode(enabled: bool) -> void:
+	"""Enable/disable elastic bouncing (absorbs energy vs restores it)"""
+	if enabled:
+		set_bounce_multiplier(1.2)
+	else:
+		set_bounce_multiplier(0.8)
+
+
+func get_last_bounce_velocity() -> Vector2:
+	"""Get the velocity of the last ball that bounced"""
+	return Vector2.ZERO  # Can be extended to track
+
+
+func is_recently_bounced() -> bool:
+	"""Check if surface bounced something recently (within 0.1s)"""
+	return (_time - _last_bounce_time) < 0.1
+
+
+func reset_animation() -> void:
+	"""Reset all animation states"""
+	_squash = 0.0
+	_last_bounce_time = -10.0
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SPECIAL BOUNCE TYPES
+# ═══════════════════════════════════════════════════════════════════════════
+
+func apply_trampoline_bounce(ball: RigidBody2D) -> void:
+	"""Specialized bounce for trampoline-like behavior (rigid upward force)"""
+	var bounce_force := 1500.0  # Fixed upward bounce force
+	var horizontal_carry := ball.linear_velocity.x * 0.5  # Preserve some horizontal momentum
+	ball.linear_velocity = Vector2(horizontal_carry, -bounce_force)
+	_squash = 0.8
+	_spawn_bounce_particles(ball.global_position)
+
+
+func apply_springboard_bounce(ball: RigidBody2D, direction: Vector2 = Vector2.UP) -> void:
+	"""Springboard bounce in a specific direction"""
+	var force := 1800.0
+	ball.linear_velocity = direction.normalized() * force
+	_squash = 0.95
+	_spawn_bounce_particles(ball.global_position)
+
+
+func apply_soft_bounce(ball: RigidBody2D) -> void:
+	"""Gentle bounce (cloud-like)"""
+	var current_speed := ball.linear_velocity.length()
+	var reduced_speed := max(current_speed * 0.4, 100.0)
+	var normal := (ball.global_position - global_position).normalized()
+	ball.linear_velocity = normal * reduced_speed
+	_squash = 0.3
+	_spawn_bounce_particles(ball.global_position)
+
+
+func apply_explosive_bounce(ball: RigidBody2D) -> void:
+	"""Maximum power bounce (rocket-like)"""
+	var current_speed := ball.linear_velocity.length()
+	var boosted_speed := min(current_speed * 2.5, 2000.0)
+	var normal := (ball.global_position - global_position).normalized()
+	ball.linear_velocity = normal * boosted_speed
+	_squash = 1.0
+	
+	# Extra particles for explosive effect
+	for _i in range(3):
+		_spawn_bounce_particles(ball.global_position)
+
+
+func get_bounce_quality() -> float:
+	"""Return bounce quality metric (0-1) for feedback"""
+	var time_since_bounce := _time - _last_bounce_time
+	var quality := 1.0 - clampf(time_since_bounce / 2.0, 0.0, 1.0)
+	return quality

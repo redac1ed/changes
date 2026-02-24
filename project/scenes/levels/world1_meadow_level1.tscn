@@ -1,1845 +1,284 @@
-[gd_scene format=3 uid="uid://level1"]
+[gd_scene load_steps=9 format=3 uid="uid://level1"]
 
-[ext_resource type="Script" uid="uid://blaj2gkd602k1" path="res://scripts/level_template.gd" id="1_level"]
-[ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="2_goal"]
-[ext_resource type="Script" uid="uid://btfs6tvq53fxc" path="res://scripts/moving_platform.gd" id="3_moving_platform"]
-[ext_resource type="Script" uid="uid://cowswmrclhjrt" path="res://scripts/mechanics/lava_hazard.gd" id="4_lava"]
-[ext_resource type="PackedScene" path="res://scenes/tree_1.tscn" id="6_tree1"]
-[ext_resource type="PackedScene" path="res://scenes/tree_2.tscn" id="7_tree2"]
-[ext_resource type="PackedScene" path="res://scenes/tree_3.tscn" id="8_tree3"]
+[ext_resource type="Script" path="res://scripts/level_template.gd" id="1_level"]
+[ext_resource type="Script" path="res://scripts/goal.gd" id="2_goal"]
+[ext_resource type="PackedScene" path="res://scenes/tree_1.tscn" id="3_tree1"]
+[ext_resource type="PackedScene" path="res://scenes/tree_2.tscn" id="4_tree2"]
+[ext_resource type="PackedScene" path="res://scenes/tree_3.tscn" id="5_tree3"]
 
-[sub_resource type="RectangleShape2D" id="rect_floor_lg"]
-size = Vector2(800, 40)
+[sub_resource type="RectangleShape2D" id="rect_floor_main"]
+size = Vector2(2400, 40)
 
-[sub_resource type="RectangleShape2D" id="rect_lava_sm"]
-size = Vector2(160, 36)
+[sub_resource type="RectangleShape2D" id="rect_platform_lg"]
+size = Vector2(300, 20)
 
-[sub_resource type="RectangleShape2D" id="rect_floor_md"]
-size = Vector2(500, 40)
+[sub_resource type="RectangleShape2D" id="rect_platform_md"]
+size = Vector2(240, 20)
 
-[sub_resource type="RectangleShape2D" id="rect_wall_med"]
-size = Vector2(40, 180)
+[sub_resource type="RectangleShape2D" id="rect_platform_sm"]
+size = Vector2(160, 20)
 
-[sub_resource type="RectangleShape2D" id="rect_lava_lg"]
-size = Vector2(320, 57)
-
-[sub_resource type="RectangleShape2D" id="rect_lava_md"]
-size = Vector2(240, 57)
-
-[sub_resource type="RectangleShape2D" id="rect_plat_sm"]
-size = Vector2(120, 18)
-
-[sub_resource type="RectangleShape2D" id="rect_floor_sm"]
-size = Vector2(300, 40)
-
-[sub_resource type="RectangleShape2D" id="rect_plat_md"]
-size = Vector2(180, 20)
-
-[sub_resource type="RectangleShape2D" id="rect_wall_short"]
-size = Vector2(40, 120)
-
-[sub_resource type="RectangleShape2D" id="rect_wall_tall"]
-size = Vector2(40, 260)
-
-[sub_resource type="RectangleShape2D" id="rect_plat_xs"]
-size = Vector2(78, 12)
+[sub_resource type="RectangleShape2D" id="rect_wall"]
+size = Vector2(40, 800)
 
 [sub_resource type="CircleShape2D" id="circle_goal"]
 radius = 35.0
 
-[sub_resource type="RectangleShape2D" id="rect_floor_xs"]
-size = Vector2(160, 40)
-
-[sub_resource type="ConvexPolygonShape2D" id="ramp_down"]
-points = PackedVector2Array(-100, -30, 100, 30, -100, 30)
-
-[sub_resource type="RectangleShape2D" id="rect_pillar"]
-size = Vector2(30, 100)
-
-[sub_resource type="RectangleShape2D" id="rect_floor_xl"]
-size = Vector2(1200, 71)
-
-[sub_resource type="RectangleShape2D" id="rect_bnd_h"]
-size = Vector2(6000, 400)
-
-[sub_resource type="RectangleShape2D" id="rect_bnd_v"]
-size = Vector2(400, 2000)
-
-[node name="World1MeadowLevel1" type="Node2D" unique_id=381295166]
+[node name="World1MeadowLevel1" type="Node2D"]
 script = ExtResource("1_level")
-camera_limits = Rect2(0, 0, 4800, 800)
+level_number = 1
+world_number = 1
+camera_limits = Rect2(0, 0, 2400, 800)
 
-[node name="Background" type="ColorRect" parent="." unique_id=1080920479]
-offset_left = -637.0
-offset_top = -804.0
-offset_right = 5763.0
-offset_bottom = 1596.0
+; ══════════════════════════════════════════════════════════════
+; BACKGROUND & SCENERY
+; ══════════════════════════════════════════════════════════════
+
+[node name="Background" type="ColorRect" parent="."]
+z_index = -5
+offset_right = 2400.0
+offset_bottom = 800.0
 color = Color(0.68, 0.86, 0.97, 1)
 
-[node name="SkyGradient" type="ColorRect" parent="." unique_id=648877158]
-offset_left = -800.0
-offset_top = -800.0
-offset_right = 5600.0
-offset_bottom = 200.0
+[node name="SkyGradient" type="ColorRect" parent="."]
+z_index = -4
+offset_right = 2400.0
+offset_bottom = 400.0
 color = Color(0.55, 0.78, 0.96, 0.5)
 
-[node name="CloudLayer" type="ColorRect" parent="." unique_id=927991456]
+[node name="CloudLayer1" type="ColorRect" parent="."]
 offset_left = 200.0
 offset_top = 60.0
 offset_right = 460.0
 offset_bottom = 100.0
 color = Color(1, 1, 1, 0.18)
 
-[node name="CloudLayer2" type="ColorRect" parent="." unique_id=623066263]
+[node name="CloudLayer2" type="ColorRect" parent="."]
 offset_left = 900.0
 offset_top = 90.0
 offset_right = 1200.0
 offset_bottom = 125.0
 color = Color(1, 1, 1, 0.14)
 
-[node name="CloudLayer3" type="ColorRect" parent="." unique_id=1549045568]
+[node name="CloudLayer3" type="ColorRect" parent="."]
 offset_left = 1700.0
 offset_top = 50.0
 offset_right = 2050.0
 offset_bottom = 88.0
 color = Color(1, 1, 1, 0.16)
 
-[node name="CloudLayer4" type="ColorRect" parent="." unique_id=1127393363]
-offset_left = 2600.0
-offset_top = 75.0
-offset_right = 2900.0
-offset_bottom = 110.0
-color = Color(1, 1, 1, 0.13)
-
-[node name="CloudLayer5" type="ColorRect" parent="." unique_id=87050136]
-offset_left = 3400.0
-offset_top = 55.0
-offset_right = 3700.0
-offset_bottom = 90.0
-color = Color(1, 1, 1, 0.15)
-
-[node name="CloudLayer6" type="ColorRect" parent="." unique_id=1327013881]
-offset_left = 4100.0
-offset_top = 85.0
-offset_right = 4380.0
-offset_bottom = 118.0
-color = Color(1, 1, 1, 0.12)
-
-[node name="Tree1" parent="." instance=ExtResource("6_tree1")]
-position = Vector2(400, 690)
+; ── Decorative trees ──
+[node name="Tree1" parent="." instance=ExtResource("3_tree1")]
+z_index = -3
+position = Vector2(300, 690)
 scale = Vector2(0.3, 0.3)
+modulate = Color(1, 1, 1, 0.6)
 
-[node name="Tree2" parent="." instance=ExtResource("7_tree2")]
-position = Vector2(1200, 690)
-scale = Vector2(0.4, 0.4)
-
-[node name="Tree3" parent="." instance=ExtResource("8_tree3")]
-position = Vector2(2500, 690)
+[node name="Tree2" parent="." instance=ExtResource("4_tree2")]
+z_index = -3
+position = Vector2(1100, 690)
 scale = Vector2(0.35, 0.35)
+modulate = Color(1, 1, 1, 0.65)
 
-[node name="Tree4" parent="." instance=ExtResource("6_tree1")]
-position = Vector2(3500, 690)
-scale = Vector2(0.45, 0.45)
+[node name="Tree3" parent="." instance=ExtResource("5_tree3")]
+z_index = -3
+position = Vector2(2000, 690)
+scale = Vector2(0.32, 0.32)
+modulate = Color(1, 1, 1, 0.55)
 
+; ══════════════════════════════════════════════════════════════
+; LEVEL LAYOUT — PLATFORMS
+; ══════════════════════════════════════════════════════════════
 
+; ── Main Floor ──
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(1200, 700)
 
-[node name="HillBg5" type="ColorRect" parent="." unique_id=2019620139]
-offset_left = 3500.0
-offset_top = 375.0
-offset_right = 4200.0
-offset_bottom = 530.0
-color = Color(0.48, 0.7, 0.34, 0.32)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
+shape = SubResource("rect_floor_main")
 
-[node name="GroundFill" type="ColorRect" parent="." unique_id=1244718934]
-offset_left = -800.0
-offset_top = 690.0
-offset_right = 5600.0
-offset_bottom = 1600.0
-color = Color(0.34, 0.56, 0.2, 1)
-
-[node name="GrassLine" type="ColorRect" parent="." unique_id=1931962715]
-offset_left = -800.0
-offset_top = 686.0
-offset_right = 5600.0
-offset_bottom = 700.0
-color = Color(0.52, 0.82, 0.3, 1)
-
-[node name="GrassDark" type="ColorRect" parent="." unique_id=1617183856]
-offset_left = -800.0
-offset_top = 700.0
-offset_right = 5600.0
-offset_bottom = 720.0
-color = Color(0.3, 0.52, 0.18, 1)
-
-[node name="BallSpawn" type="Marker2D" parent="." unique_id=1162097906]
-position = Vector2(160, 530)
-
-[node name="Floor1" type="StaticBody2D" parent="." unique_id=1584234004]
-position = Vector2(400, 580)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor1" unique_id=752021333]
-shape = SubResource("rect_floor_lg")
-
-[node name="Top" type="ColorRect" parent="Floor1" unique_id=1530876220]
-offset_left = -400.0
+[node name="GrassTop" type="ColorRect" parent="Floor"]
+offset_left = -1200.0
 offset_top = -20.0
-offset_right = 400.0
-color = Color(0.52, 0.78, 0.32, 1)
-
-[node name="Body" type="ColorRect" parent="Floor1" unique_id=1334404102]
-offset_left = -400.0
-offset_right = 400.0
-offset_bottom = 120.0
-color = Color(0.38, 0.62, 0.24, 1)
-
-[node name="DirtLayer" type="ColorRect" parent="Floor1" unique_id=230407071]
-offset_left = -400.0
-offset_top = 40.0
-offset_right = 400.0
-offset_bottom = 120.0
-color = Color(0.45, 0.36, 0.22, 0.6)
-
-[node name="ArrowBg1" type="ColorRect" parent="." unique_id=1373295214]
-offset_left = 358.0
-offset_top = 436.0
-offset_right = 558.0
-offset_bottom = 476.0
-color = Color(0.14, 0.16, 0.1, 0.82)
-
-[node name="ArrowLabel1" type="Label" parent="." unique_id=418213082]
-offset_left = 368.0
-offset_top = 442.0
-offset_right = 552.0
-offset_bottom = 470.0
-theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 1)
-theme_override_font_sizes/font_size = 15
-text = ">>>  This way!  >>>"
-horizontal_alignment = 1
-
-[node name="Flower1" type="ColorRect" parent="." unique_id=1416854475]
-offset_left = 260.0
-offset_top = 548.0
-offset_right = 272.0
-offset_bottom = 560.0
-color = Color(0.95, 0.45, 0.5, 0.7)
-
-[node name="Flower2" type="ColorRect" parent="." unique_id=1622025620]
-offset_left = 440.0
-offset_top = 550.0
-offset_right = 450.0
-offset_bottom = 560.0
-color = Color(0.95, 0.85, 0.3, 0.7)
-
-[node name="Flower3" type="ColorRect" parent="." unique_id=688099034]
-offset_left = 600.0
-offset_top = 549.0
-offset_right = 611.0
-offset_bottom = 560.0
-color = Color(0.6, 0.45, 0.9, 0.7)
-
-[node name="Flower4" type="ColorRect" parent="." unique_id=472882087]
-offset_left = 150.0
-offset_top = 551.0
-offset_right = 160.0
-offset_bottom = 560.0
-color = Color(0.95, 0.7, 0.4, 0.7)
-
-[node name="Lava1" type="Area2D" parent="." unique_id=404849678]
-position = Vector2(920, 720)
-script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12, 1)
-glow_color = Color(1, 0.7, 0.25, 1)
-bubble_count = 5
-surface_wave_speed = 2.2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava1" unique_id=515590652]
-shape = SubResource("rect_lava_sm")
-
-[node name="Floor2" type="StaticBody2D" parent="." unique_id=624109816]
-position = Vector2(1150, 580)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor2" unique_id=616799424]
-shape = SubResource("rect_floor_md")
-
-[node name="Top" type="ColorRect" parent="Floor2" unique_id=640752770]
-offset_left = -250.0
-offset_top = -20.0
-offset_right = 250.0
-color = Color(0.52, 0.78, 0.32, 1)
-
-[node name="Body" type="ColorRect" parent="Floor2" unique_id=1128288992]
-offset_left = -250.0
-offset_right = 250.0
-offset_bottom = 120.0
-color = Color(0.38, 0.62, 0.24, 1)
-
-[node name="DirtLayer" type="ColorRect" parent="Floor2" unique_id=2064053236]
-offset_left = -250.0
-offset_top = 40.0
-offset_right = 250.0
-offset_bottom = 120.0
-color = Color(0.45, 0.36, 0.22, 0.6)
-
-[node name="Wall1" type="StaticBody2D" parent="." unique_id=396471101]
-position = Vector2(1420, 470)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall1" unique_id=692345316]
-shape = SubResource("rect_wall_med")
-
-[node name="Body" type="ColorRect" parent="Wall1" unique_id=528040086]
-offset_left = -20.0
-offset_top = -90.0
-offset_right = 20.0
-offset_bottom = 90.0
-color = Color(0.52, 0.38, 0.22, 1)
-
-[node name="CapTop" type="ColorRect" parent="Wall1" unique_id=172612353]
-offset_left = -24.0
-offset_top = -96.0
-offset_right = 24.0
-offset_bottom = -86.0
-color = Color(0.62, 0.48, 0.28, 1)
-
-[node name="Stripe1" type="ColorRect" parent="Wall1" unique_id=481382132]
-offset_left = -20.0
-offset_top = -50.0
-offset_right = 20.0
-offset_bottom = -40.0
-color = Color(0.72, 0.25, 0.12, 0.6)
-
-[node name="Stripe2" type="ColorRect" parent="Wall1" unique_id=515165084]
-offset_left = -20.0
-offset_right = 20.0
-offset_bottom = 10.0
-color = Color(0.72, 0.25, 0.12, 0.6)
-
-[node name="Stripe3" type="ColorRect" parent="Wall1" unique_id=22462310]
-offset_left = -20.0
-offset_top = 50.0
-offset_right = 20.0
-offset_bottom = 60.0
-color = Color(0.72, 0.25, 0.12, 0.6)
-
-[node name="Floor3" type="StaticBody2D" parent="." unique_id=1387814483]
-position = Vector2(1650, 580)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor3" unique_id=1113215313]
-shape = SubResource("rect_floor_md")
-
-[node name="Top" type="ColorRect" parent="Floor3" unique_id=626980898]
-offset_left = -250.0
-offset_top = -20.0
-offset_right = 250.0
-color = Color(0.52, 0.78, 0.32, 1)
-
-[node name="Body" type="ColorRect" parent="Floor3" unique_id=176615467]
-offset_left = -250.0
-offset_right = 250.0
-offset_bottom = 120.0
-color = Color(0.38, 0.62, 0.24, 1)
-
-[node name="DirtLayer" type="ColorRect" parent="Floor3" unique_id=1521625311]
-offset_left = -250.0
-offset_top = 40.0
-offset_right = 250.0
-offset_bottom = 120.0
-color = Color(0.45, 0.36, 0.22, 0.6)
-
-[node name="Flower5" type="ColorRect" parent="." unique_id=28373098]
-offset_left = 1520.0
-offset_top = 548.0
-offset_right = 1532.0
-offset_bottom = 560.0
-color = Color(0.95, 0.45, 0.5, 0.7)
-
-[node name="Flower6" type="ColorRect" parent="." unique_id=297337171]
-offset_left = 1680.0
-offset_top = 549.0
-offset_right = 1690.0
-offset_bottom = 560.0
-color = Color(0.95, 0.85, 0.3, 0.7)
-
-[node name="Lava2" type="Area2D" parent="." unique_id=196966259]
-position = Vector2(2100, 720)
-script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12, 1)
-glow_color = Color(1, 0.7, 0.25, 1)
-bubble_count = 10
-surface_wave_speed = 2.4
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava2" unique_id=869988121]
-position = Vector2(0, -10.5)
-shape = SubResource("rect_lava_lg")
-
-[node name="Lava2b" type="Area2D" parent="." unique_id=1158637844]
-position = Vector2(2350, 720)
-script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12, 1)
-glow_color = Color(1, 0.7, 0.25, 1)
-bubble_count = 8
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava2b" unique_id=886997537]
-position = Vector2(0, -10.5)
-shape = SubResource("rect_lava_md")
-
-[node name="StepStone1" type="StaticBody2D" parent="." unique_id=481938602]
-position = Vector2(2060, 530)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StepStone1" unique_id=1874970106]
-position = Vector2(57, -22)
-shape = SubResource("rect_plat_sm")
-
-[node name="Top" type="ColorRect" parent="StepStone1" unique_id=1509328711]
-offset_left = -3.0
-offset_top = -31.0
-offset_right = 117.0
-offset_bottom = -22.0
-color = Color(0.52, 0.78, 0.32, 1)
-
-[node name="Body" type="ColorRect" parent="StepStone1" unique_id=1179166352]
-offset_left = -3.0
-offset_top = -22.0
-offset_right = 117.0
-offset_bottom = -2.0
-color = Color(0.42, 0.64, 0.26, 1)
-
-[node name="Side" type="ColorRect" parent="StepStone1" unique_id=1956528931]
-offset_left = -3.0
-offset_top = -13.0
-offset_right = 117.0
-offset_bottom = 2.0
-color = Color(0.34, 0.52, 0.2, 1)
-
-[node name="StepStone2" type="StaticBody2D" parent="." unique_id=400586722]
-position = Vector2(2280, 510)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StepStone2" unique_id=813456544]
-position = Vector2(22, -71)
-shape = SubResource("rect_plat_sm")
-
-[node name="Top" type="ColorRect" parent="StepStone2" unique_id=906123139]
-offset_left = -35.0
-offset_top = -79.0
-offset_right = 85.0
-offset_bottom = -70.0
-color = Color(0.52, 0.78, 0.32, 1)
-
-[node name="Body" type="ColorRect" parent="StepStone2" unique_id=1236622326]
-offset_left = -35.0
-offset_top = -70.0
-offset_right = 85.0
-offset_bottom = -50.0
-color = Color(0.42, 0.64, 0.26, 1)
-
-[node name="Side" type="ColorRect" parent="StepStone2" unique_id=1497518886]
-offset_left = -35.0
-offset_top = -61.0
-offset_right = 85.0
-offset_bottom = -46.0
-color = Color(0.34, 0.52, 0.2, 1)
-
-[node name="Floor4" type="StaticBody2D" parent="." unique_id=1482698564]
-position = Vector2(2550, 580)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor4" unique_id=654916386]
-shape = SubResource("rect_floor_sm")
-
-[node name="Top" type="ColorRect" parent="Floor4" unique_id=1528241529]
-offset_left = -150.0
-offset_top = -20.0
-offset_right = 150.0
-color = Color(0.52, 0.78, 0.32, 1)
-
-[node name="Body" type="ColorRect" parent="Floor4" unique_id=1756315075]
-offset_left = -150.0
-offset_right = 150.0
-offset_bottom = 120.0
-color = Color(0.38, 0.62, 0.24, 1)
-
-[node name="DirtLayer" type="ColorRect" parent="Floor4" unique_id=843780616]
-offset_left = -150.0
-offset_top = 40.0
-offset_right = 150.0
-offset_bottom = 120.0
-color = Color(0.45, 0.36, 0.22, 0.6)
-
-[node name="Lava3" type="Area2D" parent="." unique_id=176007451]
-position = Vector2(2850, 720)
-script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12, 1)
-glow_color = Color(1, 0.7, 0.25, 1)
-bubble_count = 9
-surface_wave_speed = 2.3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava3" unique_id=1474995538]
-shape = SubResource("rect_lava_lg")
-
-[node name="MovPlat1" type="StaticBody2D" parent="." unique_id=1711066387]
-position = Vector2(2850, 480)
-collision_mask = 3
-script = ExtResource("3_moving_platform")
-move_distance = 140.0
-move_speed = 72.0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MovPlat1" unique_id=715302139]
-shape = SubResource("rect_plat_md")
-
-[node name="Top" type="ColorRect" parent="MovPlat1" unique_id=1346234396]
-offset_left = -90.0
-offset_top = -10.0
-offset_right = 90.0
-color = Color(0.35, 0.68, 0.62, 1)
-
-[node name="Body" type="ColorRect" parent="MovPlat1" unique_id=197717503]
-offset_left = -90.0
-offset_right = 90.0
-offset_bottom = 10.0
-color = Color(0.25, 0.52, 0.46, 1)
-
-[node name="IndicL" type="ColorRect" parent="MovPlat1" unique_id=2046223986]
-offset_left = -86.0
-offset_top = -6.0
-offset_right = -76.0
-offset_bottom = 6.0
-color = Color(0.9, 0.9, 0.3, 0.5)
-
-[node name="IndicR" type="ColorRect" parent="MovPlat1" unique_id=1178779903]
-offset_left = 76.0
-offset_top = -6.0
-offset_right = 86.0
-offset_bottom = 6.0
-color = Color(0.9, 0.9, 0.3, 0.5)
-
-[node name="Floor5" type="StaticBody2D" parent="." unique_id=163428129]
-position = Vector2(3100, 580)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor5" unique_id=1022511778]
-shape = SubResource("rect_floor_sm")
-
-[node name="Top" type="ColorRect" parent="Floor5" unique_id=2040376734]
-offset_left = -150.0
-offset_top = -20.0
-offset_right = 150.0
-color = Color(0.52, 0.78, 0.32, 1)
-
-[node name="Body" type="ColorRect" parent="Floor5" unique_id=1086722139]
-offset_left = -150.0
-offset_right = 150.0
-offset_bottom = 120.0
-color = Color(0.38, 0.62, 0.24, 1)
-
-[node name="DirtLayer" type="ColorRect" parent="Floor5" unique_id=2131548266]
-offset_left = -150.0
-offset_top = 40.0
-offset_right = 150.0
-offset_bottom = 120.0
-color = Color(0.45, 0.36, 0.22, 0.6)
-
-[node name="Floor6" type="StaticBody2D" parent="." unique_id=1511210510]
-position = Vector2(3500, 580)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor6" unique_id=649986510]
-shape = SubResource("rect_floor_lg")
-
-[node name="Top" type="ColorRect" parent="Floor6" unique_id=2048975442]
-offset_left = -400.0
-offset_top = -20.0
-offset_right = 400.0
-color = Color(0.52, 0.78, 0.32, 1)
-
-[node name="Body" type="ColorRect" parent="Floor6" unique_id=231203355]
-offset_left = -400.0
-offset_right = 400.0
-offset_bottom = 120.0
-color = Color(0.38, 0.62, 0.24, 1)
-
-[node name="DirtLayer" type="ColorRect" parent="Floor6" unique_id=1093044064]
-offset_left = -400.0
-offset_top = 40.0
-offset_right = 400.0
-offset_bottom = 120.0
-color = Color(0.45, 0.36, 0.22, 0.6)
-
-[node name="Spike1" type="StaticBody2D" parent="." unique_id=449222429]
-position = Vector2(3260, 470)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Spike1" unique_id=978749228]
-shape = SubResource("rect_wall_short")
-
-[node name="Body" type="ColorRect" parent="Spike1" unique_id=1732033405]
-offset_left = -20.0
-offset_top = -60.0
-offset_right = 20.0
-offset_bottom = 60.0
-color = Color(0.56, 0.18, 0.14, 1)
-
-[node name="TopCap" type="ColorRect" parent="Spike1" unique_id=524132435]
-offset_left = -22.0
-offset_top = -66.0
-offset_right = 22.0
-offset_bottom = -58.0
-color = Color(0.85, 0.25, 0.15, 1)
-
-[node name="DangerStripe1" type="ColorRect" parent="Spike1" unique_id=464138913]
-offset_left = -20.0
-offset_top = -40.0
-offset_right = 20.0
-offset_bottom = -30.0
-color = Color(0.9, 0.8, 0.2, 0.5)
-
-[node name="DangerStripe2" type="ColorRect" parent="Spike1" unique_id=379980980]
-offset_left = -20.0
-offset_right = 20.0
-offset_bottom = 10.0
-color = Color(0.9, 0.8, 0.2, 0.5)
-
-[node name="DangerStripe3" type="ColorRect" parent="Spike1" unique_id=804962026]
-offset_left = -20.0
-offset_top = 40.0
-offset_right = 20.0
-offset_bottom = 50.0
-color = Color(0.9, 0.8, 0.2, 0.5)
-
-[node name="Spike2" type="StaticBody2D" parent="." unique_id=1059008552]
-position = Vector2(3460, 450)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Spike2" unique_id=1556299487]
-shape = SubResource("rect_wall_med")
-
-[node name="Body" type="ColorRect" parent="Spike2" unique_id=1078090997]
-offset_left = -20.0
-offset_top = -90.0
-offset_right = 20.0
-offset_bottom = 90.0
-color = Color(0.56, 0.18, 0.14, 1)
-
-[node name="TopCap" type="ColorRect" parent="Spike2" unique_id=896231082]
-offset_left = -22.0
-offset_top = -96.0
-offset_right = 22.0
-offset_bottom = -88.0
-color = Color(0.85, 0.25, 0.15, 1)
-
-[node name="DangerStripe1" type="ColorRect" parent="Spike2" unique_id=1432578531]
-offset_left = -20.0
-offset_top = -60.0
-offset_right = 20.0
-offset_bottom = -50.0
-color = Color(0.9, 0.8, 0.2, 0.5)
-
-[node name="DangerStripe2" type="ColorRect" parent="Spike2" unique_id=1444104097]
-offset_left = -20.0
-offset_right = 20.0
-offset_bottom = 10.0
-color = Color(0.9, 0.8, 0.2, 0.5)
-
-[node name="DangerStripe3" type="ColorRect" parent="Spike2" unique_id=1295281435]
-offset_left = -20.0
-offset_top = 60.0
-offset_right = 20.0
-offset_bottom = 70.0
-color = Color(0.9, 0.8, 0.2, 0.5)
-
-[node name="Spike3" type="StaticBody2D" parent="." unique_id=1101630431]
-position = Vector2(3660, 430)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Spike3" unique_id=1779481701]
-shape = SubResource("rect_wall_tall")
-
-[node name="Body" type="ColorRect" parent="Spike3" unique_id=1581259626]
-offset_left = -20.0
-offset_top = -130.0
-offset_right = 20.0
-offset_bottom = 130.0
-color = Color(0.56, 0.18, 0.14, 1)
-
-[node name="TopCap" type="ColorRect" parent="Spike3" unique_id=1160614437]
-offset_left = -22.0
-offset_top = -136.0
-offset_right = 22.0
-offset_bottom = -128.0
-color = Color(0.85, 0.25, 0.15, 1)
-
-[node name="DangerStripe1" type="ColorRect" parent="Spike3" unique_id=703267692]
-offset_left = -20.0
-offset_top = -100.0
-offset_right = 20.0
-offset_bottom = -90.0
-color = Color(0.9, 0.8, 0.2, 0.5)
-
-[node name="DangerStripe2" type="ColorRect" parent="Spike3" unique_id=546626154]
-offset_left = -20.0
-offset_top = -40.0
-offset_right = 20.0
-offset_bottom = -30.0
-color = Color(0.9, 0.8, 0.2, 0.5)
-
-[node name="DangerStripe3" type="ColorRect" parent="Spike3" unique_id=184900124]
-offset_left = -20.0
+offset_right = 1200.0
+offset_bottom = -14.0
+color = Color(0.42, 0.72, 0.28, 1)
+
+[node name="SoilBody" type="ColorRect" parent="Floor"]
+offset_left = -1200.0
+offset_top = -14.0
+offset_right = 1200.0
+offset_bottom = 20.0
+color = Color(0.35, 0.28, 0.18, 1)
+
+[node name="DirtFill" type="ColorRect" parent="Floor"]
+offset_left = -1200.0
 offset_top = 20.0
-offset_right = 20.0
-offset_bottom = 30.0
-color = Color(0.9, 0.8, 0.2, 0.5)
+offset_right = 1200.0
+offset_bottom = 100.0
+color = Color(0.28, 0.22, 0.14, 1)
 
-[node name="DangerStripe4" type="ColorRect" parent="Spike3" unique_id=1846777366]
-offset_left = -20.0
-offset_top = 80.0
-offset_right = 20.0
-offset_bottom = 90.0
-color = Color(0.9, 0.8, 0.2, 0.5)
+; ── Platform 1 (spawn area) ──
+[node name="Platform1" type="StaticBody2D" parent="."]
+position = Vector2(250, 550)
 
-[node name="Lava4" type="Area2D" parent="." unique_id=716840611]
-position = Vector2(3980, 720)
-script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12, 1)
-glow_color = Color(1, 0.7, 0.25, 1)
-bubble_count = 10
-surface_wave_speed = 2.5
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform1"]
+shape = SubResource("rect_platform_lg")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava4" unique_id=1465568562]
-shape = SubResource("rect_lava_lg")
-
-[node name="Lava4b" type="Area2D" parent="." unique_id=1372376979]
-position = Vector2(4200, 720)
-script = ExtResource("4_lava")
-lava_color = Color(0.95, 0.35, 0.12, 1)
-glow_color = Color(1, 0.7, 0.25, 1)
-bubble_count = 7
-surface_wave_speed = 2.2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Lava4b" unique_id=1205559220]
-shape = SubResource("rect_lava_md")
-
-[node name="MovPlat2" type="StaticBody2D" parent="." unique_id=1001021372]
-position = Vector2(3960, 430)
-collision_mask = 3
-script = ExtResource("3_moving_platform")
-move_distance = 100.0
-move_speed = 55.0
-horizontal = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MovPlat2" unique_id=387845165]
-shape = SubResource("rect_plat_md")
-
-[node name="Top" type="ColorRect" parent="MovPlat2" unique_id=1617248990]
-offset_left = -90.0
+[node name="PlatformTop" type="ColorRect" parent="Platform1"]
+offset_left = -150.0
 offset_top = -10.0
-offset_right = 90.0
-color = Color(0.35, 0.68, 0.62, 1)
-
-[node name="Body" type="ColorRect" parent="MovPlat2" unique_id=1740175090]
-offset_left = -90.0
-offset_right = 90.0
-offset_bottom = 10.0
-color = Color(0.25, 0.52, 0.46, 1)
-
-[node name="IndicL" type="ColorRect" parent="MovPlat2" unique_id=2142045215]
-offset_left = -86.0
-offset_top = -6.0
-offset_right = -76.0
-offset_bottom = 6.0
-color = Color(0.9, 0.5, 0.3, 0.5)
-
-[node name="IndicR" type="ColorRect" parent="MovPlat2" unique_id=1625612489]
-offset_left = 76.0
-offset_top = -6.0
-offset_right = 86.0
-offset_bottom = 6.0
-color = Color(0.9, 0.5, 0.3, 0.5)
-
-[node name="Wall2" type="StaticBody2D" parent="." unique_id=1187086020]
-position = Vector2(4180, 480)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall2" unique_id=2067879752]
-shape = SubResource("rect_wall_short")
-
-[node name="Body" type="ColorRect" parent="Wall2" unique_id=885737635]
-offset_left = -20.0
-offset_top = -60.0
-offset_right = 20.0
-offset_bottom = 60.0
-color = Color(0.52, 0.38, 0.22, 1)
-
-[node name="CapTop" type="ColorRect" parent="Wall2" unique_id=789251789]
-offset_left = -24.0
-offset_top = -66.0
-offset_right = 24.0
-offset_bottom = -58.0
-color = Color(0.62, 0.48, 0.28, 1)
-
-[node name="Stripe1" type="ColorRect" parent="Wall2" unique_id=1526154695]
-offset_left = -20.0
-offset_top = -30.0
-offset_right = 20.0
-offset_bottom = -20.0
-color = Color(0.72, 0.25, 0.12, 0.6)
-
-[node name="Stripe2" type="ColorRect" parent="Wall2" unique_id=935824064]
-offset_left = -20.0
-offset_top = 20.0
-offset_right = 20.0
-offset_bottom = 30.0
-color = Color(0.72, 0.25, 0.12, 0.6)
-
-[node name="StepStone3" type="StaticBody2D" parent="." unique_id=1192572830]
-position = Vector2(4100, 500)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StepStone3" unique_id=1150555280]
-shape = SubResource("rect_plat_xs")
-
-[node name="Top" type="ColorRect" parent="StepStone3" unique_id=1787691349]
-offset_left = -40.0
-offset_top = -8.0
-offset_right = 40.0
+offset_right = 150.0
+offset_bottom = -4.0
 color = Color(0.52, 0.78, 0.32, 1)
 
-[node name="Body" type="ColorRect" parent="StepStone3" unique_id=1066134498]
-offset_left = -40.0
-offset_right = 40.0
-offset_bottom = 12.0
-color = Color(0.38, 0.62, 0.24, 1)
+[node name="PlatformBody" type="ColorRect" parent="Platform1"]
+offset_left = -150.0
+offset_top = -4.0
+offset_right = 150.0
+offset_bottom = 10.0
+color = Color(0.38, 0.58, 0.22, 1)
 
-[node name="FloorGoal" type="StaticBody2D" parent="." unique_id=1634580553]
-position = Vector2(4550, 580)
-collision_mask = 3
+; ── Platform 2 (middle section) ──
+[node name="Platform2" type="StaticBody2D" parent="."]
+position = Vector2(600, 480)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="FloorGoal" unique_id=1846062687]
-shape = SubResource("rect_floor_md")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform2"]
+shape = SubResource("rect_platform_md")
 
-[node name="Top" type="ColorRect" parent="FloorGoal" unique_id=722210336]
-offset_left = -250.0
-offset_top = -20.0
-offset_right = 250.0
-color = Color(0.56, 0.82, 0.38, 1)
+[node name="PlatformTop" type="ColorRect" parent="Platform2"]
+offset_left = -120.0
+offset_top = -10.0
+offset_right = 120.0
+offset_bottom = -4.0
+color = Color(0.58, 0.75, 0.35, 1)
 
-[node name="Body" type="ColorRect" parent="FloorGoal" unique_id=535203108]
-offset_left = -250.0
-offset_right = 250.0
-offset_bottom = 120.0
-color = Color(0.42, 0.68, 0.28, 1)
+[node name="PlatformBody" type="ColorRect" parent="Platform2"]
+offset_left = -120.0
+offset_top = -4.0
+offset_right = 120.0
+offset_bottom = 10.0
+color = Color(0.42, 0.58, 0.25, 1)
 
-[node name="DirtLayer" type="ColorRect" parent="FloorGoal" unique_id=234446799]
-offset_left = -250.0
-offset_top = 40.0
-offset_right = 250.0
-offset_bottom = 120.0
-color = Color(0.5, 0.4, 0.24, 0.6)
+; ── Platform 3 (middle-right) ──
+[node name="Platform3" type="StaticBody2D" parent="."]
+position = Vector2(1100, 400)
 
-[node name="VictoryBanner1" type="ColorRect" parent="." unique_id=218961853]
-offset_left = 4440.0
-offset_top = 440.0
-offset_right = 4444.0
-offset_bottom = 560.0
-color = Color(0.52, 0.38, 0.22, 1)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform3"]
+shape = SubResource("rect_platform_md")
 
-[node name="VictoryFlag1" type="ColorRect" parent="." unique_id=1571386466]
-offset_left = 4444.0
-offset_top = 440.0
-offset_right = 4480.0
-offset_bottom = 470.0
-color = Color(0.95, 0.35, 0.3, 0.8)
+[node name="PlatformTop" type="ColorRect" parent="Platform3"]
+offset_left = -120.0
+offset_top = -10.0
+offset_right = 120.0
+offset_bottom = -4.0
+color = Color(0.58, 0.75, 0.35, 1)
 
-[node name="VictoryBanner2" type="ColorRect" parent="." unique_id=270708876]
-offset_left = 4640.0
-offset_top = 440.0
-offset_right = 4644.0
-offset_bottom = 560.0
-color = Color(0.52, 0.38, 0.22, 1)
+[node name="PlatformBody" type="ColorRect" parent="Platform3"]
+offset_left = -120.0
+offset_top = -4.0
+offset_right = 120.0
+offset_bottom = 10.0
+color = Color(0.42, 0.58, 0.25, 1)
 
-[node name="VictoryFlag2" type="ColorRect" parent="." unique_id=1325241912]
-offset_left = 4600.0
-offset_top = 440.0
-offset_right = 4640.0
-offset_bottom = 470.0
-color = Color(0.3, 0.35, 0.95, 0.8)
+; ── Platform 4 (right section, elevated) ──
+[node name="Platform4" type="StaticBody2D" parent="."]
+position = Vector2(1620, 320)
 
-[node name="GoalZone" type="Area2D" parent="." unique_id=239949228]
-position = Vector2(4550, 520)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform4"]
+shape = SubResource("rect_platform_md")
+
+[node name="PlatformTop" type="ColorRect" parent="Platform4"]
+offset_left = -120.0
+offset_top = -10.0
+offset_right = 120.0
+offset_bottom = -4.0
+color = Color(0.58, 0.75, 0.35, 1)
+
+[node name="PlatformBody" type="ColorRect" parent="Platform4"]
+offset_left = -120.0
+offset_top = -4.0
+offset_right = 120.0
+offset_bottom = 10.0
+color = Color(0.42, 0.58, 0.25, 1)
+
+; ── Platform 5 (final jump to goal) ──
+[node name="Platform5" type="StaticBody2D" parent="."]
+position = Vector2(2100, 380)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform5"]
+shape = SubResource("rect_platform_sm")
+
+[node name="PlatformTop" type="ColorRect" parent="Platform5"]
+offset_left = -80.0
+offset_top = -10.0
+offset_right = 80.0
+offset_bottom = -4.0
+color = Color(0.52, 0.78, 0.32, 1)
+
+[node name="PlatformBody" type="ColorRect" parent="Platform5"]
+offset_left = -80.0
+offset_top = -4.0
+offset_right = 80.0
+offset_bottom = 10.0
+color = Color(0.38, 0.58, 0.22, 1)
+
+; ── Boundary Walls ──
+[node name="WallLeft" type="StaticBody2D" parent="."]
+position = Vector2(-20, 400)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("rect_wall")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+position = Vector2(2420, 400)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("rect_wall")
+
+[node name="Ceiling" type="StaticBody2D" parent="."]
+position = Vector2(1200, -20)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ceiling"]
+shape = SubResource("rect_floor_main")
+
+; ══════════════════════════════════════════════════════════════
+; BALL & GOAL
+; ══════════════════════════════════════════════════════════════
+
+; ── Ball Spawn (on Platform1) ──
+[node name="BallSpawn" type="Marker2D" parent="."]
+position = Vector2(250, 530)
+
+; ── Goal Zone (on Platform5) ──
+[node name="GoalZone" type="Area2D" parent="."]
+position = Vector2(2100, 350)
+collision_layer = 1
+collision_mask = 0
+monitoring = true
+monitorable = true
 script = ExtResource("2_goal")
 goal_color = Color(0.35, 0.92, 0.5, 1)
-goal_radius = 32.0
+goal_radius = 28.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone" unique_id=819320358]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone"]
 shape = SubResource("circle_goal")
 
-[node name="Bridge12" type="StaticBody2D" parent="." unique_id=195583234]
-position = Vector2(820, 580)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Bridge12" unique_id=1664798164]
-shape = SubResource("rect_floor_xs")
-
-[node name="RampDown1" type="StaticBody2D" parent="." unique_id=795356152]
-position = Vector2(830, 600)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RampDown1" unique_id=60503803]
-shape = SubResource("ramp_down")
-
-[node name="Bridge34" type="StaticBody2D" parent="." unique_id=1256871088]
-position = Vector2(1910, 580)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Bridge34" unique_id=234278450]
-shape = SubResource("rect_floor_xs")
-
-[node name="Top" type="ColorRect" parent="Bridge34" unique_id=1925472889]
-offset_left = -80.0
-offset_top = -20.0
-offset_right = 80.0
-color = Color(0.48, 0.72, 0.3, 1)
-
-[node name="Body" type="ColorRect" parent="Bridge34" unique_id=1776568108]
-offset_left = -80.0
-offset_right = 80.0
-offset_bottom = 40.0
-color = Color(0.38, 0.6, 0.22, 1)
-
-[node name="Bridge45" type="StaticBody2D" parent="." unique_id=972110632]
-position = Vector2(2710, 580)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Bridge45" unique_id=120906587]
-shape = SubResource("rect_floor_xs")
-
-[node name="Top" type="ColorRect" parent="Bridge45" unique_id=747575446]
-offset_left = -80.0
-offset_top = -20.0
-offset_right = 80.0
-color = Color(0.48, 0.72, 0.3, 1)
-
-[node name="Body" type="ColorRect" parent="Bridge45" unique_id=2019199186]
-offset_left = -80.0
-offset_right = 80.0
-offset_bottom = 40.0
-color = Color(0.38, 0.6, 0.22, 1)
-
-[node name="Bridge67" type="StaticBody2D" parent="." unique_id=807999403]
-position = Vector2(3830, 580)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Bridge67" unique_id=2005435257]
-shape = SubResource("rect_floor_xs")
-
-[node name="Top" type="ColorRect" parent="Bridge67" unique_id=195188751]
-offset_left = -80.0
-offset_top = -20.0
-offset_right = 80.0
-color = Color(0.48, 0.72, 0.3, 1)
-
-[node name="Body" type="ColorRect" parent="Bridge67" unique_id=2102108927]
-offset_left = -80.0
-offset_right = 80.0
-offset_bottom = 40.0
-color = Color(0.38, 0.6, 0.22, 1)
-
-[node name="Bridge7G" type="StaticBody2D" parent="." unique_id=212205006]
-position = Vector2(4330, 580)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Bridge7G" unique_id=1780817956]
-shape = SubResource("rect_floor_xs")
-
-[node name="Top" type="ColorRect" parent="Bridge7G" unique_id=189164403]
-offset_left = -80.0
-offset_top = -20.0
-offset_right = 80.0
-color = Color(0.48, 0.72, 0.3, 1)
-
-[node name="Body" type="ColorRect" parent="Bridge7G" unique_id=1071561432]
-offset_left = -80.0
-offset_right = 80.0
-offset_bottom = 40.0
-color = Color(0.38, 0.6, 0.22, 1)
-
-[node name="Pillar1" type="StaticBody2D" parent="." unique_id=747262456]
-position = Vector2(760, 510)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Pillar1" unique_id=1571741198]
-shape = SubResource("rect_pillar")
-
-[node name="Body" type="ColorRect" parent="Pillar1" unique_id=1789644564]
-offset_left = -15.0
-offset_top = -50.0
-offset_right = 15.0
-offset_bottom = 50.0
-color = Color(0.48, 0.38, 0.24, 0.8)
-
-[node name="Cap" type="ColorRect" parent="Pillar1" unique_id=436402151]
-offset_left = -18.0
-offset_top = -56.0
-offset_right = 18.0
-offset_bottom = -48.0
-color = Color(0.58, 0.48, 0.3, 0.8)
-
-[node name="Pillar2" type="StaticBody2D" parent="." unique_id=433905669]
-position = Vector2(1840, 510)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Pillar2" unique_id=1997592290]
-shape = SubResource("rect_pillar")
-
-[node name="Body" type="ColorRect" parent="Pillar2" unique_id=385352409]
-offset_left = -15.0
-offset_top = -50.0
-offset_right = 15.0
-offset_bottom = 50.0
-color = Color(0.48, 0.38, 0.24, 0.8)
-
-[node name="Cap" type="ColorRect" parent="Pillar2" unique_id=1084813822]
-offset_left = -18.0
-offset_top = -56.0
-offset_right = 18.0
-offset_bottom = -48.0
-color = Color(0.58, 0.48, 0.3, 0.8)
-
-[node name="Pillar3" type="StaticBody2D" parent="." unique_id=657714532]
-position = Vector2(3040, 510)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Pillar3" unique_id=647897861]
-shape = SubResource("rect_pillar")
-
-[node name="Body" type="ColorRect" parent="Pillar3" unique_id=1952304752]
-offset_left = -15.0
-offset_top = -50.0
-offset_right = 15.0
-offset_bottom = 50.0
-color = Color(0.48, 0.38, 0.24, 0.8)
-
-[node name="Cap" type="ColorRect" parent="Pillar3" unique_id=293837045]
-offset_left = -18.0
-offset_top = -56.0
-offset_right = 18.0
-offset_bottom = -48.0
-color = Color(0.58, 0.48, 0.3, 0.8)
-
-[node name="Pillar4" type="StaticBody2D" parent="." unique_id=1129249797]
-position = Vector2(4280, 510)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Pillar4" unique_id=1636005225]
-shape = SubResource("rect_pillar")
-
-[node name="Body" type="ColorRect" parent="Pillar4" unique_id=1464787677]
-offset_left = -15.0
-offset_top = -50.0
-offset_right = 15.0
-offset_bottom = 50.0
-color = Color(0.48, 0.38, 0.24, 0.8)
-
-[node name="Cap" type="ColorRect" parent="Pillar4" unique_id=1415905454]
-offset_left = -18.0
-offset_top = -56.0
-offset_right = 18.0
-offset_bottom = -48.0
-color = Color(0.58, 0.48, 0.3, 0.8)
-
-[node name="Bush1a" type="ColorRect" parent="." unique_id=294112360]
-offset_left = 340.0
-offset_top = 538.0
-offset_right = 380.0
-offset_bottom = 560.0
-color = Color(0.32, 0.56, 0.2, 0.8)
-
-[node name="Bush1b" type="ColorRect" parent="." unique_id=344621612]
-offset_left = 362.0
-offset_top = 532.0
-offset_right = 400.0
-offset_bottom = 560.0
-color = Color(0.36, 0.6, 0.24, 0.7)
-
-[node name="Bush2a" type="ColorRect" parent="." unique_id=1989258184]
-offset_left = 1580.0
-offset_top = 540.0
-offset_right = 1616.0
-offset_bottom = 560.0
-color = Color(0.32, 0.56, 0.2, 0.8)
-
-[node name="Bush2b" type="ColorRect" parent="." unique_id=1727858944]
-offset_left = 1600.0
-offset_top = 534.0
-offset_right = 1634.0
-offset_bottom = 560.0
-color = Color(0.36, 0.6, 0.24, 0.7)
-
-[node name="Bush3a" type="ColorRect" parent="." unique_id=1732153111]
-offset_left = 3140.0
-offset_top = 542.0
-offset_right = 3174.0
-offset_bottom = 560.0
-color = Color(0.32, 0.56, 0.2, 0.8)
-
-[node name="Bush3b" type="ColorRect" parent="." unique_id=550130470]
-offset_left = 3160.0
-offset_top = 536.0
-offset_right = 3192.0
-offset_bottom = 560.0
-color = Color(0.36, 0.6, 0.24, 0.7)
-
-[node name="Rock1" type="ColorRect" parent="." unique_id=69448461]
-offset_left = 480.0
-offset_top = 548.0
-offset_right = 510.0
-offset_bottom = 560.0
-color = Color(0.52, 0.5, 0.46, 0.6)
-
-[node name="Rock2" type="ColorRect" parent="." unique_id=1783393428]
-offset_left = 1720.0
-offset_top = 550.0
-offset_right = 1748.0
-offset_bottom = 560.0
-color = Color(0.52, 0.5, 0.46, 0.6)
-
-[node name="Rock3" type="ColorRect" parent="." unique_id=1067836072]
-offset_left = 2620.0
-offset_top = 549.0
-offset_right = 2646.0
-offset_bottom = 560.0
-color = Color(0.52, 0.5, 0.46, 0.6)
-
-[node name="Rock4" type="ColorRect" parent="." unique_id=74950948]
-offset_left = 4420.0
-offset_top = 550.0
-offset_right = 4450.0
-offset_bottom = 560.0
-color = Color(0.52, 0.5, 0.46, 0.6)
-
-[node name="GroundFloorA" type="StaticBody2D" parent="." unique_id=383831265]
-position = Vector2(600, 700)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundFloorA" unique_id=2051491072]
-shape = SubResource("rect_floor_xl")
-
-[node name="GroundFloorB" type="StaticBody2D" parent="." unique_id=466654173]
-position = Vector2(1800, 700)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundFloorB" unique_id=1504846136]
-position = Vector2(0, -15.5)
-shape = SubResource("rect_floor_xl")
-
-[node name="GroundFloorC" type="StaticBody2D" parent="." unique_id=1735104533]
-position = Vector2(3000, 700)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundFloorC" unique_id=2130160381]
-shape = SubResource("rect_floor_xl")
-
-[node name="GroundFloorD" type="StaticBody2D" parent="." unique_id=134325722]
-position = Vector2(4200, 700)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundFloorD" unique_id=743919235]
-shape = SubResource("rect_floor_xl")
-
-[node name="Bumper1" type="StaticBody2D" parent="." unique_id=2099950127]
-position = Vector2(550, 546)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Bumper1" unique_id=80832115]
-shape = SubResource("rect_plat_xs")
-
-[node name="Top" type="ColorRect" parent="Bumper1" unique_id=1460886174]
-offset_left = -40.0
-offset_top = -8.0
-offset_right = 40.0
-color = Color(0.62, 0.78, 0.42, 1)
-
-[node name="Body" type="ColorRect" parent="Bumper1" unique_id=1891344256]
-offset_left = -40.0
-offset_right = 40.0
-offset_bottom = 14.0
-color = Color(0.48, 0.62, 0.32, 1)
-
-[node name="Ledge1" type="StaticBody2D" parent="." unique_id=1468137329]
-position = Vector2(1500, 540)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Ledge1" unique_id=1499462159]
-shape = SubResource("rect_plat_sm")
-
-[node name="Top" type="ColorRect" parent="Ledge1" unique_id=1872327573]
-offset_left = -60.0
-offset_top = -9.0
-offset_right = 60.0
-color = Color(0.52, 0.74, 0.34, 1)
-
-[node name="Body" type="ColorRect" parent="Ledge1" unique_id=1176789317]
-offset_left = -60.0
-offset_right = 60.0
-offset_bottom = 20.0
-color = Color(0.4, 0.6, 0.26, 1)
-
-[node name="RestPlat1" type="StaticBody2D" parent="." unique_id=1528489405]
-position = Vector2(2750, 520)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RestPlat1" unique_id=706975192]
-shape = SubResource("rect_plat_sm")
-
-[node name="Top" type="ColorRect" parent="RestPlat1" unique_id=1130913953]
-offset_left = -60.0
-offset_top = -9.0
-offset_right = 60.0
-color = Color(0.52, 0.74, 0.34, 1)
-
-[node name="Body" type="ColorRect" parent="RestPlat1" unique_id=1568909394]
-offset_left = -60.0
-offset_right = 60.0
-offset_bottom = 20.0
-color = Color(0.4, 0.6, 0.26, 1)
-
-[node name="MiniWall1" type="StaticBody2D" parent="." unique_id=2024279245]
-position = Vector2(3360, 530)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MiniWall1" unique_id=2102571643]
-shape = SubResource("rect_pillar")
-
-[node name="Body" type="ColorRect" parent="MiniWall1" unique_id=256615958]
-offset_left = -15.0
-offset_top = -50.0
-offset_right = 15.0
-offset_bottom = 50.0
-color = Color(0.56, 0.42, 0.24, 0.7)
-
-[node name="BoundaryTop" type="StaticBody2D" parent="." unique_id=973573352]
-position = Vector2(2400, -200)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BoundaryTop" unique_id=986557599]
-shape = SubResource("rect_bnd_h")
-
-[node name="BoundaryBottom" type="StaticBody2D" parent="." unique_id=160695511]
-position = Vector2(2400, 1000)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BoundaryBottom" unique_id=1770733979]
-position = Vector2(97, 19)
-shape = SubResource("rect_bnd_h")
-
-[node name="BoundaryLeft" type="StaticBody2D" parent="." unique_id=718473677]
-position = Vector2(-200, 400)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BoundaryLeft" unique_id=1720689615]
-shape = SubResource("rect_bnd_v")
-
-[node name="BoundaryRight" type="StaticBody2D" parent="." unique_id=1225601847]
-position = Vector2(5000, 400)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BoundaryRight" unique_id=1620780560]
-shape = SubResource("rect_bnd_v")
-
-[node name="Tree1Trunk" type="ColorRect" parent="." unique_id=548527650]
-offset_left = 80.0
-offset_top = 480.0
-offset_right = 100.0
-offset_bottom = 560.0
-color = Color(0.42, 0.3, 0.18, 0.6)
-
-[node name="Tree1Canopy" type="ColorRect" parent="." unique_id=1642679115]
-offset_left = 48.0
-offset_top = 430.0
-offset_right = 132.0
-offset_bottom = 490.0
-color = Color(0.28, 0.52, 0.18, 0.45)
-
-[node name="Tree3Trunk" type="ColorRect" parent="." unique_id=451170669]
-offset_left = 965.0
-offset_top = 487.0
-offset_right = 985.0
-offset_bottom = 562.0
-color = Color(0.42, 0.3, 0.18, 0.6)
-
-[node name="Tree3Canopy" type="ColorRect" parent="." unique_id=902280618]
-offset_left = 933.0
-offset_top = 437.0
-offset_right = 1017.0
-offset_bottom = 496.0
-color = Color(0.28, 0.52, 0.18, 0.45)
-
-[node name="Tree4Trunk" type="ColorRect" parent="." unique_id=1463159769]
-offset_left = 2480.0
-offset_top = 488.0
-offset_right = 2498.0
-offset_bottom = 560.0
-color = Color(0.42, 0.3, 0.18, 0.6)
-
-[node name="Tree4Canopy" type="ColorRect" parent="." unique_id=538479271]
-offset_left = 2450.0
-offset_top = 438.0
-offset_right = 2528.0
-offset_bottom = 496.0
-color = Color(0.28, 0.52, 0.18, 0.45)
-
-[node name="Tree5Trunk" type="ColorRect" parent="." unique_id=1332630935]
-offset_left = 3780.0
-offset_top = 490.0
-offset_right = 3798.0
-offset_bottom = 560.0
-color = Color(0.42, 0.3, 0.18, 0.6)
-
-[node name="Tree5Canopy" type="ColorRect" parent="." unique_id=1166325625]
-offset_left = 3748.0
-offset_top = 440.0
-offset_right = 3830.0
-offset_bottom = 498.0
-color = Color(0.28, 0.52, 0.18, 0.45)
-
-[node name="Tree6Trunk" type="ColorRect" parent="." unique_id=458344129]
-offset_left = 4700.0
-offset_top = 485.0
-offset_right = 4720.0
-offset_bottom = 560.0
-color = Color(0.42, 0.3, 0.18, 0.6)
-
-[node name="Tree6Canopy" type="ColorRect" parent="." unique_id=205507836]
-offset_left = 4668.0
-offset_top = 432.0
-offset_right = 4752.0
-offset_bottom = 494.0
-color = Color(0.28, 0.52, 0.18, 0.45)
-
-[node name="MovPlat3" type="StaticBody2D" parent="." unique_id=684545725]
-position = Vector2(3180, 460)
-collision_mask = 3
-script = ExtResource("3_moving_platform")
-move_distance = 80.0
-move_speed = 40.0
-horizontal = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MovPlat3" unique_id=224077131]
-shape = SubResource("rect_plat_sm")
-
-[node name="Top" type="ColorRect" parent="MovPlat3" unique_id=1690259537]
-offset_left = -60.0
-offset_top = -9.0
-offset_right = 60.0
-color = Color(0.35, 0.68, 0.62, 1)
-
-[node name="Body" type="ColorRect" parent="MovPlat3" unique_id=1405001379]
-offset_left = -60.0
-offset_right = 60.0
-offset_bottom = 9.0
-color = Color(0.25, 0.52, 0.46, 1)
-
-[node name="HelperPlat1" type="StaticBody2D" parent="." unique_id=1944941874]
-position = Vector2(3740, 540)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HelperPlat1" unique_id=564149200]
-shape = SubResource("rect_plat_md")
-
-[node name="Top" type="ColorRect" parent="HelperPlat1" unique_id=810371276]
-offset_left = -90.0
-offset_top = -10.0
-offset_right = 90.0
-color = Color(0.5, 0.76, 0.34, 1)
-
-[node name="Body" type="ColorRect" parent="HelperPlat1" unique_id=791002725]
-offset_left = -90.0
-offset_right = 90.0
-offset_bottom = 16.0
-color = Color(0.4, 0.62, 0.26, 1)
-
-[node name="LavaGlow2" type="ColorRect" parent="." unique_id=824474763]
-offset_left = 1884.0
-offset_top = 647.0
-offset_right = 2484.0
-offset_bottom = 717.0
-color = Color(1, 0.45, 0.15, 0.15)
-
-[node name="LavaGlow3" type="ColorRect" parent="." unique_id=1441512901]
-offset_left = 2680.0
-offset_top = 680.0
-offset_right = 3020.0
-offset_bottom = 750.0
-color = Color(1, 0.45, 0.15, 0.15)
-
-[node name="LavaGlow4" type="ColorRect" parent="." unique_id=973376283]
-offset_left = 3810.0
-offset_top = 680.0
-offset_right = 4340.0
-offset_bottom = 750.0
-color = Color(1, 0.45, 0.15, 0.15)
-
-[node name="LavaGlow1" type="ColorRect" parent="." unique_id=1818135752]
-offset_left = 762.0
-offset_top = 625.0
-offset_right = 942.0
-offset_bottom = 702.0
-color = Color(1, 0.45, 0.15, 0.15)
-
-[node name="Bird1" type="ColorRect" parent="." unique_id=2140047044]
-offset_left = 300.0
-offset_top = 160.0
-offset_right = 318.0
-offset_bottom = 166.0
-color = Color(0.2, 0.22, 0.28, 0.3)
-
-[node name="Bird2" type="ColorRect" parent="." unique_id=226251122]
-offset_left = 1200.0
-offset_top = 140.0
-offset_right = 1216.0
-offset_bottom = 146.0
-color = Color(0.2, 0.22, 0.28, 0.25)
-
-[node name="Bird3" type="ColorRect" parent="." unique_id=1540036187]
-offset_left = 2400.0
-offset_top = 170.0
-offset_right = 2420.0
-offset_bottom = 176.0
-color = Color(0.2, 0.22, 0.28, 0.28)
-
-[node name="Bird4" type="ColorRect" parent="." unique_id=1124460639]
-offset_left = 3600.0
-offset_top = 145.0
-offset_right = 3618.0
-offset_bottom = 151.0
-color = Color(0.2, 0.22, 0.28, 0.3)
-
-[node name="Bird5" type="ColorRect" parent="." unique_id=1797825372]
-offset_left = 4400.0
-offset_top = 155.0
-offset_right = 4416.0
-offset_bottom = 161.0
-color = Color(0.2, 0.22, 0.28, 0.22)
-
-[node name="Milestone1Post" type="ColorRect" parent="." unique_id=724138126]
-offset_left = 1094.0
-offset_top = 502.0
-offset_right = 1102.0
-offset_bottom = 562.0
-color = Color(0.62, 0.52, 0.32, 1)
-
-[node name="Milestone1Flag" type="ColorRect" parent="." unique_id=1459111835]
-offset_left = 1102.0
-offset_top = 502.0
-offset_right = 1136.0
-offset_bottom = 524.0
-color = Color(0.2, 0.7, 0.3, 0.8)
-
-[node name="Milestone2Post" type="ColorRect" parent="." unique_id=1546531821]
-offset_left = 1768.0
-offset_top = 520.0
-offset_right = 1776.0
-offset_bottom = 580.0
-color = Color(0.62, 0.52, 0.32, 1)
-
-[node name="Milestone2Flag" type="ColorRect" parent="." unique_id=1765452383]
-offset_left = 1776.0
-offset_top = 520.0
-offset_right = 1808.0
-offset_bottom = 542.0
-color = Color(0.2, 0.3, 0.7, 0.8)
-
-[node name="Milestone3Post" type="ColorRect" parent="." unique_id=1110665948]
-offset_left = 2628.0
-offset_top = 520.0
-offset_right = 2636.0
-offset_bottom = 580.0
-color = Color(0.62, 0.52, 0.32, 1)
-
-[node name="Milestone3Flag" type="ColorRect" parent="." unique_id=718109398]
-offset_left = 2636.0
-offset_top = 520.0
-offset_right = 2668.0
-offset_bottom = 542.0
-color = Color(0.7, 0.3, 0.2, 0.8)
-
-[node name="Milestone4Post" type="ColorRect" parent="." unique_id=1998344837]
-offset_left = 3208.0
-offset_top = 520.0
-offset_right = 3216.0
-offset_bottom = 580.0
-color = Color(0.62, 0.52, 0.32, 1)
-
-[node name="Milestone4Flag" type="ColorRect" parent="." unique_id=310321426]
-offset_left = 3216.0
-offset_top = 520.0
-offset_right = 3248.0
-offset_bottom = 542.0
-color = Color(0.7, 0.6, 0.2, 0.8)
-
-[node name="AimGuide1" type="ColorRect" parent="." unique_id=529225644]
-offset_left = 226.0
-offset_top = 510.0
-offset_right = 234.0
-offset_bottom = 518.0
-color = Color(1, 1, 1, 0.25)
-
-[node name="AimGuide2" type="ColorRect" parent="." unique_id=1604899154]
-offset_left = 250.0
-offset_top = 490.0
-offset_right = 258.0
-offset_bottom = 498.0
-color = Color(1, 1, 1, 0.22)
-
-[node name="AimGuide3" type="ColorRect" parent="." unique_id=585108449]
-offset_left = 278.0
-offset_top = 475.0
-offset_right = 286.0
-offset_bottom = 483.0
-color = Color(1, 1, 1, 0.19)
-
-[node name="AimGuide4" type="ColorRect" parent="." unique_id=2135018732]
-offset_left = 310.0
-offset_top = 465.0
-offset_right = 318.0
-offset_bottom = 473.0
-color = Color(1, 1, 1, 0.16)
-
-[node name="AimGuide5" type="ColorRect" parent="." unique_id=885571208]
-offset_left = 346.0
-offset_top = 460.0
-offset_right = 354.0
-offset_bottom = 468.0
-color = Color(1, 1, 1, 0.13)
-
-[node name="AimGuide6" type="ColorRect" parent="." unique_id=1730275985]
-offset_left = 386.0
-offset_top = 462.0
-offset_right = 394.0
-offset_bottom = 470.0
-color = Color(1, 1, 1, 0.1)
-
-[node name="AimGuide7" type="ColorRect" parent="." unique_id=815888107]
-offset_left = 426.0
-offset_top = 470.0
-offset_right = 434.0
-offset_bottom = 478.0
-color = Color(1, 1, 1, 0.08)
-
-[node name="DistMark500" type="ColorRect" parent="." unique_id=1527508532]
-offset_left = 498.0
-offset_top = 692.0
-offset_right = 502.0
-offset_bottom = 700.0
-color = Color(0.8, 0.8, 0.7, 0.3)
-
-[node name="DistMark1000" type="ColorRect" parent="." unique_id=1788906117]
-offset_left = 998.0
-offset_top = 692.0
-offset_right = 1002.0
-offset_bottom = 700.0
-color = Color(0.8, 0.8, 0.7, 0.3)
-
-[node name="DistMark1500" type="ColorRect" parent="." unique_id=348724274]
-offset_left = 1498.0
-offset_top = 692.0
-offset_right = 1502.0
-offset_bottom = 700.0
-color = Color(0.8, 0.8, 0.7, 0.3)
-
-[node name="DistMark2000" type="ColorRect" parent="." unique_id=1739171016]
-offset_left = 1998.0
-offset_top = 692.0
-offset_right = 2002.0
-offset_bottom = 700.0
-color = Color(0.8, 0.8, 0.7, 0.3)
-
-[node name="DistMark2500" type="ColorRect" parent="." unique_id=53157380]
-offset_left = 2498.0
-offset_top = 692.0
-offset_right = 2502.0
-offset_bottom = 700.0
-color = Color(0.8, 0.8, 0.7, 0.3)
-
-[node name="DistMark3000" type="ColorRect" parent="." unique_id=1554528626]
-offset_left = 2998.0
-offset_top = 692.0
-offset_right = 3002.0
-offset_bottom = 700.0
-color = Color(0.8, 0.8, 0.7, 0.3)
-
-[node name="DistMark3500" type="ColorRect" parent="." unique_id=1569816864]
-offset_left = 3498.0
-offset_top = 692.0
-offset_right = 3502.0
-offset_bottom = 700.0
-color = Color(0.8, 0.8, 0.7, 0.3)
-
-[node name="DistMark4000" type="ColorRect" parent="." unique_id=389413054]
-offset_left = 3998.0
-offset_top = 692.0
-offset_right = 4002.0
-offset_bottom = 700.0
-color = Color(0.8, 0.8, 0.7, 0.3)
-
-[node name="DistMark4500" type="ColorRect" parent="." unique_id=1784982235]
-offset_left = 4498.0
-offset_top = 692.0
-offset_right = 4502.0
-offset_bottom = 700.0
-color = Color(0.8, 0.8, 0.7, 0.3)
-
-[node name="GroundLine1" type="ColorRect" parent="." unique_id=79096627]
-offset_left = -600.0
-offset_top = 730.0
-offset_right = 5600.0
-offset_bottom = 734.0
-color = Color(0.3, 0.5, 0.16, 0.5)
-
-[node name="GroundLine2" type="ColorRect" parent="." unique_id=998169237]
-offset_left = -600.0
-offset_top = 760.0
-offset_right = 5600.0
-offset_bottom = 763.0
-color = Color(0.28, 0.48, 0.15, 0.35)
-
-[node name="GroundLine3" type="ColorRect" parent="." unique_id=123755023]
-offset_left = -600.0
-offset_top = 790.0
-offset_right = 5600.0
-offset_bottom = 792.0
-color = Color(0.26, 0.44, 0.14, 0.25)
-
-[node name="FloatPlat1" type="StaticBody2D" parent="." unique_id=612267881]
-position = Vector2(1080, 440)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="FloatPlat1" unique_id=436667378]
-position = Vector2(159, -5)
-shape = SubResource("rect_plat_xs")
-
-[node name="Top" type="ColorRect" parent="FloatPlat1" unique_id=1598213861]
-offset_left = 121.0
-offset_top = -13.0
-offset_right = 201.0
-offset_bottom = -5.0
-color = Color(0.58, 0.82, 0.38, 1)
-
-[node name="Body" type="ColorRect" parent="FloatPlat1" unique_id=1932647243]
-offset_left = 121.0
-offset_top = -5.0
-offset_right = 201.0
-offset_bottom = 7.0
-color = Color(0.46, 0.66, 0.28, 1)
-
-[node name="FloatPlat2" type="StaticBody2D" parent="." unique_id=363383193]
-position = Vector2(2200, 400)
-collision_mask = 3
-
-[node name="FloatPlat3" type="StaticBody2D" parent="." unique_id=1064536798]
-position = Vector2(4050, 380)
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="FloatPlat3" unique_id=196139674]
-shape = SubResource("rect_plat_sm")
-
-[node name="Top" type="ColorRect" parent="FloatPlat3" unique_id=42367817]
-offset_left = -60.0
-offset_top = -9.0
-offset_right = 60.0
-color = Color(0.58, 0.82, 0.38, 1)
-
-[node name="Body" type="ColorRect" parent="FloatPlat3" unique_id=1355024969]
-offset_left = -60.0
-offset_right = 60.0
-offset_bottom = 16.0
-color = Color(0.46, 0.66, 0.28, 1)
-
-[node name="Fence1a" type="ColorRect" parent="." unique_id=1574936155]
-offset_left = 100.0
-offset_top = 544.0
-offset_right = 104.0
-offset_bottom = 560.0
-color = Color(0.48, 0.36, 0.22, 0.5)
-
-[node name="Fence1b" type="ColorRect" parent="." unique_id=992890059]
-offset_left = 130.0
-offset_top = 544.0
-offset_right = 134.0
-offset_bottom = 560.0
-color = Color(0.48, 0.36, 0.22, 0.5)
-
-[node name="Fence1c" type="ColorRect" parent="." unique_id=1970985468]
-offset_left = 160.0
-offset_top = 544.0
-offset_right = 164.0
-offset_bottom = 560.0
-color = Color(0.48, 0.36, 0.22, 0.5)
-
-[node name="Fence1Rail" type="ColorRect" parent="." unique_id=1081165984]
-offset_left = 98.0
-offset_top = 546.0
-offset_right = 166.0
-offset_bottom = 548.0
-color = Color(0.48, 0.36, 0.22, 0.5)
-
-[node name="Fence2a" type="ColorRect" parent="." unique_id=683809486]
-offset_left = 2960.0
-offset_top = 544.0
-offset_right = 2964.0
-offset_bottom = 560.0
-color = Color(0.48, 0.36, 0.22, 0.5)
-
-[node name="Fence2b" type="ColorRect" parent="." unique_id=890015609]
-offset_left = 2990.0
-offset_top = 544.0
-offset_right = 2994.0
-offset_bottom = 560.0
-color = Color(0.48, 0.36, 0.22, 0.5)
-
-[node name="Fence2c" type="ColorRect" parent="." unique_id=635268851]
-offset_left = 3020.0
-offset_top = 544.0
-offset_right = 3024.0
-offset_bottom = 560.0
-color = Color(0.48, 0.36, 0.22, 0.5)
-
-[node name="Fence2Rail" type="ColorRect" parent="." unique_id=1197572567]
-offset_left = 2958.0
-offset_top = 546.0
-offset_right = 3026.0
-offset_bottom = 548.0
-color = Color(0.48, 0.36, 0.22, 0.5)
-
-[node name="Fence3a" type="ColorRect" parent="." unique_id=1819582041]
-offset_left = 4380.0
-offset_top = 544.0
-offset_right = 4384.0
-offset_bottom = 560.0
-color = Color(0.48, 0.36, 0.22, 0.5)
-
-[node name="Fence3b" type="ColorRect" parent="." unique_id=1979102906]
-offset_left = 4410.0
-offset_top = 544.0
-offset_right = 4414.0
-offset_bottom = 560.0
-color = Color(0.48, 0.36, 0.22, 0.5)
-
-[node name="Fence3c" type="ColorRect" parent="." unique_id=486870268]
-offset_left = 4440.0
-offset_top = 544.0
-offset_right = 4444.0
-offset_bottom = 560.0
-color = Color(0.48, 0.36, 0.22, 0.5)
-
-[node name="Fence3Rail" type="ColorRect" parent="." unique_id=192339556]
-offset_left = 4378.0
-offset_top = 546.0
-offset_right = 4446.0
-offset_bottom = 548.0
-color = Color(0.48, 0.36, 0.22, 0.5)
-
-[node name="ArrowBg2" type="ColorRect" parent="." unique_id=1142626674]
-offset_left = 1076.0
-offset_top = 461.0
-offset_right = 1206.0
-offset_bottom = 491.0
-color = Color(0.14, 0.16, 0.1, 0.65)
-
-[node name="Arrow2" type="Label" parent="." unique_id=698962734]
-offset_left = 1084.0
-offset_top = 465.0
-offset_right = 1198.0
-offset_bottom = 487.0
-theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 0.8)
-theme_override_font_sizes/font_size = 14
-text = ">>>  >>>"
+; ── Tutorial Hints ──
+[node name="HintLabel" type="Label" parent="."]
+offset_left = 800.0
+offset_top = 200.0
+offset_right = 1400.0
+offset_bottom = 250.0
+text = "Jump across the platforms!"
 horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="ArrowBg3" type="ColorRect" parent="." unique_id=1369078910]
-offset_left = 1660.0
-offset_top = 498.0
-offset_right = 1790.0
-offset_bottom = 528.0
-color = Color(0.14, 0.16, 0.1, 0.65)
-
-[node name="Arrow3" type="Label" parent="." unique_id=1952943454]
-offset_left = 1668.0
-offset_top = 502.0
-offset_right = 1782.0
-offset_bottom = 524.0
-theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 0.8)
-theme_override_font_sizes/font_size = 14
-text = ">>>  >>>"
+[node name="GoalHintLabel" type="Label" parent="."]
+offset_left = 2000.0
+offset_top = 280.0
+offset_right = 2200.0
+offset_bottom = 330.0
+text = ">> GOAL"
 horizontal_alignment = 1
-
-[node name="ArrowBg4" type="ColorRect" parent="." unique_id=1765005081]
-offset_left = 2540.0
-offset_top = 498.0
-offset_right = 2670.0
-offset_bottom = 528.0
-color = Color(0.14, 0.16, 0.1, 0.65)
-
-[node name="Arrow4" type="Label" parent="." unique_id=856008935]
-offset_left = 2548.0
-offset_top = 502.0
-offset_right = 2662.0
-offset_bottom = 524.0
-theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 0.8)
-theme_override_font_sizes/font_size = 14
-text = ">>>  >>>"
-horizontal_alignment = 1
-
-[node name="ArrowBg5" type="ColorRect" parent="." unique_id=749411397]
-offset_left = 3070.0
-offset_top = 498.0
-offset_right = 3200.0
-offset_bottom = 528.0
-color = Color(0.14, 0.16, 0.1, 0.65)
-
-[node name="Arrow5" type="Label" parent="." unique_id=1997653791]
-offset_left = 3078.0
-offset_top = 502.0
-offset_right = 3192.0
-offset_bottom = 524.0
-theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 0.8)
-theme_override_font_sizes/font_size = 14
-text = ">>>  >>>"
-horizontal_alignment = 1
-
-[node name="ArrowBg6" type="ColorRect" parent="." unique_id=1878023688]
-offset_left = 3710.0
-offset_top = 498.0
-offset_right = 3840.0
-offset_bottom = 528.0
-color = Color(0.14, 0.16, 0.1, 0.65)
-
-[node name="Arrow6" type="Label" parent="." unique_id=111984901]
-offset_left = 3718.0
-offset_top = 502.0
-offset_right = 3832.0
-offset_bottom = 524.0
-theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 0.8)
-theme_override_font_sizes/font_size = 14
-text = ">>>  >>>"
-horizontal_alignment = 1
-
-[node name="ArrowBg7" type="ColorRect" parent="." unique_id=185806013]
-offset_left = 4260.0
-offset_top = 498.0
-offset_right = 4390.0
-offset_bottom = 528.0
-color = Color(0.14, 0.16, 0.1, 0.65)
-
-[node name="Arrow7" type="Label" parent="." unique_id=1841373410]
-offset_left = 4268.0
-offset_top = 502.0
-offset_right = 4382.0
-offset_bottom = 524.0
-theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 0.8)
-theme_override_font_sizes/font_size = 14
-text = ">>>  >>>"
-horizontal_alignment = 1
+vertical_alignment = 1
