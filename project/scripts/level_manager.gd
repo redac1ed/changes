@@ -24,7 +24,8 @@ var _collectibles_found: Dictionary = {}  # world:level -> count
 
 func _ready():
 	WORLD_SCENES[0] = "res://scenes/tutorial.tscn"
-	WORLD_SCENES[6] = "res://scenes/levels/bonus.tscn"
+	# Bonus level removed - commented out
+	# WORLD_SCENES[6] = "res://scenes/levels/bonus.tscn"
 	
 	var dir := DirAccess.open("res://scenes/levels")
 	if dir != null:
