@@ -29,6 +29,7 @@ var settings_panel: Control
 var credits_panel: Control
 var panels: Dictionary = {}
 var visualizer_bars: Array[ColorRect] = []
+var visualizer_index_order: PoolIntArray = PoolIntArray()
 var menu_buttons: Array[Button] = []
 
 # ─── Rolling Ball ────────────────────────────────────────────
@@ -64,7 +65,9 @@ var fullscreen: bool = false
 # ─── Constants ───────────────────────────────────────────────
 const SCREEN_W: float = 1200.0
 const SCREEN_H: float = 800.0
-const VISUALIZER_BAR_COUNT: int = 22
+const VISUALIZER_BAR_COUNT: int = 18
+const VISUALIZER_CENTER_X: float = SCREEN_W / 2.0
+const VISUALIZER_CENTER_Y: float = SCREEN_H / 2.0
 const BALL_SIZE: float = 26.0
 const BALL_SPEED: float = 120.0
 const BALL_Y: float = SCREEN_H - 60.0
@@ -128,17 +131,25 @@ func _build_background() -> void:
 	starfield_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bg_layer.add_child(starfield_tex)
 
-	# Visualizer bars — white, anchored to bottom
-	var bar_total_w := SCREEN_W - 80.0
-	var bar_spacing := bar_total_w / VISUALIZER_BAR_COUNT
+	# Visualizer bars — centered, white, translucent
+	var bar_width := 6.0
+	var bar_spacing := bar_width + 4.0
+	var total_visualizer_width := bar_spacing * VISUALIZER_BAR_COUNT
+	var start_x := VISUALIZER_CENTER_X - (total_visualizer_width / 2.0)
+	# create bars and record their logical frequency index order
+	visualizer_index_order.resize(VISUALIZER_BAR_COUNT)
+	for i in VISUALIZER_BAR_COUNT:
+		visualizer_index_order[i] = i
 	for i in VISUALIZER_BAR_COUNT:
 		var bar := ColorRect.new()
-		bar.size = Vector2(bar_spacing - 3, 4)
-		bar.color = Color(1.0, 1.0, 1.0, 0.55)
-		bar.position = Vector2(40.0 + i * bar_spacing, SCREEN_H - 4)
+		bar.size = Vector2(bar_width, 4)
+		bar.color = Color(1.0, 1.0, 1.0, 0.4)
+		bar.position = Vector2(start_x + i * bar_spacing, VISUALIZER_CENTER_Y)
 		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		visualizer_bars.append(bar)
 		bg_layer.add_child(bar)
+	# randomize mapping so bars don't update sequentially left-to-right
+	visualizer_index_order.shuffle()
 
 
 func _setup_spectrum() -> void:
@@ -166,28 +177,31 @@ func _update_background(_delta: float) -> void:
 		_spectrum_inst = AudioServer.get_bus_effect_instance(
 			_spectrum_bus_idx, _spectrum_effect_idx) as AudioEffectSpectrumAnalyzerInstance
 
-	var bar_total_w := SCREEN_W - 80.0
-	var bar_spacing := bar_total_w / VISUALIZER_BAR_COUNT
+	var bar_spacing := 10.0
 	for i in visualizer_bars.size():
 		var bar: ColorRect = visualizer_bars[i]
 		var height: float
+		var idx := visualizer_index_order[i]
 		if _spectrum_inst:
 			# Spread frequencies logarithmically for better visual response
-			var t := float(i) / float(VISUALIZER_BAR_COUNT)
+			var t := float(idx) / float(VISUALIZER_BAR_COUNT)
 			var freq_lo := 40.0 * pow(500.0, t)
 			var freq_hi := freq_lo * (1.0 + 1.5 / VISUALIZER_BAR_COUNT * 20.0)
 			var mag := _spectrum_inst.get_magnitude_for_frequency_range(
 				freq_lo, freq_hi, AudioEffectSpectrumAnalyzerInstance.MAGNITUDE_AVERAGE)
 			var db := linear_to_db(mag.length())
-			height = clampf(remap(db, -80.0, -10.0, 3.0, 200.0), 3.0, 200.0)
+			height = clampf(remap(db, -80.0, -10.0, 3.0, 180.0), 3.0, 180.0)
 		else:
-			height = 6.0 + sin(time_elapsed * 2.5 + i * 0.35) * 4.0
-		bar.size.x = bar_spacing - 3
+			height = 6.0 + sin(time_elapsed * 2.5 + idx * 0.35) * 4.0
+		# Center bars: grow both up and down from center
 		bar.size.y = height
-		bar.position.y = SCREEN_H - height
-		# White but dims slightly on silence
-		var brightness := clampf(height / 80.0, 0.3, 1.0)
-		bar.color = Color(brightness, brightness, brightness, 0.7)
+		bar.position.y = VISUALIZER_CENTER_Y - (height / 2.0)
+		# White translucent, dims slightly on silence
+		var alpha := clampf(height / 100.0, 0.3, 0.7)
+		bar.color = Color(1.0, 1.0, 1.0, alpha)
+	# periodically reshuffle to avoid static patterns
+	if int(time_elapsed) % 5 == 0:
+		visualizer_index_order.shuffle()
 
 
 # ═══════════════════════════════════════════════════════════════
