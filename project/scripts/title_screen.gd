@@ -29,7 +29,7 @@ var settings_panel: Control
 var credits_panel: Control
 var panels: Dictionary = {}
 var visualizer_bars: Array[ColorRect] = []
-var visualizer_index_order: PackedInt32Array = PackedInt32Array()
+var visualizer_index_order: Array[int] = []
 var menu_buttons: Array[Button] = []
 
 # ─── Rolling Ball ────────────────────────────────────────────
