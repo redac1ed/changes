@@ -187,8 +187,7 @@ func _draw_platform_details(rect: Rect2) -> void:
 		var warn_y := rect.position.y - 14.0
 		draw_string(
 			ThemeDB.fallback_font, Vector2(warn_x - 3, warn_y),
-			"!", ThemeDB.fallback_font_size, -1,
-			Color(1.0, 0.3, 0.2, 0.9)
+			"!", ThemeDB.fallback_font_size, Color(1.0, 0.3, 0.2, 0.9), -1, HORIZONTAL_ALIGNMENT_CENTER
 		)
 
 

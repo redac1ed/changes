@@ -197,7 +197,7 @@ func _draw_top_bar() -> void:
 	var bar_h := 44.0
 	for i in range(int(bar_h)):
 		var t := float(i) / bar_h
-		var alpha := lerp(0.55, 0.0, t * t)
+		var alpha: float = lerp(0.55, 0.0, t * t)
 		var c := Color(0.03, 0.03, 0.08, alpha)
 		_draw_node.draw_line(
 			Vector2(0, i), Vector2(SCREEN_W, i), c, 1.0
@@ -319,7 +319,7 @@ func _draw_level_indicator() -> void:
 	var bar_y := SCREEN_H - 30
 	for i in range(30):
 		var t := float(i) / 30.0
-		var alpha := lerp(0.0, 0.35, t * t)
+		var alpha: float = lerp(0.0, 0.35, t * t)
 		_draw_node.draw_line(
 			Vector2(0, bar_y + i), Vector2(SCREEN_W, bar_y + i),
 			Color(0.03, 0.03, 0.08, alpha), 1.0
@@ -373,8 +373,8 @@ func _draw_score_popups() -> void:
 	var font := ThemeDB.fallback_font
 	
 	for popup in _score_popup_items:
-		var alpha := 1.0 - (popup["time"] / 1.5)
-		var scale := 1.0 + popup["time"] * 0.3
+		var alpha: float = 1.0 - (popup["time"] / 1.5)
+		var scale: float = 1.0 + popup["time"] * 0.3
 		var c := COIN_COLOR
 		c.a = alpha
 		

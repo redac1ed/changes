@@ -188,7 +188,7 @@ func _select_item() -> void:
 
 func _on_draw() -> void:
 	# Dimmed background
-	var dim_a := min(_anim_time * 4.0, 1.0) * 0.75
+	var dim_a: float = min(_anim_time * 4.0, 1.0) * 0.75
 	_draw_node.draw_rect(Rect2(0, 0, SCREEN_W, SCREEN_H), Color(0.01, 0.01, 0.04, dim_a), true)
 	
 	if _view == PauseView.MAIN:

@@ -133,7 +133,7 @@ func _on_body_entered(body: Node2D) -> void:
 		
 		# SFX
 		if AudioManager and AudioManager.has_method("play_goal_reached"):
-			AudioManager.play_goal_reached()
+			AudioManager.play_goal_reached(0)
 		
 		door_entered.emit(body)
 		door_opened.emit()

@@ -176,7 +176,7 @@ func _draw() -> void:
 	
 	# Flame particles
 	for p in _flame_particles:
-		var alpha := (1.0 - p["time"] / 0.5) * _fire_intensity
+		var alpha: float = (1.0 - p["time"] / 0.5) * _fire_intensity
 		var hue: float = p["hue"]
 		var c := Color.from_hsv(hue, 0.9, 1.0, alpha)
 		draw_circle(Vector2(p["x"], p["y"]), p["size"], c)

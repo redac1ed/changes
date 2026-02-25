@@ -167,7 +167,7 @@ func _process_shake(delta: float) -> void:
 	_shake_strength = move_toward(_shake_strength, 0.0, shake_decay * delta)
 	_trauma = move_toward(_trauma, 0.0, delta * 1.5)
 	
-	var intensity := max(_shake_strength, _trauma * _trauma)
+	var intensity: float = max(_shake_strength, _trauma * _trauma)
 	
 	if intensity <= 0.001:
 		offset = Vector2.ZERO
@@ -266,7 +266,7 @@ func _process_cinematic(delta: float) -> void:
 	var duration: float = point.get("duration", 1.0)
 	
 	_cinematic_timer += delta
-	var t := min(_cinematic_timer / duration, 1.0)
+	var t: float = min(_cinematic_timer / duration, 1.0)
 	
 	# Ease
 	t = _ease_in_out_cubic(t)

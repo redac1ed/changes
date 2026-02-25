@@ -9,11 +9,11 @@ class_name SpikeStrip
 ## Supports floor, ceiling, and wall orientations.
 
 # ─── Enums ───────────────────────────────────────────────────────────────────
-enum Orientation { FLOOR, CEILING, LEFT_WALL, RIGHT_WALL }
+enum SpikeOrientation { FLOOR, CEILING, LEFT_WALL, RIGHT_WALL }
 
 # ─── Exports ─────────────────────────────────────────────────────────────────
 @export_category("Spike Settings")
-@export var orientation: Orientation = Orientation.FLOOR
+@export var orientation: SpikeOrientation = SpikeOrientation.FLOOR
 @export var spike_count: int = 0  ## 0 = auto from size
 @export var spike_height_ratio: float = 0.65
 @export var gleam_speed: float = 2.0
@@ -29,11 +29,11 @@ func _trap_ready() -> void:
 	
 	# Rotate collision based on orientation
 	match orientation:
-		Orientation.CEILING:
+		SpikeOrientation.CEILING:
 			rotation = PI
-		Orientation.LEFT_WALL:
+		SpikeOrientation.LEFT_WALL:
 			rotation = PI / 2.0
-		Orientation.RIGHT_WALL:
+		SpikeOrientation.RIGHT_WALL:
 			rotation = -PI / 2.0
 	
 	_actual_spike_count = spike_count if spike_count > 0 else int(trap_size.x / 12.0)

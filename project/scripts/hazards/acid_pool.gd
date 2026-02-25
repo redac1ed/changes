@@ -46,7 +46,7 @@ func _process(delta: float) -> void:
 	# Update surface wave
 	var segments := _surface_points.size()
 	for i in range(segments):
-		var x_norm := float(i) / max(segments - 1, 1)
+		var x_norm: float = float(i) / max(segments - 1, 1)
 		var wave := sin(_time_elapsed * wave_speed + x_norm * 8.0) * wave_height
 		wave += sin(_time_elapsed * wave_speed * 1.7 + x_norm * 12.0) * wave_height * 0.4
 		_surface_points[i].y = -pool_size.y / 2.0 + wave
@@ -146,7 +146,7 @@ func _draw() -> void:
 	
 	# Drip particles
 	for dp in _drip_particles:
-		var dp_alpha := 1.0 - dp["time"] / 0.5
+		var dp_alpha: float = 1.0 - dp["time"] / 0.5
 		draw_circle(Vector2(dp["x"], dp["y"]), dp["size"], Color(0.4, 0.9, 0.2, dp_alpha))
 	
 	# Warning skulls/icons at edges

@@ -143,5 +143,5 @@ func _draw() -> void:
 	
 	# Emitter particles
 	for p in _emitter_particles:
-		var p_alpha := 1.0 - (p["time"] / 0.4)
+		var p_alpha: float = 1.0 - (p["time"] / 0.4)
 		draw_circle(Vector2(p["x"], p["y"]), 2.0, Color(beam_color.r, beam_color.g, beam_color.b, p_alpha * 0.6))

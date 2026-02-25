@@ -191,7 +191,7 @@ func _process_chase(delta: float) -> void:
 		state = EnemyState.PATROL
 		return
 	
-	var dir_to_ball := sign(_target_ball.global_position.x - global_position.x)
+	var dir_to_ball: float = sign(_target_ball.global_position.x - global_position.x)
 	facing = FacingDirection.RIGHT if dir_to_ball > 0 else FacingDirection.LEFT
 	velocity.x = dir_to_ball * chase_speed
 	
@@ -336,7 +336,7 @@ func _draw() -> void:
 	
 	# Death particles
 	for p in _death_particles:
-		var alpha := 1.0 - p["time"]
+		var alpha: float = 1.0 - p["time"]
 		var c: Color = p["color"]
 		c.a = alpha
 		draw_rect(Rect2(p["x"] - p["size"] / 2, p["y"] - p["size"] / 2, p["size"], p["size"]), c, true)
@@ -377,7 +377,7 @@ func _draw() -> void:
 
 func _draw_walker(color: Color, dir: float, hw: float, hh: float) -> void:
 	# Shadow
-	draw_ellipse(Vector2(0, hh + 2), Vector2(hw * 0.8, 3), Color(0, 0, 0, 0.2))
+	draw_filled_ellipse(Vector2(0, hh + 2), Vector2(hw * 0.8, 3), Color(0, 0, 0, 0.2))
 	
 	# Body (rounded rectangle approximation)
 	var body_rect := Rect2(-hw, -hh, hw * 2, hh * 2)
@@ -424,7 +424,7 @@ func _draw_bouncer(color: Color, dir: float, hw: float, hh: float) -> void:
 	draw_rect(Rect2(-hw, hh - 4, hw * 2, 4), color.darkened(0.4), true)
 	
 	# Bouncy body (circle)
-	var bounce := abs(sin(_anim_frame * 3.0)) * 3.0
+	var bounce: float = abs(sin(_anim_frame * 3.0)) * 3.0
 	draw_circle(Vector2(0, -bounce), hw * 0.9, color)
 	draw_arc(Vector2(0, -bounce), hw * 0.9, 0, TAU, 16, outline_color, 2.0)
 	
@@ -463,7 +463,7 @@ func _draw_turret(color: Color, dir: float, _hw: float, hh: float) -> void:
 
 func _draw_charger(color: Color, dir: float, hw: float, hh: float) -> void:
 	# Shadow
-	draw_ellipse(Vector2(0, hh + 2), Vector2(hw, 3), Color(0, 0, 0, 0.2))
+	draw_filled_ellipse(Vector2(0, hh + 2), Vector2(hw, 3), Color(0, 0, 0, 0.2))
 	
 	# Angled body
 	var points := PackedVector2Array()
@@ -485,7 +485,7 @@ func _draw_charger(color: Color, dir: float, hw: float, hh: float) -> void:
 	draw_circle(Vector2(dir * 3 + 3 + dir * 1.5, -hh * 0.3), 2.0, Color(0.9, 0.15, 0.05))
 
 
-func draw_ellipse(center: Vector2, extents: Vector2, color: Color) -> void:
+func draw_filled_ellipse(center: Vector2, extents: Vector2, color: Color) -> void:
 	var points := PackedVector2Array()
 	var segments := 12
 	for i in range(segments + 1):

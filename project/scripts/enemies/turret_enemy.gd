@@ -133,7 +133,7 @@ func _draw() -> void:
 	
 	# Death particles
 	for p in _death_particles:
-		var alpha := 1.0 - p["time"]
+		var alpha: float = 1.0 - p["time"]
 		var c: Color = p["color"]
 		c.a = alpha
 		draw_rect(Rect2(p["x"] - p["size"] / 2, p["y"] - p["size"] / 2, p["size"], p["size"]), c, true)
@@ -194,9 +194,9 @@ func _draw() -> void:
 	
 	# Projectiles
 	for proj in _projectiles:
-		var px := proj["x"]
-		var py := proj["y"]
-		var alpha := 1.0 - min(proj["time"] / 3.0, 0.8)
+		var px: float = proj["x"]
+		var py: float = proj["y"]
+		var alpha: float = 1.0 - min(proj["time"] / 3.0, 0.8)
 		
 		# Glow
 		draw_circle(Vector2(px, py), projectile_size + 2.0, Color(projectile_color.r, projectile_color.g, projectile_color.b, alpha * 0.3))
@@ -208,7 +208,7 @@ func _draw() -> void:
 		# Trail
 		var trail_len := 3
 		for t in range(trail_len):
-			var trail_alpha := alpha * (1.0 - float(t) / trail_len) * 0.5
-			var trail_x := px - proj["vx"] * 0.01 * (t + 1)
-			var trail_y := py - proj["vy"] * 0.01 * (t + 1)
+			var trail_alpha: float = alpha * (1.0 - float(t) / trail_len) * 0.5
+			var trail_x: float = px - proj["vx"] * 0.01 * (t + 1)
+			var trail_y: float = py - proj["vy"] * 0.01 * (t + 1)
 			draw_circle(Vector2(trail_x, trail_y), projectile_size * 0.6, Color(projectile_color.r, projectile_color.g, projectile_color.b, trail_alpha))

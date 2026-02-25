@@ -10,7 +10,7 @@ class_name ParallaxDecoration
 ## Supports: clouds, mountains, trees, stars, buildings, etc.
 
 # ─── Enums ───────────────────────────────────────────────────────────────────
-enum Theme {
+enum ParallaxTheme {
 	MEADOW,
 	VOLCANO,
 	SKY,
@@ -20,7 +20,7 @@ enum Theme {
 }
 
 # ─── Exports ─────────────────────────────────────────────────────────────────
-@export var theme: Theme = Theme.MEADOW
+@export var theme: ParallaxTheme = ParallaxTheme.MEADOW
 @export var layer_count: int = 4
 @export var auto_scroll: bool = false
 @export var auto_scroll_speed: float = 10.0
@@ -50,12 +50,12 @@ func _build_layers() -> void:
 	_layers.clear()
 	
 	match theme:
-		Theme.MEADOW: _build_meadow()
-		Theme.VOLCANO: _build_volcano()
-		Theme.SKY: _build_sky()
-		Theme.OCEAN: _build_ocean()
-		Theme.SPACE: _build_space()
-		Theme.CITY: _build_city()
+		ParallaxTheme.MEADOW: _build_meadow()
+		ParallaxTheme.VOLCANO: _build_volcano()
+		ParallaxTheme.SKY: _build_sky()
+		ParallaxTheme.OCEAN: _build_ocean()
+		ParallaxTheme.SPACE: _build_space()
+		ParallaxTheme.CITY: _build_city()
 
 
 func _add_layer(motion_scale: Vector2, color: Color, draw_callback: Callable) -> ParallaxLayer:
@@ -372,12 +372,12 @@ func _draw_buildings_near(canvas: Control, color: Color) -> void:
 static func create_for_world(world: int) -> ParallaxDecoration:
 	var pd := ParallaxDecoration.new()
 	match world:
-		0: pd.theme = Theme.MEADOW   # Tutorial
-		1: pd.theme = Theme.MEADOW
-		2: pd.theme = Theme.VOLCANO
-		3: pd.theme = Theme.SKY
-		4: pd.theme = Theme.OCEAN
-		5: pd.theme = Theme.SPACE
-		6: pd.theme = Theme.CITY     # Bonus
-		_: pd.theme = Theme.MEADOW
+		0: pd.theme = ParallaxTheme.MEADOW   # Tutorial
+		1: pd.theme = ParallaxTheme.MEADOW
+		2: pd.theme = ParallaxTheme.VOLCANO
+		3: pd.theme = ParallaxTheme.SKY
+		4: pd.theme = ParallaxTheme.OCEAN
+		5: pd.theme = ParallaxTheme.SPACE
+		6: pd.theme = ParallaxTheme.CITY     # Bonus
+		_: pd.theme = ParallaxTheme.MEADOW
 	return pd

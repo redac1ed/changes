@@ -259,14 +259,14 @@ func complete_level() -> void:
 		return
 	
 	level_complete = true
-	var shots := ball.shot_count if ball else 0
+	var shots: int = ball.shot_count if ball else 0
 	
 	# GameState tracking
 	var result: Dictionary = {}
 	if GameState:
 		result = GameState.complete_level(world_number, level_number, shots)
 	
-	var stars := result.get("stars", GameState.calculate_stars(shots) if GameState else 0)
+	var stars: int = result.get("stars", GameState.calculate_stars(shots) if GameState else 0)
 	var is_new_record: bool = result.get("is_new_record", false)
 	
 	# Show completion screen

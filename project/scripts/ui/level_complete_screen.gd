@@ -138,8 +138,8 @@ func _input(event: InputEvent) -> void:
 				menu_pressed.emit()
 	
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var mx := event.position.x
-		var my := event.position.y
+		var mx: float = event.position.x
+		var my: float = event.position.y
 		var btn_y := SCREEN_H / 2.0 + 130.0
 		var btn_h := 38.0
 		if my >= btn_y - 5 and my <= btn_y + btn_h + 5:
@@ -175,7 +175,7 @@ func _spawn_star_sparkles(star_index: int) -> void:
 
 func _on_draw() -> void:
 	# Full screen dim
-	var dim_alpha := min(_anim_time * 2.0, 1.0) * 0.85
+	var dim_alpha: float = min(_anim_time * 2.0, 1.0) * 0.85
 	_draw_node.draw_rect(Rect2(0, 0, SCREEN_W, SCREEN_H), Color(0.02, 0.02, 0.06, dim_alpha), true)
 	
 	if _panel_scale <= 0:
@@ -251,19 +251,19 @@ func _on_draw() -> void:
 			var bh := 34.0
 			
 			var bg := PANEL_BG.lightened(0.1 + _button_hover[i] * 0.15)
-			var border := btn_colors[i]
+			var border: Color = btn_colors[i]
 			border.a = 0.5 + _button_hover[i] * 0.5
 			
 			_draw_node.draw_rect(Rect2(bx, by, bw, bh), bg, true)
 			_draw_node.draw_rect(Rect2(bx, by, bw, bh), border, false, 1.5 + _button_hover[i])
 			
-			var text_c := btn_colors[i]
+			var text_c: Color = btn_colors[i]
 			text_c.a = 0.7 + _button_hover[i] * 0.3
 			_draw_node.draw_string(font, Vector2(bx + 8, by + 22), btn_labels[i], HORIZONTAL_ALIGNMENT_CENTER, bw - 16, 14, text_c)
 	
 	# Sparkle particles
 	for p in _sparkle_particles:
-		var alpha := 1.0 - p["time"]
+		var alpha: float = 1.0 - p["time"]
 		var c := Color(1.0, 0.95, 0.6, alpha)
 		_draw_node.draw_circle(Vector2(p["x"], p["y"]), p["size"] * (1.0 - p["time"] * 0.5), c)
 

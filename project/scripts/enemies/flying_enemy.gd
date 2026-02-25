@@ -112,7 +112,7 @@ func _draw() -> void:
 	
 	# Death particles from base
 	for p in _death_particles:
-		var alpha := 1.0 - p["time"]
+		var alpha: float = 1.0 - p["time"]
 		var c: Color = p["color"]
 		c.a = alpha
 		draw_rect(Rect2(p["x"] - p["size"] / 2, p["y"] - p["size"] / 2, p["size"], p["size"]), c, true)

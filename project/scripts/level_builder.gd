@@ -299,7 +299,7 @@ func add_coin(pos: Vector2, coin_type: int = 0) -> Node:
 
 func add_coin_line(start: Vector2, end: Vector2, count: int = 5, coin_type: int = 0) -> void:
 	for i in range(count):
-		var t := float(i) / max(count - 1, 1)
+		var t: float = float(i) / max(count - 1, 1)
 		var pos := start.lerp(end, t)
 		add_coin(pos, coin_type)
 
@@ -307,8 +307,8 @@ func add_coin_line(start: Vector2, end: Vector2, count: int = 5, coin_type: int 
 func add_coin_arc(center: Vector2, radius: float, count: int = 5,
 		start_angle: float = PI, end_angle: float = 0.0, coin_type: int = 0) -> void:
 	for i in range(count):
-		var t := float(i) / max(count - 1, 1)
-		var angle := lerp(start_angle, end_angle, t)
+		var t: float = float(i) / max(count - 1, 1)
+		var angle: float = lerp(start_angle, end_angle, t)
 		var pos := center + Vector2(cos(angle), sin(angle)) * radius
 		add_coin(pos, coin_type)
 

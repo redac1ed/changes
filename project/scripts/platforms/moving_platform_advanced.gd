@@ -138,7 +138,7 @@ func _apply_motion_profile(t: float) -> float:
 			else:
 				return 1.0 - pow(-2.0 * t + 2.0, 2.0) / 2.0
 		MotionProfile.BOUNCE:
-			var bounce_t := abs(sin(t * PI))
+			var bounce_t: float = abs(sin(t * PI))
 			return bounce_t
 	return t
 

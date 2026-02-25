@@ -146,14 +146,14 @@ func _draw_fade(coverage: float) -> void:
 
 func _draw_circle_wipe(coverage: float) -> void:
 	# Inverse circle — draw ring from edge to center
-	var max_radius := Vector2(SCREEN_W, SCREEN_H).length() * 0.6
-	var radius := max_radius * (1.0 - coverage)
-	var cx := SCREEN_W / 2.0
-	var cy := SCREEN_H / 2.0
+	var max_radius: float = Vector2(SCREEN_W, SCREEN_H).length() * 0.6
+	var radius: float = max_radius * (1.0 - coverage)
+	var cx: float = SCREEN_W / 2.0
+	var cy: float = SCREEN_H / 2.0
 	
 	# Draw filled background with circle hole using many rects
 	# Since we can't do stencil in _draw, approximate with ring segments
-	var c := transition_color
+	var c: Color = transition_color
 	
 	if coverage >= 0.99:
 		_draw_node.draw_rect(Rect2(0, 0, SCREEN_W, SCREEN_H), c, true)
@@ -161,15 +161,15 @@ func _draw_circle_wipe(coverage: float) -> void:
 	
 	# Draw thick ring by drawing large circle then cutting with background
 	# Approximate by drawing the border rects
-	var segments := 48
+	var segments: int = 48
 	for i in range(segments):
-		var angle := float(i) / segments * TAU
-		var next_angle := float(i + 1) / segments * TAU
+		var angle: float = float(i) / segments * TAU
+		var next_angle: float = float(i + 1) / segments * TAU
 		
-		var inner_r := max(radius, 0)
-		var outer_r := max_radius * 1.5
+		var inner_r: float = max(radius, 0)
+		var outer_r: float = max_radius * 1.5
 		
-		var pts := PackedVector2Array()
+		var pts: PackedVector2Array = PackedVector2Array()
 		pts.append(Vector2(cx + cos(angle) * inner_r, cy + sin(angle) * inner_r))
 		pts.append(Vector2(cx + cos(next_angle) * inner_r, cy + sin(next_angle) * inner_r))
 		pts.append(Vector2(cx + cos(next_angle) * outer_r, cy + sin(next_angle) * outer_r))
@@ -233,18 +233,18 @@ func _draw_pixelate(coverage: float) -> void:
 	if coverage <= 0:
 		return
 	
-	var cell_size := max(int(32 * (1.0 - coverage * 0.8)), 4)
-	var cols := int(SCREEN_W / cell_size) + 1
-	var rows := int(SCREEN_H / cell_size) + 1
+	var cell_size: int = max(int(32 * (1.0 - coverage * 0.8)), 4)
+	var cols: int = int(SCREEN_W / cell_size) + 1
+	var rows: int = int(SCREEN_H / cell_size) + 1
 	
 	for row in range(min(rows, 50)):
 		for col in range(min(cols, 75)):
-			var idx := (row * 30 + col) % _pixel_grid.size()
-			var threshold := _pixel_grid[idx]
+			var idx: int = (row * 30 + col) % _pixel_grid.size()
+			var threshold: float = _pixel_grid[idx]
 			
 			if coverage > threshold:
-				var x := col * cell_size
-				var y := row * cell_size
+				var x: float = col * cell_size
+				var y: float = row * cell_size
 				_draw_node.draw_rect(
 					Rect2(x, y, cell_size, cell_size),
 					transition_color, true
@@ -253,14 +253,14 @@ func _draw_pixelate(coverage: float) -> void:
 
 func _draw_curtain(coverage: float) -> void:
 	# Two curtains closing from sides
-	var hw := SCREEN_W * coverage * 0.5
+	var hw: float = SCREEN_W * coverage * 0.5
 	_draw_node.draw_rect(Rect2(0, 0, hw, SCREEN_H), transition_color, true)
 	_draw_node.draw_rect(Rect2(SCREEN_W - hw, 0, hw, SCREEN_H), transition_color, true)
 	
 	# Curtain edges with slight gradient
 	if hw > 0 and hw < SCREEN_W * 0.5:
 		for i in range(3):
-			var alpha := 0.2 * (1.0 - float(i) / 3)
+			var alpha: float = 0.2 * (1.0 - float(i) / 3)
 			_draw_node.draw_line(
 				Vector2(hw + i, 0), Vector2(hw + i, SCREEN_H),
 				Color(0.2, 0.3, 0.5, alpha), 1.0
@@ -275,8 +275,8 @@ func _draw_diagonal_wipe(coverage: float) -> void:
 	if coverage <= 0:
 		return
 	
-	var diag := (SCREEN_W + SCREEN_H) * coverage
-	var pts := PackedVector2Array()
+	var diag: float = (SCREEN_W + SCREEN_H) * coverage
+	var pts: PackedVector2Array = PackedVector2Array()
 	
 	if diag <= SCREEN_W:
 		pts.append(Vector2(0, 0))
@@ -293,7 +293,7 @@ func _draw_diagonal_wipe(coverage: float) -> void:
 		pts.append(Vector2(SCREEN_W, SCREEN_H))
 		if coverage < 1.0:
 			pts.append(Vector2(diag - SCREEN_H, SCREEN_H))
-			var left_y := min(diag, SCREEN_H)
+			var left_y: float = min(diag, SCREEN_H)
 			pts.append(Vector2(0, left_y))
 		else:
 			pts.append(Vector2(0, SCREEN_H))

@@ -72,7 +72,7 @@ func _process_chase(delta: float) -> void:
 	
 	_angry_pulse += delta * 6.0
 	
-	var dir_to := sign(_target_ball.global_position.x - global_position.x)
+	var dir_to: float = sign(_target_ball.global_position.x - global_position.x)
 	var new_facing := FacingDirection.RIGHT if dir_to > 0 else FacingDirection.LEFT
 	if new_facing != facing:
 		facing = new_facing
@@ -130,13 +130,13 @@ func _draw() -> void:
 	
 	# Walk dust
 	for p in _walk_particles:
-		var alpha := 1.0 - (p["time"] / 0.5)
+		var alpha: float = 1.0 - (p["time"] / 0.5)
 		var c := Color(0.6, 0.55, 0.5, alpha * 0.4)
 		draw_circle(Vector2(p["x"], p["y"]), p["size"] * (1.0 - p["time"]), c)
 	
 	# Chase anger indicator
 	if state == EnemyState.CHASE:
-		var anger_alpha := (sin(_angry_pulse) * 0.5 + 0.5) * 0.3
+		var anger_alpha: float = (sin(_angry_pulse) * 0.5 + 0.5) * 0.3
 		draw_circle(Vector2.ZERO, body_size.x * 0.8, Color(1.0, 0.2, 0.1, anger_alpha))
 		
 		# Exclamation mark

@@ -354,13 +354,13 @@ func _draw_toast() -> void:
 	if _toast_timer > 3.0:
 		fade_out = 1.0 - (_toast_timer - 3.0)
 	
-	var alpha := slide_in * fade_out
-	var slide_y := (1.0 - slide_in) * -60.0
+	var alpha: float = slide_in * fade_out
+	var slide_y: float = (1.0 - slide_in) * -60.0
 	
 	var tw := 320.0
 	var th := 70.0
 	var tx := (1200.0 - tw) / 2.0
-	var ty := 50.0 + slide_y
+	var ty: float = 50.0 + slide_y
 	
 	# Background
 	var bg := Color(0.06, 0.08, 0.14, 0.9 * alpha)
