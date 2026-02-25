@@ -349,8 +349,8 @@ func _draw_toast() -> void:
 	var font := ThemeDB.fallback_font
 	
 	# Animation
-	var slide_in := min(_toast_timer * 4.0, 1.0)
-	var fade_out := 1.0
+	var slide_in: float = min(_toast_timer * 4.0, 1.0)
+	var fade_out: float = 1.0
 	if _toast_timer > 3.0:
 		fade_out = 1.0 - (_toast_timer - 3.0)
 	

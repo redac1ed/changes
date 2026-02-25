@@ -259,10 +259,10 @@ func _draw() -> void:
 	if _is_collected:
 		return
 	
-	var sz: float = float(_config["size"])
-	var col: Color = _config["color"] as Color
-	var out: Color = _config["outline"] as Color
-	var shine: Color = _config["shine"] as Color
+	var sz: float = _config.get("size", 8.0)
+	var col: Color = _config.get("color", Color.YELLOW)
+	var out: Color = _config.get("outline", Color.BLACK)
+	var shine: Color = _config.get("shine", Color.WHITE)
 	
 	# 3D coin effect — squeeze X based on rotation
 	var squeeze := abs(cos(_coin_rotation))

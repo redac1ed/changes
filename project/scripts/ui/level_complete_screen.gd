@@ -234,7 +234,7 @@ func _on_draw() -> void:
 	
 	# New record badge
 	if is_new_record and _anim_time > 1.5:
-		var badge_alpha := min((_anim_time - 1.5) * 3.0, 1.0)
+		var badge_alpha: float = min((_anim_time - 1.5) * 3.0, 1.0)
 		var badge_c := Color(1.0, 0.4, 0.2, badge_alpha)
 		_draw_node.draw_string(font, Vector2(cx - 40, stat_y + 35), "★ NEW RECORD ★", HORIZONTAL_ALIGNMENT_CENTER, 80, 14, badge_c)
 	
