@@ -29,7 +29,7 @@ var settings_panel: Control
 var credits_panel: Control
 var panels: Dictionary = {}
 var visualizer_bars: Array[ColorRect] = []
-var visualizer_index_order: PoolIntArray = PoolIntArray()
+var visualizer_index_order: PackedInt32Array = PackedInt32Array()
 var menu_buttons: Array[Button] = []
 
 # ─── Rolling Ball ────────────────────────────────────────────
@@ -181,7 +181,7 @@ func _update_background(_delta: float) -> void:
 	for i in visualizer_bars.size():
 		var bar: ColorRect = visualizer_bars[i]
 		var height: float
-		var idx := visualizer_index_order[i]
+		var idx: int = visualizer_index_order[i]
 		if _spectrum_inst:
 			# Spread frequencies logarithmically for better visual response
 			var t := float(idx) / float(VISUALIZER_BAR_COUNT)

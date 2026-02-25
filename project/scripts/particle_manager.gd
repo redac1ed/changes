@@ -240,7 +240,7 @@ func emit_burst(preset: String, position: Vector2, direction: Vector2 = Vector2.
 
 func emit_trail(preset: String, points: PackedVector2Array) -> void:
 	"""Emit particles along a path (trail effect)"""
-	var step := max(1, points.size() / 10)  # Sample 10 points max
+	var step: int = max(1, points.size() / 10)  # Sample 10 points max
 	
 	for i in range(0, points.size(), step):
 		await get_tree().process_frame

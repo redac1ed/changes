@@ -292,7 +292,7 @@ func _activate_power_up(collector: Node2D) -> void:
 func _apply_speed_boost(collector: Node2D) -> void:
 	"""Boost collector velocity by 1.5x"""
 	if collector is RigidBody2D:
-		var original_vel := collector.linear_velocity
+		var original_vel: Vector2 = collector.linear_velocity
 		collector.linear_velocity = original_vel * 1.5
 		
 		# Visual trail effect
@@ -371,7 +371,7 @@ func _apply_magnetism() -> void:
 		var dist := global_position.distance_to(collectible.global_position)
 		if dist < power_up_radius:
 			# Pull towards collector
-			var direction := (global_position - collectible.global_position).normalized()
+			var direction: Vector2 = (global_position - collectible.global_position).normalized()
 			var tween := create_tween()
 			tween.set_trans(Tween.TRANS_QUAD)
 			tween.set_ease(Tween.EASE_IN)
@@ -589,7 +589,7 @@ static func create_from_preset(preset_name: String, position: Vector2) -> Node:
 		push_error("Unknown preset: %s" % preset_name)
 		return null
 	
-	var spec := PRESET_SPECS[preset_name]
+	var spec: Dictionary = PRESET_SPECS[preset_name]
 	var collectible := Area2D.new()
 	collectible.global_position = position
 	
