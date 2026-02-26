@@ -20,6 +20,9 @@ GameState="*res://scripts/game_state_enhanced.gd"
 LevelManager="*res://scripts/level_manager.gd"
 AudioManager="*res://scripts/audio_manager.gd"
 TransitionManager="*res://scripts/transition_manager.gd"
+AchievementSystem="*res://scripts/achievement_system.gd"
+ParticleManager="*res://scripts/particle_manager.gd"
+MenuManager="*res://scripts/ui/menu_manager.gd"
 
 [debug]
 

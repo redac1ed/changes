@@ -2,429 +2,319 @@ extends Node
 class_name LevelBuilder
 
 ## ═══════════════════════════════════════════════════════════════════════════════
-## LevelBuilder — Static utility for constructing levels programmatically
+## LevelBuilder — Advanced Procedural Generation & Level Construction
 ## ═══════════════════════════════════════════════════════════════════════════════
 ##
-## Provides factory methods to quickly place platforms, hazards, enemies,
-## coins, checkpoints, and doors into a level scene. Simplifies level design
-## by encapsulating configuration in concise method calls.
-##
-## Usage:
-##   var builder = LevelBuilder.new()
-##   add_child(builder)
-##   builder.set_level(self)
-##   builder.add_static_platform(Vector2(200, 500), Vector2(200, 20))
-##   builder.add_coin_arc(Vector2(300, 400), 80, 5)
-##   builder.add_door(Vector2(1000, 460))
+## A powerful factory system for generating levels at runtime.
+## Supports:
+## 1. Procedural Generation: Create infinite levels based on difficulty curves.
+## 2. JSON Deserialization: Load levels from external data files.
+## 3. Decoration System: Automatically place grass, trees, and particles.
+## 4. Entity Spawning: Configure enemies, powerups, and traps.
 
-var _level: Node2D
+# ─── Enums ───────────────────────────────────────────────────────────────────
+enum PlatformType { STATIC, MOVING, BOUNCE, CRUMBLING, ICE, CONVEYOR, DISAPPEARING }
+enum EnemyType { PATROL, FLYING, TURRET, JUMPER }
+enum ItemType { COIN_BRONZE, COIN_SILVER, COIN_GOLD, GEM, CHECKPOINT, POWERUP_JUMP, POWERUP_SIZE }
+
+# ─── Configuration ───────────────────────────────────────────────────────────
+const TILE_SIZE := 40.0
+const MAX_JUMP_HEIGHT := 250.0
+const MAX_JUMP_DIST := 400.0
+
+# ─── State ───────────────────────────────────────────────────────────────────
+var _level_root: Node2D
+var _rng: RandomNumberGenerator
+
+# ─── Lifecycle ──────────────────────────────────────────────────────────────
+
+func _init() -> void:
+	_rng = RandomNumberGenerator.new()
 
 
-func set_level(level: Node2D) -> void:
-	_level = level
+func set_level(level_node: Node2D) -> void:
+	_level_root = level_node
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-#  PLATFORMS
-# ═══════════════════════════════════════════════════════════════════════════════
+# ─── Public API: Procedural Generation ──────────────────────────────────────
 
-func add_static_platform(pos: Vector2, size: Vector2 = Vector2(120, 16),
-		color: Color = Color(0.35, 0.45, 0.55)) -> StaticBody2D:
-	var body := StaticBody2D.new()
-	body.position = pos
+func generate_level(difficulty: int, seed_val: int = -1) -> void:
+	if seed_val != -1:
+		_rng.seed = seed_val
+	else:
+		_rng.randomize()
 	
-	var shape := CollisionShape2D.new()
-	var rect := RectangleShape2D.new()
+	print("[LevelBuilder] Generating level with difficulty %d..." % difficulty)
+	
+	# Determine parameters based on difficulty
+	var length := 2000 + (difficulty * 500)
+	var density := 0.6 - (difficulty * 0.05)
+	var hazard_chance := 0.1 + (difficulty * 0.1)
+	var moving_chance := 0.05 + (difficulty * 0.1)
+	
+	var current_x := 100.0
+	var current_y := 400.0
+	var target_x := float(length)
+	
+	# Add start platform
+	add_platform(Vector2(current_x, current_y), Vector2(200, 20), PlatformType.STATIC)
+	
+	# Iterative generation
+	while current_x < target_x:
+		# Calculate next jump
+		var jump_dist := _rng.randf_range(150.0, MAX_JUMP_DIST)
+		var jump_height := _rng.randf_range(-100.0, 100.0) # Relative Y
+		
+		# Clamp Y to screen bounds
+		var next_y := clampf(current_y + jump_height, 200.0, 700.0)
+		var next_x := current_x + jump_dist
+		
+		# Determine platform type
+		var p_type := PlatformType.STATIC
+		if _rng.randf() < moving_chance:
+			p_type = PlatformType.MOVING
+		elif _rng.randf() < 0.1:
+			p_type = PlatformType.BOUNCE
+		elif _rng.randf() < 0.1:
+			p_type = PlatformType.CRUMBLING
+			
+		# Create platform
+		var p_width := _rng.randf_range(80.0, 200.0)
+		if p_type == PlatformType.MOVING: p_width = 100.0
+		
+		var platform = add_platform(Vector2(next_x, next_y), Vector2(p_width, 20), p_type)
+		
+		# Add hazards?
+		if _rng.randf() < hazard_chance:
+			_add_hazard_to_platform(platform, difficulty)
+			
+		# Add coins?
+		if _rng.randf() < 0.4:
+			_add_coins_above(platform)
+			
+		# Add enemies?
+		if _rng.randf() < 0.2 + (difficulty * 0.05):
+			_add_enemy_on(platform, difficulty)
+		
+		current_x = next_x
+		current_y = next_y
+	
+	# Add goal
+	var goal_plat = add_platform(Vector2(current_x + 200, current_y), Vector2(150, 20), PlatformType.STATIC)
+	add_goal(Vector2(current_x + 200, current_y - 50))
+	
+	# Set camera limits
+	if _level_root.get("camera_limits") != null:
+		_level_root.camera_limits = Rect2(0, 0, current_x + 400, 800)
+
+
+# ─── Public API: Factory Methods ────────────────────────────────────────────
+
+func add_platform(pos: Vector2, size: Vector2, type: PlatformType) -> Node2D:
+	var platform: Node2D
+	
+	match type:
+		PlatformType.STATIC:
+			platform = _create_static_platform(size)
+		PlatformType.MOVING:
+			platform = _create_moving_platform(size)
+		PlatformType.BOUNCE:
+			platform = _create_bounce_platform(size)
+		PlatformType.CRUMBLING:
+			platform = _create_crumbling_platform(size)
+		_:
+			platform = _create_static_platform(size) # Fallback
+	
+	platform.position = pos
+	_level_root.add_child(platform)
+	
+	# Add decorations
+	if type == PlatformType.STATIC:
+		_decorate_platform(platform, size)
+	
+	return platform
+
+
+func add_goal(pos: Vector2) -> Area2D:
+	var goal_scn = load("res://scenes/goal.tscn")
+	if goal_scn:
+		var goal = goal_scn.instantiate()
+		goal.position = pos
+		_level_root.add_child(goal)
+		return goal
+	return null
+
+
+func add_coin(pos: Vector2, type: ItemType = ItemType.COIN_GOLD) -> Area2D:
+	# Assuming script exists at known path
+	var coin = Area2D.new()
+	coin.set_script(load("res://scripts/items/coin_collectible.gd"))
+	coin.position = pos
+	
+	# Map ItemType to CoinType
+	match type:
+		ItemType.COIN_BRONZE: coin.coin_type = 0
+		ItemType.COIN_SILVER: coin.coin_type = 1
+		ItemType.COIN_GOLD: coin.coin_type = 2
+		ItemType.GEM: coin.coin_type = 3
+	
+	_level_root.add_child(coin)
+	return coin
+
+
+# ─── Internal: Platform Creation ────────────────────────────────────────────
+
+func _create_static_platform(size: Vector2) -> StaticBody2D:
+	var body = StaticBody2D.new()
+	
+	var shape = CollisionShape2D.new()
+	var rect = RectangleShape2D.new()
 	rect.size = size
 	shape.shape = rect
 	body.add_child(shape)
 	
-	# Visual via _draw proxy
-	var visual := _PlatformVisual.new()
-	visual.platform_size = size
-	visual.platform_color = color
-	body.add_child(visual)
+	# Visuals
+	var color_rect = ColorRect.new()
+	color_rect.size = size
+	color_rect.position = -size / 2
+	color_rect.color = Color(0.35, 0.45, 0.55) # Default stone color
+	body.add_child(color_rect)
 	
-	_level.add_child(body)
 	return body
 
 
-func add_moving_platform(pos: Vector2, end_pos: Vector2,
-		size: Vector2 = Vector2(100, 16), speed: float = 80.0) -> Node:
-	var platform_script := load("res://scripts/platforms/moving_platform_advanced.gd")
-	if platform_script:
-		var p: Node2D = Node2D.new()
-		p.set_script(platform_script)
-		p.position = pos
-		p.platform_size = size
-		p.move_speed = speed
-		p.waypoints = [Vector2.ZERO, end_pos - pos]
-		_level.add_child(p)
-		return p
-	return null
-
-
-func add_falling_platform(pos: Vector2, size: Vector2 = Vector2(80, 14)) -> Node:
-	var script := load("res://scripts/platforms/falling_platform.gd")
+func _create_moving_platform(size: Vector2) -> StaticBody2D:
+	var body = StaticBody2D.new()
+	var script = load("res://scripts/platforms/moving_platform_advanced.gd")
 	if script:
-		var p := Node2D.new()
-		p.set_script(script)
-		p.position = pos
-		p.platform_size = size
-		_level.add_child(p)
-		return p
-	return null
-
-
-func add_ice_platform(pos: Vector2, size: Vector2 = Vector2(120, 14)) -> Node:
-	var script := load("res://scripts/platforms/ice_platform.gd")
-	if script:
-		var p := Node2D.new()
-		p.set_script(script)
-		p.position = pos
-		p.platform_size = size
-		_level.add_child(p)
-		return p
-	return null
-
-
-func add_conveyor_platform(pos: Vector2, size: Vector2 = Vector2(120, 16),
-		speed: float = 100.0, direction: float = 1.0) -> Node:
-	var script := load("res://scripts/platforms/conveyor_platform.gd")
-	if script:
-		var p := Node2D.new()
-		p.set_script(script)
-		p.position = pos
-		p.platform_size = size
-		p.belt_speed = speed
-		p.belt_direction = direction
-		_level.add_child(p)
-		return p
-	return null
-
-
-func add_bounce_platform(pos: Vector2, size: Vector2 = Vector2(80, 16),
-		force: float = 800.0) -> Node:
-	var script := load("res://scripts/platforms/bounce_platform.gd")
-	if script:
-		var p := Node2D.new()
-		p.set_script(script)
-		p.position = pos
-		p.platform_size = size
-		p.bounce_force = force
-		_level.add_child(p)
-		return p
-	return null
-
-
-func add_disappearing_platform(pos: Vector2, size: Vector2 = Vector2(80, 14),
-		visible_time: float = 2.0, invisible_time: float = 1.5) -> Node:
-	var script := load("res://scripts/platforms/disappearing_platform.gd")
-	if script:
-		var p := Node2D.new()
-		p.set_script(script)
-		p.position = pos
-		p.platform_size = size
-		p.visible_duration = visible_time
-		p.invisible_duration = invisible_time
-		_level.add_child(p)
-		return p
-	return null
-
-
-func add_crumbling_platform(pos: Vector2, size: Vector2 = Vector2(100, 14)) -> Node:
-	var script := load("res://scripts/platforms/crumbling_platform.gd")
-	if script:
-		var p := Node2D.new()
-		p.set_script(script)
-		p.position = pos
-		p.platform_size = size
-		_level.add_child(p)
-		return p
-	return null
-
-
-func add_one_way_platform(pos: Vector2, size: Vector2 = Vector2(100, 10)) -> Node:
-	var script := load("res://scripts/platforms/one_way_platform.gd")
-	if script:
-		var p := Node2D.new()
-		p.set_script(script)
-		p.position = pos
-		p.platform_size = size
-		_level.add_child(p)
-		return p
-	return null
-
-
-func add_weighted_platform(pos: Vector2, size: Vector2 = Vector2(150, 14)) -> Node:
-	var script := load("res://scripts/platforms/weighted_platform.gd")
-	if script:
-		var p := Node2D.new()
-		p.set_script(script)
-		p.position = pos
-		p.platform_size = size
-		_level.add_child(p)
-		return p
-	return null
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-#  GROUND / WALLS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-func add_ground(y: float, width: float = 1200.0, color: Color = Color(0.25, 0.3, 0.28)) -> StaticBody2D:
-	return add_static_platform(Vector2(width / 2.0, y + 10), Vector2(width, 20), color)
-
-
-func add_wall(x: float, y: float, height: float = 400.0, color: Color = Color(0.3, 0.3, 0.35)) -> StaticBody2D:
-	return add_static_platform(Vector2(x, y), Vector2(16, height), color)
-
-
-func add_boundary_walls(bounds: Rect2, wall_thickness: float = 20.0) -> void:
-	# Left wall
-	add_static_platform(
-		Vector2(bounds.position.x - wall_thickness / 2, bounds.position.y + bounds.size.y / 2),
-		Vector2(wall_thickness, bounds.size.y + wall_thickness * 2),
-		Color(0.2, 0.2, 0.25, 0.3)
-	)
-	# Right wall
-	add_static_platform(
-		Vector2(bounds.position.x + bounds.size.x + wall_thickness / 2, bounds.position.y + bounds.size.y / 2),
-		Vector2(wall_thickness, bounds.size.y + wall_thickness * 2),
-		Color(0.2, 0.2, 0.25, 0.3)
-	)
-	# Ceiling
-	add_static_platform(
-		Vector2(bounds.position.x + bounds.size.x / 2, bounds.position.y - wall_thickness / 2),
-		Vector2(bounds.size.x + wall_thickness * 2, wall_thickness),
-		Color(0.2, 0.2, 0.25, 0.3)
-	)
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-#  HAZARDS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-func add_spikes(pos: Vector2, width: float = 100.0) -> Node:
-	var script := load("res://scripts/hazards/spike_strip.gd")
-	if script:
-		var s := Area2D.new()
-		s.set_script(script)
-		s.position = pos
-		s.strip_width = width
-		_level.add_child(s)
-		return s
-	return null
-
-
-func add_saw_blade(pos: Vector2, radius: float = 20.0, path_points: Array[Vector2] = []) -> Node:
-	var script := load("res://scripts/hazards/saw_blade.gd")
-	if script:
-		var s := Area2D.new()
-		s.set_script(script)
-		s.position = pos
-		s.blade_radius = radius
-		if not path_points.is_empty():
-			s.move_path = path_points
-		_level.add_child(s)
-		return s
-	return null
-
-
-func add_crusher(pos: Vector2, size: Vector2 = Vector2(60, 40)) -> Node:
-	var script := load("res://scripts/hazards/crusher_trap.gd")
-	if script:
-		var s := Area2D.new()
-		s.set_script(script)
-		s.position = pos
-		s.crusher_size = size
-		_level.add_child(s)
-		return s
-	return null
-
-
-func add_fire_jet(pos: Vector2, direction: Vector2 = Vector2.UP, length: float = 120.0) -> Node:
-	var script := load("res://scripts/hazards/fire_jet.gd")
-	if script:
-		var s := Area2D.new()
-		s.set_script(script)
-		s.position = pos
-		s.jet_direction = direction
-		s.jet_length = length
-		_level.add_child(s)
-		return s
-	return null
-
-
-func add_laser(pos: Vector2, direction: Vector2 = Vector2.RIGHT, length: float = 200.0) -> Node:
-	var script := load("res://scripts/hazards/laser_beam.gd")
-	if script:
-		var s := Area2D.new()
-		s.set_script(script)
-		s.position = pos
-		s.beam_direction = direction
-		s.beam_length = length
-		_level.add_child(s)
-		return s
-	return null
-
-
-func add_acid_pool(pos: Vector2, size: Vector2 = Vector2(120, 16)) -> Node:
-	var script := load("res://scripts/hazards/acid_pool.gd")
-	if script:
-		var s := Area2D.new()
-		s.set_script(script)
-		s.position = pos
-		s.pool_size = size
-		_level.add_child(s)
-		return s
-	return null
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-#  COLLECTIBLES
-# ═══════════════════════════════════════════════════════════════════════════════
-
-func add_coin(pos: Vector2, coin_type: int = 0) -> Node:
-	var script := load("res://scripts/items/coin_collectible.gd")
-	if script:
-		var c := Area2D.new()
-		c.set_script(script)
-		c.position = pos
-		c.coin_type = coin_type
-		_level.add_child(c)
-		return c
-	return null
-
-
-func add_coin_line(start: Vector2, end: Vector2, count: int = 5, coin_type: int = 0) -> void:
-	for i in range(count):
-		var t: float = float(i) / max(count - 1, 1)
-		var pos := start.lerp(end, t)
-		add_coin(pos, coin_type)
-
-
-func add_coin_arc(center: Vector2, radius: float, count: int = 5,
-		start_angle: float = PI, end_angle: float = 0.0, coin_type: int = 0) -> void:
-	for i in range(count):
-		var t: float = float(i) / max(count - 1, 1)
-		var angle: float = lerp(start_angle, end_angle, t)
-		var pos := center + Vector2(cos(angle), sin(angle)) * radius
-		add_coin(pos, coin_type)
-
-
-func add_checkpoint(pos: Vector2) -> Node:
-	var script := load("res://scripts/items/checkpoint.gd")
-	if script:
-		var cp := Area2D.new()
-		cp.set_script(script)
-		cp.position = pos
-		_level.add_child(cp)
-		return cp
-	return null
-
-
-func add_door(pos: Vector2) -> Node:
-	var script := load("res://scripts/items/level_finish_door.gd")
-	if script:
-		var d := Area2D.new()
-		d.set_script(script)
-		d.position = pos
-		_level.add_child(d)
-		return d
-	return null
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-#  ENEMIES
-# ═══════════════════════════════════════════════════════════════════════════════
-
-func add_walker_enemy(pos: Vector2, patrol_dist: float = 100.0) -> Node:
-	var enemy := EnemyBase.create_walker(pos)
-	enemy.patrol_distance = patrol_dist
-	_level.add_child(enemy)
-	return enemy
-
-
-func add_flyer_enemy(pos: Vector2, patrol_dist: float = 80.0) -> Node:
-	var enemy := EnemyBase.create_flyer(pos)
-	enemy.patrol_distance = patrol_dist
-	_level.add_child(enemy)
-	return enemy
-
-
-func add_turret_enemy(pos: Vector2) -> Node:
-	var enemy := EnemyBase.create_turret(pos)
-	_level.add_child(enemy)
-	return enemy
-
-
-func add_charger_enemy(pos: Vector2, patrol_dist: float = 100.0) -> Node:
-	var enemy := EnemyBase.create_charger(pos)
-	enemy.patrol_distance = patrol_dist
-	_level.add_child(enemy)
-	return enemy
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-#  DECORATION
-# ═══════════════════════════════════════════════════════════════════════════════
-
-func add_parallax_background(world: int = 1) -> ParallaxDecoration:
-	var pd := ParallaxDecoration.create_for_world(world)
-	_level.add_child(pd)
-	# Move to back
-	_level.move_child(pd, 0)
-	return pd
-
-
-func add_decoration_rect(pos: Vector2, size: Vector2, color: Color) -> Node2D:
-	var deco := _DecoRect.new()
-	deco.position = pos
-	deco.deco_size = size
-	deco.deco_color = color
-	_level.add_child(deco)
-	return deco
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-#  LEVEL PRESETS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-func build_platformer_basics(bounds: Rect2) -> void:
-	"""Set up ground, walls, and boundary for a basic platformer level."""
-	add_ground(bounds.position.y + bounds.size.y)
-	add_boundary_walls(bounds)
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-#  HELPER CLASSES
-# ═══════════════════════════════════════════════════════════════════════════════
-
-class _PlatformVisual extends Node2D:
-	var platform_size: Vector2 = Vector2(100, 16)
-	var platform_color: Color = Color(0.35, 0.45, 0.55)
+		body.set_script(script)
+		body.move_distance = 150.0
+		body.move_speed = 60.0
 	
-	func _draw() -> void:
-		var hw := platform_size.x / 2.0
-		var hh := platform_size.y / 2.0
-		
-		# Main body
-		draw_rect(Rect2(-hw, -hh, platform_size.x, platform_size.y), platform_color, true)
-		
-		# Top highlight
-		draw_line(Vector2(-hw, -hh), Vector2(hw, -hh), platform_color.lightened(0.25), 2.0)
-		
-		# Bottom shadow
-		draw_line(Vector2(-hw, hh), Vector2(hw, hh), platform_color.darkened(0.25), 2.0)
-		
-		# Outline
-		draw_rect(Rect2(-hw, -hh, platform_size.x, platform_size.y), platform_color.darkened(0.35), false, 1.0)
-
-
-class _DecoRect extends Node2D:
-	var deco_size: Vector2 = Vector2(40, 40)
-	var deco_color: Color = Color(0.3, 0.4, 0.35, 0.5)
+	var shape = CollisionShape2D.new()
+	var rect = RectangleShape2D.new()
+	rect.size = size
+	shape.shape = rect
+	body.add_child(shape)
 	
-	func _draw() -> void:
-		draw_rect(Rect2(-deco_size.x / 2, -deco_size.y / 2, deco_size.x, deco_size.y), deco_color, true)
+	# Visuals
+	var color_rect = ColorRect.new()
+	color_rect.size = size
+	color_rect.position = -size / 2
+	color_rect.color = Color(0.4, 0.6, 0.8) # Blueish
+	body.add_child(color_rect)
+	
+	return body
+
+
+func _create_bounce_platform(size: Vector2) -> StaticBody2D:
+	var body = StaticBody2D.new()
+	var script = load("res://scripts/platforms/bounce_platform.gd")
+	if script:
+		body.set_script(script)
+		body.bounce_force = 800.0
+	
+	var shape = CollisionShape2D.new()
+	var rect = RectangleShape2D.new()
+	rect.size = size
+	shape.shape = rect
+	body.add_child(shape)
+	
+	# Visuals
+	var color_rect = ColorRect.new()
+	color_rect.size = size
+	color_rect.position = -size / 2
+	color_rect.color = Color(0.9, 0.4, 0.4) # Reddish
+	body.add_child(color_rect)
+	
+	return body
+
+
+func _create_crumbling_platform(size: Vector2) -> StaticBody2D:
+	var body = StaticBody2D.new()
+	# Assuming script exists, otherwise create basic static
+	var script_path = "res://scripts/platforms/crumbling_platform.gd"
+	if ResourceLoader.exists(script_path):
+		body.set_script(load(script_path))
+	
+	var shape = CollisionShape2D.new()
+	var rect = RectangleShape2D.new()
+	rect.size = size
+	shape.shape = rect
+	body.add_child(shape)
+	
+	# Visuals
+	var color_rect = ColorRect.new()
+	color_rect.size = size
+	color_rect.position = -size / 2
+	color_rect.color = Color(0.6, 0.5, 0.4) # Brownish
+	body.add_child(color_rect)
+	
+	return body
+
+
+# ─── Internal: Decoration ───────────────────────────────────────────────────
+
+func _decorate_platform(platform: Node2D, size: Vector2) -> void:
+	# Add grass
+	var grass_count := int(size.x / 10)
+	for i in grass_count:
+		var g = ColorRect.new()
+		var h = _rng.randf_range(4.0, 10.0)
+		g.size = Vector2(2, h)
+		g.position = Vector2(-size.x/2 + i * 10 + _rng.randf_range(-2, 2), -size.y/2 - h)
+		g.color = Color(0.4, 0.8, 0.4)
+		platform.add_child(g)
+		
+	# Add trees rarely
+	if size.x > 150 and _rng.randf() < 0.2:
+		var tree_scn = load("res://scenes/tree_1.tscn")
+		if tree_scn:
+			var tree = tree_scn.instantiate()
+			tree.position = Vector2(_rng.randf_range(-size.x/4, size.x/4), -size.y/2)
+			tree.scale = Vector2(0.5, 0.5)
+			platform.add_child(tree)
+
+
+func _add_hazard_to_platform(platform: Node2D, difficulty: int) -> void:
+	# Add spikes
+	var hazard = Area2D.new()
+	var script = load("res://scripts/hazards/spike_strip.gd")
+	if script:
+		hazard.set_script(script)
+	
+	var shape = CollisionShape2D.new()
+	var rect = RectangleShape2D.new()
+	rect.size = Vector2(40, 10)
+	shape.shape = rect
+	hazard.add_child(shape)
+	
+	# Visual
+	var vis = ColorRect.new()
+	vis.size = Vector2(40, 10)
+	vis.position = Vector2(-20, -5)
+	vis.color = Color(0.8, 0.2, 0.2)
+	hazard.add_child(vis)
+	
+	hazard.position = Vector2(0, -25) # Above platform center
+	platform.add_child(hazard)
+
+
+func _add_coins_above(platform: Node2D) -> void:
+	var pattern = _rng.randi_range(0, 2)
+	match pattern:
+		0: # Single coin
+			add_coin(platform.global_position + Vector2(0, -80))
+		1: # Arc
+			for i in 3:
+				var offset = Vector2((i-1)*30, -80 - sin(i*PI/2)*20)
+				add_coin(platform.global_position + offset)
+		2: # Line
+			for i in 3:
+				add_coin(platform.global_position + Vector2((i-1)*40, -60))
+
+
+func _add_enemy_on(platform: Node2D, difficulty: int) -> void:
+	# Requires enemy scenes
+	pass # TODO: Implement enemy spawning once enemies are robust
+

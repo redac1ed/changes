@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://level_main"]
+[gd_scene load_steps=11 format=3 uid="uid://level_main"]
 
-[ext_resource type="Script" path="res://scripts/level_template.gd" id="1_level"]
+[ext_resource type="Script" path="res://scripts/levels/level_1_improved.gd" id="1_level"]
 [ext_resource type="Script" path="res://scripts/goal.gd" id="2_goal"]
 [ext_resource type="Script" path="res://scripts/platforms/bounce_platform.gd" id="3_bounce"]
 [ext_resource type="Script" path="res://scripts/platforms/moving_platform_advanced.gd" id="4_moving"]
 [ext_resource type="Script" path="res://scripts/hazards/spike_strip.gd" id="5_spike"]
+[ext_resource type="Script" path="res://scripts/items/coin_collectible.gd" id="6_coin"]
 
 [sub_resource type="RectangleShape2D" id="rect_floor"]
 size = Vector2(1600, 40)
@@ -146,6 +147,15 @@ offset_top = -4.0
 offset_right = 75.0
 offset_bottom = 10.0
 color = Color(0.38, 0.58, 0.22, 1)
+
+; ══════════════════════════════════════════════════════════════════════════════
+; COLLECTIBLE COIN
+; ══════════════════════════════════════════════════════════════════════════════
+
+[node name="Coin" type="Area2D" parent="."]
+position = Vector2(400, 440)
+script = ExtResource("6_coin")
+coin_type = 2
 
 ; ══════════════════════════════════════════════════════════════════════════════
 ; BOUNCE PLATFORM - LAUNCHES BALL UPWARD
@@ -309,7 +319,7 @@ position = Vector2(150, 490)
 [node name="GoalZone" type="Area2D" parent="."]
 position = Vector2(1450, 410)
 collision_layer = 1
-collision_mask = 1
+collision_mask = 2
 monitoring = true
 monitorable = true
 script = ExtResource("2_goal")

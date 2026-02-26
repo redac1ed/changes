@@ -6,7 +6,7 @@ extends RigidBody2D
 
 @export_group("Power")
 @export var max_power: float = 1600.0
-@export var drag_radius: float = 100.0
+@export var drag_radius: float = 60.0
 @export var drag_sensitivity: float = 1.5
 
 @export_group("Ball Appearance")

@@ -5,7 +5,7 @@ extends Control
 ## world select, settings, credits, old-TV-close transition
 
 # ─── Menu States ─────────────────────────────────────────────
-enum MenuState { MAIN, WORLD_SELECT, SETTINGS, CREDITS }
+enum MenuState { MAIN, WORLD_SELECT, SETTINGS, CREDITS, SHOP }
 var current_state: MenuState = MenuState.MAIN
 
 # ─── World Data ──────────────────────────────────────────────
@@ -97,6 +97,12 @@ func _ready() -> void:
 	modulate.a = 0.0
 	var tween := create_tween()
 	tween.tween_property(self, "modulate:a", 1.0, 0.8).set_ease(Tween.EASE_OUT)
+
+
+func _exit_tree() -> void:
+	# Stop title screen music when leaving the title screen
+	if AudioManager:
+		AudioManager.stop_music()
 
 
 func _process(delta: float) -> void:
@@ -333,6 +339,7 @@ func _build_main_panel() -> void:
 	var btn_data := [
 		{"text": "Continue", "cb": "_on_continue_pressed"},
 		{"text": "Worlds",   "cb": "_on_worlds_pressed"},
+		{"text": "Shop",     "cb": "_on_shop_pressed"},
 		{"text": "Settings", "cb": "_on_settings_pressed"},
 		{"text": "Credits",  "cb": "_on_credits_pressed"},
 		{"text": "Quit",     "cb": "_on_quit_pressed"},
@@ -744,6 +751,31 @@ func _build_credits_panel() -> void:
 
 
 # ═══════════════════════════════════════════════════════════════
+# SHOP PANEL
+# ═══════════════════════════════════════════════════════════════
+
+func _build_shop_panel() -> void:
+	var shop = ShopMenu.new()
+	shop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	shop.visible = false
+	add_child(shop)
+	panels["shop"] = shop
+	
+	# Add a back button manually since ShopMenu might not have one in its base
+	var back_btn = Button.new()
+	back_btn.text = "Back"
+	back_btn.position = Vector2(40, 40)
+	back_btn.size = Vector2(100, 40)
+	back_btn.pressed.connect(_on_back_pressed)
+	shop.add_child(back_btn)
+
+func _on_shop_pressed() -> void:
+	if not panels.has("shop"):
+		_build_shop_panel()
+	_show_panel("shop")
+
+
+# ═══════════════════════════════════════════════════════════════
 # UI HELPERS
 # ═══════════════════════════════════════════════════════════════
 
@@ -863,6 +895,7 @@ func _show_panel(panel_name: String) -> void:
 		"world":    current_state = MenuState.WORLD_SELECT
 		"settings": current_state = MenuState.SETTINGS
 		"credits":  current_state = MenuState.CREDITS
+		"shop":     current_state = MenuState.SHOP
 
 
 # ═══════════════════════════════════════════════════════════════
