@@ -265,7 +265,7 @@ func _draw() -> void:
 	var shine: Color = _config.get("shine", Color.WHITE)
 	
 	# 3D coin effect — squeeze X based on rotation
-	var squeeze := abs(cos(_coin_rotation))
+	var squeeze: float = abs(cos(_coin_rotation))
 	squeeze = maxf(squeeze, 0.15)  # Never fully flat
 	
 	# Shadow

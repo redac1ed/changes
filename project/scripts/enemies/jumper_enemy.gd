@@ -87,7 +87,7 @@ func _jump_towards_player() -> void:
 	
 	_is_grounded = false
 	
-	var dir = sign(_target_player.global_position.x - global_position.x)
+	var dir = sign(_target_ball.global_position.x - global_position.x)
 	velocity.x = dir * jump_horizontal_speed * 1.5
 	
 	_reset_jump_timer()
