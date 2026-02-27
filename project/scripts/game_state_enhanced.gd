@@ -107,6 +107,33 @@ const AUTO_SAVE_INTERVAL: float = 60.0 # Save every minute
 var _session_start_time: float = 0.0
 var _level_start_time: float = 0.0
 
+# ─── Backward Compatibility Properties ───────────────────────────────────────
+# These properties provide compatibility with the legacy GameState API
+# They expose nested data as direct properties for easier access
+
+func get_levels_completed() -> int:
+	return _save_data.levels.size()
+
+var levels_completed: int:
+	get: return get_levels_completed()
+
+var worlds_completed: int:
+	get: return _save_data.progression.worlds_completed.size()
+
+var total_shots: int:
+	get: return _save_data.meta.total_shots
+
+var game_completed: bool:
+	get: return _save_data.progression.max_world_reached >= MAX_WORLDS
+
+var current_world: int:
+	get: return _save_data.progression.current_world
+	set(value): _save_data.progression.current_world = value
+
+var current_level: int:
+	get: return _save_data.progression.current_level
+	set(value): _save_data.progression.current_level = value
+
 # ─── Lifecycle ──────────────────────────────────────────────────────────────
 
 func _ready() -> void:

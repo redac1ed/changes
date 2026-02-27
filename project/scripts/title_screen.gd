@@ -352,7 +352,7 @@ func _build_main_panel() -> void:
 		btn.position = Vector2(LEFT_MARGIN, btn_y)
 		btn.size = Vector2(280, 42)
 		btn.pressed.connect(Callable(self, d["cb"]))
-		if d["text"] == "Continue" and GameState.levels_completed == 0:
+		if d["text"] == "Continue" and GameState.get_levels_completed() == 0:
 			btn.disabled = true
 			btn.modulate.a = 0.4
 		main_panel.add_child(btn)
