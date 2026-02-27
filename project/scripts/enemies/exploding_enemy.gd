@@ -25,7 +25,7 @@ func _ready() -> void:
 	damage = 2
 
 func _process(delta: float) -> void:
-	super._process(delta)
+	# super._process(delta) # Base class does not define _process
 	
 	if state == EnemyState.DEAD:
 		return
@@ -41,8 +41,8 @@ func _process(delta: float) -> void:
 		modulate = Color(1.0 + flash_rate, 1.0 - flash_rate, 1.0 - flash_rate)
 
 	# Check player distance to start fuse
-	if _target_player and not _fuse_active:
-		var dist = global_position.distance_to(_target_player.global_position)
+	if _target_ball and not _fuse_active:
+		var dist = global_position.distance_to(_target_ball.global_position)
 		if dist < detection_range * 0.6:
 			start_fuse()
 
@@ -99,5 +99,5 @@ func explode() -> void:
 
 func die() -> void:
 	# Override base die to ensure explosion happens
-	super.die()
+	super._die()
 	explode()

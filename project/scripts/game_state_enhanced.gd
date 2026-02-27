@@ -90,6 +90,9 @@ var _settings: Dictionary = {
 		"text_size": 1.0,
 		"photosensitive": false,
 	},
+	"gameplay": {
+		"show_trajectory": true
+	},
 	"controls": {
 		"mouse_sensitivity": 1.0,
 		"invert_y": false,

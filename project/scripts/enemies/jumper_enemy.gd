@@ -78,10 +78,14 @@ func _jump() -> void:
 
 
 func _jump_towards_player() -> void:
-	if not is_on_floor(): return
-	if not _target_player: return
+	if not _is_grounded:
+		return
 	
-	velocity.y = -jump_force * 1.2 # Higher jump
+	if not _target_ball:
+		_jump()
+		return
+	
+	_is_grounded = false
 	
 	var dir = sign(_target_player.global_position.x - global_position.x)
 	velocity.x = dir * jump_horizontal_speed * 1.5

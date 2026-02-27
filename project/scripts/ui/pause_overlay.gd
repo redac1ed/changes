@@ -80,13 +80,19 @@ func _unpause() -> void:
 func _load_settings_values() -> void:
 	if GameState:
 		_settings_values = [
-			GameState.get_setting("music_volume", 0.7),
-			GameState.get_setting("sfx_volume", 0.8),
-			GameState.get_setting("master_volume", 1.0),
-			GameState.get_setting("screen_shake", true),
-			GameState.get_setting("show_trajectory", true),
+			GameState.get_setting("audio", "music"),
+			GameState.get_setting("audio", "sfx"),
+			GameState.get_setting("audio", "master"),
+			GameState.get_setting("video", "shake") > 0.0,
+			GameState.get_setting("gameplay", "show_trajectory"),
 			0,  # back button placeholder
 		]
+		# Handle potential nulls
+		if _settings_values[0] == null: _settings_values[0] = 0.7
+		if _settings_values[1] == null: _settings_values[1] = 0.8
+		if _settings_values[2] == null: _settings_values[2] = 1.0
+		if _settings_values[3] == null: _settings_values[3] = true
+		if _settings_values[4] == null: _settings_values[4] = true
 	else:
 		_settings_values = [0.7, 0.8, 1.0, true, true, 0]
 
@@ -145,20 +151,24 @@ func _input(event: InputEvent) -> void:
 func _adjust_setting(dir: int) -> void:
 	match _selected:
 		0, 1, 2:  # Volume sliders
-			var keys := ["music_volume", "sfx_volume", "master_volume"]
 			var val: float = _settings_values[_selected]
 			val = clamp(val + dir * 0.1, 0.0, 1.0)
 			_settings_values[_selected] = val
 			if GameState:
-				GameState.set_setting(keys[_selected], val)
+				var key = ""
+				match _selected:
+					0: key = "music"
+					1: key = "sfx"
+					2: key = "master"
+				GameState.set_setting("audio", key, val)
 		3:  # Screen shake toggle
 			_settings_values[3] = not _settings_values[3]
 			if GameState:
-				GameState.set_setting("screen_shake", _settings_values[3])
+				GameState.set_setting("video", "shake", 1.0 if _settings_values[3] else 0.0)
 		4:  # Trajectory toggle
 			_settings_values[4] = not _settings_values[4]
 			if GameState:
-				GameState.set_setting("show_trajectory", _settings_values[4])
+				GameState.set_setting("gameplay", "show_trajectory", _settings_values[4])
 
 
 func _select_item() -> void:

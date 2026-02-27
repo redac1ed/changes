@@ -1,5 +1,5 @@
 extends Node
-class_name AchievementSystem
+# class_name AchievementSystem
 
 ## ═══════════════════════════════════════════════════════════════════════════════
 ## AchievementSystem — Enhanced Achievement Tracker & Display

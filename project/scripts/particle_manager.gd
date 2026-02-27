@@ -1,5 +1,5 @@
 extends Node
-class_name ParticleManager
+# class_name ParticleManager
 
 ## ═══════════════════════════════════════════════════════════════════════════════
 ## ParticleManager — Advanced Effect Pooling System

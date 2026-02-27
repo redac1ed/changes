@@ -990,3 +990,10 @@ func _on_reset_progress() -> void:
 		child.queue_free()
 	await get_tree().process_frame
 	_build_world_panel()
+
+
+func _on_back_pressed() -> void:
+	if panels.has("shop"):
+		panels["shop"].visible = false
+	# Or maybe go back to main menu?
+	# For now just hide shop as it's the only one adding a back button connected to this

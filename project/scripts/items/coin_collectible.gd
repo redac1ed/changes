@@ -274,8 +274,8 @@ func _draw() -> void:
 	# Coin body (ellipse via scale trick)
 	var segments := 20
 	var points := PackedVector2Array()
-	for i in range(segments):
-		var angle := i * TAU / segments
+	for i: int in range(segments):
+		var angle: float = float(i) * TAU / float(segments)
 		points.append(Vector2(cos(angle) * sz * squeeze, sin(angle) * sz))
 	draw_colored_polygon(points, col)
 	

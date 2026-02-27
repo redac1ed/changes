@@ -1,5 +1,5 @@
 extends CanvasLayer
-class_name MenuManager
+# class_name MenuManager
 
 ## ═══════════════════════════════════════════════════════════════════════════════
 ## MenuManager — Centralized UI Navigation Controller
@@ -111,6 +111,10 @@ func pop_menu() -> void:
 func clear_menus() -> void:
 	while not _menu_stack.is_empty():
 		pop_menu()
+	
+	if _overlay:
+		_fade_overlay(false)
+	get_tree().paused = false
 
 
 # ─── Internal: UI Construction ──────────────────────────────────────────────
