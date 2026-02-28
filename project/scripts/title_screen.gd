@@ -1,5 +1,7 @@
 extends Control
 
+const ShopMenuScene := preload("res://scripts/ui/shop_menu.gd")
+
 ## Interactive Title Screen — left-aligned layout
 ## Features: starfield background, single rolling ball, music visualizer,
 ## world select, settings, credits, old-TV-close transition
@@ -755,7 +757,7 @@ func _build_credits_panel() -> void:
 # ═══════════════════════════════════════════════════════════════
 
 func _build_shop_panel() -> void:
-	var shop = ShopMenu.new()
+	var shop = ShopMenuScene.new()
 	shop.set_anchors_preset(Control.PRESET_FULL_RECT)
 	shop.visible = false
 	add_child(shop)

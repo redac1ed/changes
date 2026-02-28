@@ -542,5 +542,20 @@ func reset() -> void:
 		"levels": {},
 		"achievements": {},
 	}
-	_current_slot = 1
-	print("[GameStateEnhanced] Reset to initial state")
+
+
+func get_world_name(world: int) -> String:
+	"""Get display name for a world - delegates to LevelManager"""
+	if LevelManager:
+		return LevelManager.get_world_name(world)
+	# Fallback if LevelManager not available
+	var world_names := {
+		0: "Tutorial",
+		1: "Meadow",
+		2: "Volcano",
+		3: "Sky",
+		4: "Ocean",
+		5: "Space",
+		6: "Bonus"
+	}
+	return world_names.get(world, "Unknown")
