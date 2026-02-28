@@ -502,3 +502,45 @@ func _merge_dict(target: Dictionary, patch: Dictionary) -> Dictionary:
 		else:
 			result[key] = patch[key]
 	return result
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# RESET FUNCTIONALITY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+func reset() -> void:
+	"""Reset the game state to initial values - called when starting a new game"""
+	_save_data = {
+		"version": CURRENT_VERSION,
+		"meta": {
+			"playtime": 0.0,
+			"last_played": "",
+			"created_at": "",
+			"death_count": 0,
+			"total_shots": 0,
+			"total_jumps": 0,
+		},
+		"progression": {
+			"current_world": 1,
+			"current_level": 1,
+			"max_world_reached": 1,
+			"max_level_reached": 1,
+			"worlds_completed": [],
+		},
+		"currency": {
+			"coins": 0,
+			"gems": 0,
+			"total_coins_collected": 0,
+		},
+		"unlockables": {
+			"skins": ["default"],
+			"trails": ["default"],
+			"modes": ["story"],
+			"active_skin": "default",
+			"active_trail": "default",
+		},
+		"levels": {},
+		"achievements": {},
+	}
+	_current_slot = 1
+	print("[GameStateEnhanced] Reset to initial state")
