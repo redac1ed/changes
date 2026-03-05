@@ -123,6 +123,10 @@ var worlds_completed: int:
 var total_shots: int:
 	get: return _save_data.meta.total_shots
 
+var shots_total: int:
+	get: return _save_data.meta.total_shots
+	set(value): _save_data.meta.total_shots = maxi(0, value)
+
 var game_completed: bool:
 	get: return _save_data.progression.max_world_reached >= MAX_WORLDS
 
@@ -170,6 +174,20 @@ func _process(delta: float) -> void:
 func start_level(world: int, level: int) -> void:
 	_level_start_time = Time.get_ticks_msec() / 1000.0
 	print("[GameState] Starting World %d Level %d" % [world, level])
+
+
+func add_shots(count: int) -> void:
+	# Legacy API compatibility (old GameState.gd)
+	if count == 0:
+		return
+	_save_data.meta.total_shots += count
+	_is_dirty = true
+	state_changed.emit("shots_total", _save_data.meta.total_shots)
+
+
+func add_score(points: int) -> void:
+	# Legacy API compatibility: score maps to coins in enhanced state.
+	add_currency(points)
 
 
 func complete_level(world: int, level: int, shots: int, coins: int = 0) -> Dictionary:
