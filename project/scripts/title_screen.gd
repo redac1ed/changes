@@ -915,7 +915,7 @@ func _on_button_hover(btn: Button) -> void:
 
 func _on_play_pressed() -> void:
 	_play_tv_close_and_load(func() -> void:
-		GameState.reset()
+		
 		LevelManager.load_world(1)
 	)
 

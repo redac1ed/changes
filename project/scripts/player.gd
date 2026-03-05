@@ -7,7 +7,7 @@ extends RigidBody2D
 @export_group("Power")
 @export var max_power: float = 1600.0
 @export var drag_radius: float = 60.0
-@export var drag_sensitivity: float = 1.5
+@export var drag_sensitivity: float = 5
 
 @export_group("Ball Appearance")
 @export var ball_radius: float = 20.0
@@ -21,6 +21,7 @@ extends RigidBody2D
 # --- State ---
 var is_dragging: bool = false
 var drag_start: Vector2 = Vector2.ZERO
+var drag_offset: Vector2 = Vector2.ZERO
 var drag_current: Vector2 = Vector2.ZERO
 var shot_count: int = 0
 # True when drag was started while ball was still moving
@@ -129,8 +130,10 @@ func _input(event: InputEvent) -> void:
 			_start_drag(get_global_mouse_position())
 		else:
 			_end_drag()
+
 	elif event is InputEventMouseMotion and is_dragging:
-		drag_current = get_global_mouse_position()
+		drag_offset += event.relative
+		drag_current = drag_start + drag_offset
 
 
 # ===========================================================================
@@ -255,7 +258,12 @@ func _start_drag(mpos: Vector2) -> void:
 		return
 	is_dragging = true
 	drag_start = mpos
-	drag_current = mpos
+	drag_offset = Vector2.ZERO
+	drag_current = drag_start
+
+	# Setting the mouse to capture beyond the window
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
 	if _is_resting():
 		# Ball is already still — freeze and aim like normal
 		_drag_slow_mode = false
@@ -270,6 +278,10 @@ func _start_drag(mpos: Vector2) -> void:
 func _end_drag() -> void:
 	if not is_dragging:
 		return
+
+	# Stop the mouse capture
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+
 	is_dragging = false
 	_drag_slow_mode = false
 	freeze = false
