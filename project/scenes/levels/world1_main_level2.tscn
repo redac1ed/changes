@@ -1,12 +1,11 @@
 [gd_scene format=3 uid="uid://76bb0sd1rejb"]
 
-[ext_resource type="Script" path="res://scripts/levels/level_2.gd" id="1_level"]
-
-[ext_resource type="Script" uid="uid://cqywxv8cwge47" path="res://scripts/items/coin_collectible.gd" id="1_x0rpe"]
-[ext_resource type="Script" uid="uid://bkyx37g0sbjtw" path="res://scripts/platforms/bounce_platform.gd" id="2_mjvil"]
-[ext_resource type="Script" uid="uid://xnann1vxbuff" path="res://scripts/hazards/spike_strip.gd" id="3_v5rsi"]
-[ext_resource type="Script" uid="uid://nbhuh5einthv" path="res://scripts/platforms/moving_platform_advanced.gd" id="4_fheg2"]
-[ext_resource type="Script" uid="uid://c0vam075mn165" path="res://scripts/goal.gd" id="5_pgto0"]
+[ext_resource type="Script" uid="uid://bmhnh3dh2brvi" path="res://scripts/levels/level_2.gd" id="1_level"]
+[ext_resource type="Script" uid="uid://cb22oq5jbtnd0" path="res://scripts/items/coin_collectible.gd" id="1_x0rpe"]
+[ext_resource type="Script" uid="uid://b0dy33wopbxul" path="res://scripts/platforms/bounce_platform.gd" id="2_mjvil"]
+[ext_resource type="Script" uid="uid://dusn86fy4y26b" path="res://scripts/hazards/spike_strip.gd" id="3_v5rsi"]
+[ext_resource type="Script" uid="uid://brye3fcvyicjj" path="res://scripts/platforms/moving_platform_advanced.gd" id="4_fheg2"]
+[ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="5_pgto0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t5w2r"]
 size = Vector2(303.5039, 21.41446)
@@ -41,7 +40,6 @@ radius = 35.0
 [node name="World1MainLevel2" type="Node2D" unique_id=1126490249]
 script = ExtResource("1_level")
 level_number = 2
-world_number = 1
 camera_limits = Rect2(0, 0, 1600, 975)
 
 [node name="Background" type="ColorRect" parent="." unique_id=435546695]
@@ -215,7 +213,7 @@ offset_bottom = 10.0
 color = Color(0.6, 0.6, 0.65, 1)
 
 [node name="MovingPlatform" type="StaticBody2D" parent="." unique_id=364807637]
-position = Vector2(950, 350)
+position = Vector2(998, 304)
 script = ExtResource("4_fheg2")
 move_distance = 150.0
 move_speed = 60.0
@@ -230,6 +228,7 @@ offset_top = -10.0
 offset_right = 60.0
 offset_bottom = 10.0
 color = Color(0.45, 0.65, 0.85, 1)
+metadata/_edit_use_anchors_ = true
 
 [node name="MovingHighlight" type="ColorRect" parent="MovingPlatform" unique_id=392291047]
 offset_left = -55.0
@@ -237,9 +236,10 @@ offset_top = -8.0
 offset_right = 55.0
 offset_bottom = -4.0
 color = Color(0.6, 0.8, 1, 0.4)
+metadata/_edit_use_anchors_ = true
 
 [node name="Platform4" type="StaticBody2D" parent="." unique_id=325243]
-position = Vector2(1200, 400)
+position = Vector2(1125, 471)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Platform4" unique_id=1201428308]
 shape = SubResource("RectangleShape2D_ornir")
@@ -250,6 +250,7 @@ offset_top = -10.0
 offset_right = 75.0
 offset_bottom = -4.0
 color = Color(0.52, 0.78, 0.32, 1)
+metadata/_edit_use_anchors_ = true
 
 [node name="PlatformBody" type="ColorRect" parent="Platform4" unique_id=1196453815]
 offset_left = -75.0
@@ -257,9 +258,10 @@ offset_top = -4.0
 offset_right = 75.0
 offset_bottom = 10.0
 color = Color(0.38, 0.58, 0.22, 1)
+metadata/_edit_use_anchors_ = true
 
 [node name="GoalPlatform" type="StaticBody2D" parent="." unique_id=926212799]
-position = Vector2(1450, 172)
+position = Vector2(1455, 254)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoalPlatform" unique_id=1431209861]
 shape = SubResource("RectangleShape2D_0ar77")
@@ -284,7 +286,7 @@ metadata/_edit_use_anchors_ = true
 position = Vector2(140, 126)
 
 [node name="GoalZone" type="Area2D" parent="." unique_id=130418363]
-position = Vector2(1450, 132)
+position = Vector2(1455, 214)
 collision_mask = 2
 script = ExtResource("5_pgto0")
 goal_color = Color(0.35, 0.92, 0.5, 1)
@@ -312,10 +314,10 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="GoalHint" type="Label" parent="." unique_id=1554056070]
-offset_left = 1400.0
-offset_top = 350.0
-offset_right = 1500.0
-offset_bottom = 380.0
+offset_left = 1393.0
+offset_top = 50.0
+offset_right = 1493.0
+offset_bottom = 80.0
 theme_override_colors/font_color = Color(0.35, 0.9, 0.5, 1)
 text = ">> GOAL <<"
 horizontal_alignment = 1
