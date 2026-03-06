@@ -1,22 +1,12 @@
 extends CanvasLayer
 class_name SceneTransitionFX
 
-## ═══════════════════════════════════════════════════════════════════════════════
-## SceneTransitionFX — Collection of transition effects for level changes
-## ═══════════════════════════════════════════════════════════════════════════════
-##
-## Provides multiple transition styles: fade, circle wipe, diamond wipe,
-## slide, pixelate, dissolve. All drawn procedurally via custom _draw().
-## Works alongside existing TransitionManager or as standalone.
-
 const SCREEN_W := 1200.0
 const SCREEN_H := 800.0
 
-# ─── Signals ─────────────────────────────────────────────────────────────────
 signal transition_midpoint  ## Emitted at the halfway point (screen fully covered)
 signal transition_finished
 
-# ─── Enums ───────────────────────────────────────────────────────────────────
 enum TransitionType {
 	FADE,
 	CIRCLE_WIPE,
@@ -28,12 +18,10 @@ enum TransitionType {
 	DIAGONAL_WIPE,
 }
 
-# ─── Exports ─────────────────────────────────────────────────────────────────
 @export var default_type: TransitionType = TransitionType.FADE
 @export var default_duration: float = 0.8
 @export var transition_color: Color = Color(0.02, 0.02, 0.06)
 
-# ─── State ───────────────────────────────────────────────────────────────────
 var _active: bool = false
 var _type: TransitionType = TransitionType.FADE
 var _progress: float = 0.0  # 0 to 2 (0-1 = in, 1-2 = out)
@@ -307,9 +295,6 @@ func _ease_in_out(t: float) -> float:
 		return 2.0 * t * t
 	else:
 		return 1.0 - pow(-2.0 * t + 2.0, 2) / 2.0
-
-
-# ─── Convenience Methods ────────────────────────────────────────────────────
 
 func fade_to_scene(scene_path: String, duration: float = 0.8) -> void:
 	play(TransitionType.FADE, duration, func():

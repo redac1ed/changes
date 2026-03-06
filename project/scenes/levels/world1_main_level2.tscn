@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://76bb0sd1rejb"]
 
+[ext_resource type="Script" path="res://scripts/level_template.gd" id="1_level"]
+
 [ext_resource type="Script" uid="uid://cqywxv8cwge47" path="res://scripts/items/coin_collectible.gd" id="1_x0rpe"]
 [ext_resource type="Script" uid="uid://bkyx37g0sbjtw" path="res://scripts/platforms/bounce_platform.gd" id="2_mjvil"]
 [ext_resource type="Script" uid="uid://xnann1vxbuff" path="res://scripts/hazards/spike_strip.gd" id="3_v5rsi"]
@@ -37,6 +39,10 @@ size = Vector2(100, 20)
 radius = 35.0
 
 [node name="World1MainLevel2" type="Node2D" unique_id=1126490249]
+script = ExtResource("1_level")
+level_number = 2
+world_number = 1
+camera_limits = Rect2(0, 0, 1600, 975)
 
 [node name="Background" type="ColorRect" parent="." unique_id=435546695]
 z_index = -5

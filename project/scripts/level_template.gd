@@ -1,8 +1,5 @@
 extends Node2D
 
-## Template for level scenes
-## Handles ball spawning, goal setup, and level completion
-
 @export var level_number: int = 1
 @export var world_number: int = 1
 
@@ -75,7 +72,7 @@ func _on_goal_entered(body: Node2D) -> void:
 		print("[LevelTemplate] body != ball, ignoring")
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("reset"):
+	if event is InputEventKey and event.pressed and event.keycode == KEY_R:
 		# Reset ball position
 		if ball:
 			ball.position = ball_spawn.position

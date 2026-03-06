@@ -34,19 +34,11 @@ size = Vector2(120, 20)
 [sub_resource type="RectangleShape2D" id="rect_spike"]
 size = Vector2(100, 20)
 
-; ══════════════════════════════════════════════════════════════════════════════
-; LEVEL ROOT NODE
-; ══════════════════════════════════════════════════════════════════════════════
-
 [node name="World1Level1" type="Node2D"]
 script = ExtResource("1_level")
 level_number = 1
 world_number = 1
 camera_limits = Rect2(0, 0, 1600, 700)
-
-; ══════════════════════════════════════════════════════════════════════════════
-; BACKGROUND
-; ══════════════════════════════════════════════════════════════════════════════
 
 [node name="Background" type="ColorRect" parent="."]
 z_index = -5
@@ -59,10 +51,6 @@ z_index = -4
 offset_right = 1600.0
 offset_bottom = 350.0
 color = Color(0.55, 0.75, 0.95, 0.5)
-
-; ══════════════════════════════════════════════════════════════════════════════
-; GROUND/FLOOR
-; ══════════════════════════════════════════════════════════════════════════════
 
 [node name="Floor" type="StaticBody2D" parent="."]
 position = Vector2(800, 620)
@@ -84,10 +72,6 @@ offset_right = 800.0
 offset_bottom = 20.0
 color = Color(0.45, 0.35, 0.25, 1)
 
-; ══════════════════════════════════════════════════════════════════════════════
-; BOUNDARY WALLS
-; ══════════════════════════════════════════════════════════════════════════════
-
 [node name="WallLeft" type="StaticBody2D" parent="."]
 position = Vector2(-20, 350)
 
@@ -99,10 +83,6 @@ position = Vector2(1620, 350)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="WallRight"]
 shape = SubResource("rect_wall")
-
-; ══════════════════════════════════════════════════════════════════════════════
-; PLATFORM 1 - START AREA
-; ══════════════════════════════════════════════════════════════════════════════
 
 [node name="StartPlatform" type="StaticBody2D" parent="."]
 position = Vector2(150, 520)
@@ -124,10 +104,6 @@ offset_right = 100.0
 offset_bottom = 10.0
 color = Color(0.38, 0.58, 0.22, 1)
 
-; ══════════════════════════════════════════════════════════════════════════════
-; PLATFORM 2 - MIDDLE LOWER
-; ══════════════════════════════════════════════════════════════════════════════
-
 [node name="Platform2" type="StaticBody2D" parent="."]
 position = Vector2(400, 480)
 
@@ -148,18 +124,10 @@ offset_right = 75.0
 offset_bottom = 10.0
 color = Color(0.38, 0.58, 0.22, 1)
 
-; ══════════════════════════════════════════════════════════════════════════════
-; COLLECTIBLE COIN
-; ══════════════════════════════════════════════════════════════════════════════
-
 [node name="Coin" type="Area2D" parent="."]
 position = Vector2(400, 440)
 script = ExtResource("6_coin")
 coin_type = 2
-
-; ══════════════════════════════════════════════════════════════════════════════
-; BOUNCE PLATFORM - LAUNCHES BALL UPWARD
-; ══════════════════════════════════════════════════════════════════════════════
 
 [node name="BouncePlatform" type="StaticBody2D" parent="."]
 position = Vector2(580, 430)
@@ -185,10 +153,6 @@ offset_right = 35.0
 offset_bottom = -4.0
 color = Color(1.0, 0.6, 0.5, 0.5)
 
-; ══════════════════════════════════════════════════════════════════════════════
-; PLATFORM 3 - ELEVATED (reached via bounce)
-; ══════════════════════════════════════════════════════════════════════════════
-
 [node name="Platform3" type="StaticBody2D" parent="."]
 position = Vector2(700, 300)
 
@@ -209,10 +173,6 @@ offset_right = 75.0
 offset_bottom = 10.0
 color = Color(0.38, 0.58, 0.22, 1)
 
-; ══════════════════════════════════════════════════════════════════════════════
-; SPIKE HAZARD - DANGER ZONE BELOW
-; ══════════════════════════════════════════════════════════════════════════════
-
 [node name="SpikeStrip" type="Area2D" parent="."]
 position = Vector2(550, 598)
 script = ExtResource("5_spike")
@@ -228,10 +188,6 @@ offset_top = -10.0
 offset_right = 50.0
 offset_bottom = 10.0
 color = Color(0.6, 0.6, 0.65, 1)
-
-; ══════════════════════════════════════════════════════════════════════════════
-; MOVING PLATFORM - HORIZONTAL OSCILLATION
-; ══════════════════════════════════════════════════════════════════════════════
 
 [node name="MovingPlatform" type="StaticBody2D" parent="."]
 position = Vector2(950, 350)
@@ -257,10 +213,6 @@ offset_right = 55.0
 offset_bottom = -4.0
 color = Color(0.6, 0.8, 1.0, 0.4)
 
-; ══════════════════════════════════════════════════════════════════════════════
-; PLATFORM 4 - PRE-GOAL
-; ══════════════════════════════════════════════════════════════════════════════
-
 [node name="Platform4" type="StaticBody2D" parent="."]
 position = Vector2(1200, 400)
 
@@ -280,10 +232,6 @@ offset_top = -4.0
 offset_right = 75.0
 offset_bottom = 10.0
 color = Color(0.38, 0.58, 0.22, 1)
-
-; ══════════════════════════════════════════════════════════════════════════════
-; GOAL PLATFORM
-; ══════════════════════════════════════════════════════════════════════════════
 
 [node name="GoalPlatform" type="StaticBody2D" parent="."]
 position = Vector2(1450, 450)
@@ -305,16 +253,8 @@ offset_right = 50.0
 offset_bottom = 10.0
 color = Color(0.25, 0.7, 0.38, 1)
 
-; ══════════════════════════════════════════════════════════════════════════════
-; BALL SPAWN POINT
-; ══════════════════════════════════════════════════════════════════════════════
-
 [node name="BallSpawn" type="Marker2D" parent="."]
 position = Vector2(150, 490)
-
-; ══════════════════════════════════════════════════════════════════════════════
-; GOAL ZONE - LEVEL COMPLETE AREA
-; ══════════════════════════════════════════════════════════════════════════════
 
 [node name="GoalZone" type="Area2D" parent="."]
 position = Vector2(1450, 410)
@@ -328,10 +268,6 @@ goal_radius = 35.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone"]
 shape = SubResource("circle_goal")
-
-; ══════════════════════════════════════════════════════════════════════════════
-; UI HINTS
-; ══════════════════════════════════════════════════════════════════════════════
 
 [node name="StartHint" type="Label" parent="."]
 offset_left = 80.0

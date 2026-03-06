@@ -1,15 +1,6 @@
 extends ParallaxBackground
 class_name ParallaxDecoration
 
-## ═══════════════════════════════════════════════════════════════════════════════
-## ParallaxDecoration — Multi-layer parallax background system
-## ═══════════════════════════════════════════════════════════════════════════════
-##
-## Creates procedural parallax layers with configurable themes.
-## Each layer renders via _draw() for consistency with project style.
-## Supports: clouds, mountains, trees, stars, buildings, etc.
-
-# ─── Enums ───────────────────────────────────────────────────────────────────
 enum ParallaxTheme {
 	MEADOW,
 	VOLCANO,
@@ -19,13 +10,11 @@ enum ParallaxTheme {
 	CITY,
 }
 
-# ─── Exports ─────────────────────────────────────────────────────────────────
 @export var theme: ParallaxTheme = ParallaxTheme.MEADOW
 @export var layer_count: int = 4
 @export var auto_scroll: bool = false
 @export var auto_scroll_speed: float = 10.0
 
-# ─── Internal ────────────────────────────────────────────────────────────────
 var _layers: Array[ParallaxLayer] = []
 var _time: float = 0.0
 var _seed_value: int = 0
@@ -72,9 +61,6 @@ func _add_layer(motion_scale: Vector2, color: Color, draw_callback: Callable) ->
 	add_child(layer)
 	_layers.append(layer)
 	return layer
-
-
-# ─── MEADOW THEME ───────────────────────────────────────────────────────────
 
 func _build_meadow() -> void:
 	# Far sky gradient
@@ -365,9 +351,6 @@ func _draw_buildings_near(canvas: Control, color: Color) -> void:
 		var bh := rng.randf_range(80, 200)
 		canvas.draw_rect(Rect2(x, base_y - bh, bw, bh + 100), color, true)
 		x += bw + rng.randf_range(10, 30)
-
-
-# ─── Factory ────────────────────────────────────────────────────────────────
 
 static func create_for_world(world: int) -> ParallaxDecoration:
 	var pd := ParallaxDecoration.new()
