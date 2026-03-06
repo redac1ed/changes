@@ -110,6 +110,12 @@ func _load_scene(path: String) -> void:
 	_level_start_time = Time.get_ticks_msec() / 1000.0
 	_death_count_current = 0
 	get_tree().change_scene_to_file(path)
+	# Reset the flag once the new scene tree is ready
+	get_tree().tree_changed.connect(_on_scene_loaded, CONNECT_ONE_SHOT)
+
+
+func _on_scene_loaded() -> void:
+	_transition_in_progress = false
 
 
 func get_world_config(world: int) -> Dictionary:
