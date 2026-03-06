@@ -187,7 +187,7 @@ func _draw_trajectory() -> void:
 	if power < 10.0:
 		return
 
-	var dir := drag_vec.normalized()
+	var dir := -drag_vec.normalized()
 	var vel := dir * power
 	var grav := Vector2(0, ProjectSettings.get_setting(
 		"physics/2d/default_gravity", 980.0))
@@ -206,7 +206,7 @@ func _draw_aim_line() -> void:
 	var power := clampf(drag_vec.length() * drag_sensitivity, 0.0, max_power)
 	if power < 10.0:
 		return
-	var dir := drag_vec.normalized()
+	var dir := -drag_vec.normalized()
 	# Short solid aim line from ball center
 	var line_len := clampf(power * 0.08, 10.0, 60.0)
 	draw_line(Vector2.ZERO, dir * line_len, Color(1, 1, 1, 0.5), 2.0, true)
@@ -288,7 +288,7 @@ func _end_drag() -> void:
 
 	var drag_vec := drag_start - drag_current
 	var power := clampf(drag_vec.length() * drag_sensitivity, 0.0, max_power)
-	var dir := drag_vec.normalized()
+	var dir := -drag_vec.normalized()
 
 	if power < 10.0:
 		return
