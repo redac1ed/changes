@@ -1,22 +1,13 @@
 extends CanvasLayer
 class_name PauseOverlay
 
-## ═══════════════════════════════════════════════════════════════════════════════
-## PauseOverlay — Full-featured pause menu with settings sub-panel
-## ═══════════════════════════════════════════════════════════════════════════════
-##
-## Triggered by ESC key. Shows resume/restart/settings/quit options.
-## Settings sub-panel for volume sliders and toggles. All custom _draw().
-
 const SCREEN_W := 1200.0
 const SCREEN_H := 800.0
 
-# ─── Signals ─────────────────────────────────────────────────────────────────
 signal resumed
 signal restarted
 signal quit_to_menu
 
-# ─── Colors ──────────────────────────────────────────────────────────────────
 const BG_DIM := Color(0.01, 0.01, 0.04, 0.75)
 const PANEL_BG := Color(0.06, 0.08, 0.14, 0.95)
 const PANEL_BORDER := Color(0.3, 0.4, 0.65, 0.5)
@@ -24,7 +15,6 @@ const TEXT_COLOR := Color(0.9, 0.92, 0.95)
 const HIGHLIGHT := Color(0.45, 0.78, 1.0)
 const DIM_TEXT := Color(0.55, 0.55, 0.6)
 
-# ─── State ───────────────────────────────────────────────────────────────────
 enum PauseView { MAIN, SETTINGS }
 
 var _view: PauseView = PauseView.MAIN
@@ -35,30 +25,24 @@ var _settings_values: Array = []
 var _is_active: bool = false
 var _anim_time: float = 0.0
 var _glow_offsets: Array[float] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-
 var _draw_node: Control
-
 
 func _ready() -> void:
 	layer = 25
 	visible = false
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	
 	_draw_node = Control.new()
 	_draw_node.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_draw_node.draw.connect(_on_draw)
 	_draw_node.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(_draw_node)
-	
 	_load_settings_values()
-
 
 func toggle_pause() -> void:
 	if _is_active:
 		_unpause()
 	else:
 		_pause()
-
 
 func _pause() -> void:
 	_is_active = true
@@ -69,13 +53,11 @@ func _pause() -> void:
 	get_tree().paused = true
 	_load_settings_values()
 
-
 func _unpause() -> void:
 	_is_active = false
 	visible = false
 	get_tree().paused = false
 	resumed.emit()
-
 
 func _load_settings_values() -> void:
 	if GameState:
@@ -96,19 +78,15 @@ func _load_settings_values() -> void:
 	else:
 		_settings_values = [0.7, 0.8, 1.0, true, true, 0]
 
-
 func _process(delta: float) -> void:
 	if not _is_active:
 		return
 	_anim_time += delta
-	
 	var items := _menu_items if _view == PauseView.MAIN else _settings_items
 	for i in range(items.size()):
 		var target := 1.0 if i == _selected else 0.0
 		_glow_offsets[i] = move_toward(_glow_offsets[i], target, delta * 6.0)
-	
 	_draw_node.queue_redraw()
-
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
@@ -123,14 +101,11 @@ func _input(event: InputEvent) -> void:
 			_pause()
 			get_viewport().set_input_as_handled()
 		return
-	
 	if not _is_active:
 		return
-	
 	if event is InputEventKey and event.pressed:
 		var items := _menu_items if _view == PauseView.MAIN else _settings_items
 		var count := items.size()
-		
 		match event.keycode:
 			KEY_UP, KEY_W:
 				_selected = (_selected - 1 + count) % count
@@ -144,9 +119,7 @@ func _input(event: InputEvent) -> void:
 					_adjust_setting(1)
 			KEY_ENTER, KEY_SPACE:
 				_select_item()
-		
 		get_viewport().set_input_as_handled()
-
 
 func _adjust_setting(dir: int) -> void:
 	match _selected:
@@ -169,7 +142,6 @@ func _adjust_setting(dir: int) -> void:
 			_settings_values[4] = not _settings_values[4]
 			if GameState:
 				GameState.set_setting("gameplay", "show_trajectory", _settings_values[4])
-
 
 func _select_item() -> void:
 	if _view == PauseView.MAIN:
@@ -195,17 +167,14 @@ func _select_item() -> void:
 				_view = PauseView.MAIN
 				_selected = 2
 
-
 func _on_draw() -> void:
 	# Dimmed background
 	var dim_a: float = min(_anim_time * 4.0, 1.0) * 0.75
 	_draw_node.draw_rect(Rect2(0, 0, SCREEN_W, SCREEN_H), Color(0.01, 0.01, 0.04, dim_a), true)
-	
 	if _view == PauseView.MAIN:
 		_draw_main_menu()
 	else:
 		_draw_settings()
-
 
 func _draw_main_menu() -> void:
 	var font := ThemeDB.fallback_font
@@ -230,22 +199,14 @@ func _draw_main_menu() -> void:
 	for i in range(_menu_items.size()):
 		var is_sel := i == _selected
 		var glow := _glow_offsets[i]
-		
-		# Selection bg
 		if glow > 0:
 			var sel_bg := Color(HIGHLIGHT.r, HIGHLIGHT.g, HIGHLIGHT.b, 0.1 * glow)
 			_draw_node.draw_rect(Rect2(px + 15, item_y - 8, pw - 30, 32), sel_bg, true)
-		
-		# Indicator
 		if is_sel:
 			_draw_node.draw_string(font, Vector2(px + 25, item_y + 12), "▸", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, HIGHLIGHT)
-		
-		# Text
 		var text_c := HIGHLIGHT if is_sel else TEXT_COLOR.darkened(0.15)
 		_draw_node.draw_string(font, Vector2(px + 45, item_y + 12), _menu_items[i], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, text_c)
-		
 		item_y += 42
-
 
 func _draw_settings() -> void:
 	var font := ThemeDB.fallback_font
@@ -267,14 +228,11 @@ func _draw_settings() -> void:
 	for i in range(_settings_items.size()):
 		var is_sel := i == _selected
 		var glow := _glow_offsets[i] if i < _glow_offsets.size() else 0.0
-		
 		if glow > 0:
 			var sel_bg := Color(HIGHLIGHT.r, HIGHLIGHT.g, HIGHLIGHT.b, 0.08 * glow)
 			_draw_node.draw_rect(Rect2(px + 10, item_y - 10, pw - 20, 36), sel_bg, true)
-		
 		var label_c := HIGHLIGHT if is_sel else TEXT_COLOR.darkened(0.15)
 		_draw_node.draw_string(font, Vector2(px + 25, item_y + 10), _settings_items[i], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, label_c)
-		
 		# Value display
 		if i <= 2:  # Volume sliders
 			var val: float = _settings_values[i] if i < _settings_values.size() else 0.0
@@ -298,12 +256,11 @@ func _draw_settings() -> void:
 			var toggle_text := "ON" if val else "OFF"
 			var toggle_c := Color(0.3, 0.9, 0.4) if val else Color(0.7, 0.3, 0.3)
 			_draw_node.draw_string(font, Vector2(toggle_x, item_y + 10), toggle_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, toggle_c)
-		
+
 		elif i == 5:  # Back button
 			if is_sel:
 				_draw_node.draw_string(font, Vector2(px + 15, item_y + 10), "◂", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, HIGHLIGHT)
-		
-		item_y += 44
 	
+		item_y += 44
 	# Navigation hint
 	_draw_node.draw_string(font, Vector2(cx - 80, py + ph - 15), "← → to adjust · Enter to select", HORIZONTAL_ALIGNMENT_CENTER, 160, 11, DIM_TEXT)

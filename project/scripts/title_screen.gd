@@ -2,15 +2,9 @@ extends Control
 
 const ShopMenuScene := preload("res://scripts/ui/shop_menu.gd")
 
-## Interactive Title Screen — left-aligned layout
-## Features: starfield background, single rolling ball, music visualizer,
-## world select, settings, credits, old-TV-close transition
-
-# ─── Menu States ─────────────────────────────────────────────
 enum MenuState { MAIN, WORLD_SELECT, SETTINGS, CREDITS, SHOP }
 var current_state: MenuState = MenuState.MAIN
 
-# ─── World Data ──────────────────────────────────────────────
 const WORLDS = [
 	{"name": "Tutorial", "subtitle": "Learn the basics", "color": Color(0.95, 0.88, 0.72), "icon": "T", "levels": 1},
 	{"name": "Meadow", "subtitle": "Rolling green hills", "color": Color(0.45, 0.82, 0.45), "icon": "M", "levels": 3},
@@ -20,7 +14,6 @@ const WORLDS = [
 	{"name": "Space", "subtitle": "Zero gravity", "color": Color(0.6, 0.4, 0.9), "icon": "X", "levels": 3},
 ]
 
-# ─── Node References ─────────────────────────────────────────
 var bg_layer: Control
 var title_label: Label
 var subtitle_label: Label
@@ -34,37 +27,30 @@ var visualizer_bars: Array[ColorRect] = []
 var visualizer_index_order: Array[int] = []
 var menu_buttons: Array[Button] = []
 
-# ─── Rolling Ball ────────────────────────────────────────────
 var rolling_ball: ColorRect
 var ball_x: float = -40.0
 var ball_rotation: float = 0.0
 
-# ─── TV Close Transition ─────────────────────────────────────
 var tv_top_bar: ColorRect
 var tv_bottom_bar: ColorRect
 var tv_overlay: Control
 
-# ─── Animation State ─────────────────────────────────────────
 var time_elapsed: float = 0.0
 var is_transitioning: bool = false
 var title_bob_offset: float = 0.0
 
-# ─── Spectrum Analyzer ───────────────────────────────────────
 var _spectrum_bus_idx: int = -1
 var _spectrum_effect_idx: int = -1
 var _spectrum_inst: AudioEffectSpectrumAnalyzerInstance = null
 
-# ─── Mute Button ─────────────────────────────────────────────
 var mute_btn: Button
 
-# ─── Settings State ──────────────────────────────────────────
 var master_vol: float = 1.0
 var music_vol: float = 0.8
 var sfx_vol: float = 1.0
 var screen_shake: bool = true
 var fullscreen: bool = false
 
-# ─── Constants ───────────────────────────────────────────────
 const SCREEN_W: float = 1200.0
 const SCREEN_H: float = 800.0
 const VISUALIZER_BAR_COUNT: int = 18
@@ -74,11 +60,9 @@ const BALL_SIZE: float = 26.0
 const BALL_SPEED: float = 120.0
 const BALL_Y: float = SCREEN_H - 60.0
 
-# ─── Layout constants: left-aligned ─────────────────────────
 const LEFT_MARGIN: float = 80.0
 const TITLE_Y: float = 140.0
 const BUTTONS_START_Y: float = 380.0
-
 
 func _ready() -> void:
 	_build_background()
@@ -89,23 +73,18 @@ func _ready() -> void:
 	_build_credits_panel()
 	_build_tv_overlay()
 	_show_panel("main")
-
 	_setup_spectrum()
 	_build_mute_button()
-
 	if AudioManager:
 		AudioManager.play_music("res://assets/audio/lobby.mp3")
-
 	modulate.a = 0.0
 	var tween := create_tween()
 	tween.tween_property(self, "modulate:a", 1.0, 0.8).set_ease(Tween.EASE_OUT)
-
 
 func _exit_tree() -> void:
 	# Stop title screen music when leaving the title screen
 	if AudioManager:
 		AudioManager.stop_music()
-
 
 func _process(delta: float) -> void:
 	time_elapsed += delta
@@ -113,23 +92,16 @@ func _process(delta: float) -> void:
 	_update_title_animation(delta)
 	_update_rolling_ball(delta)
 
-
-# ═══════════════════════════════════════════════════════════════
-# BACKGROUND — starfield + visualizer bars
-# ═══════════════════════════════════════════════════════════════
-
 func _build_background() -> void:
 	bg_layer = Control.new()
 	bg_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg_layer)
-
 	# Pure black base
 	var bg := ColorRect.new()
 	bg.color = Color(0.0, 0.0, 0.0, 1.0)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg_layer.add_child(bg)
-
 	# Starfield — greyscale, subtle
 	var starfield_tex := TextureRect.new()
 	starfield_tex.texture = load("res://assets/sprites/pixelart_starfield.png")
@@ -138,7 +110,6 @@ func _build_background() -> void:
 	starfield_tex.modulate = Color(0.55, 0.55, 0.55, 0.75)
 	starfield_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bg_layer.add_child(starfield_tex)
-
 	# Visualizer bars — centered, white, translucent
 	var bar_width := 6.0
 	var bar_spacing := bar_width + 4.0
@@ -159,7 +130,6 @@ func _build_background() -> void:
 	# randomize mapping so bars don't update sequentially left-to-right
 	visualizer_index_order.shuffle()
 
-
 func _setup_spectrum() -> void:
 	# Find Music bus, fall back to Master
 	var bus_idx := AudioServer.get_bus_index("Music")
@@ -178,13 +148,11 @@ func _setup_spectrum() -> void:
 	_spectrum_bus_idx = bus_idx
 	_spectrum_effect_idx = AudioServer.get_bus_effect_count(bus_idx) - 1
 
-
 func _update_background(_delta: float) -> void:
 	# Lazily resolve the instance (only valid after the bus effect is added)
 	if _spectrum_inst == null and _spectrum_bus_idx >= 0 and _spectrum_effect_idx >= 0:
 		_spectrum_inst = AudioServer.get_bus_effect_instance(
 			_spectrum_bus_idx, _spectrum_effect_idx) as AudioEffectSpectrumAnalyzerInstance
-
 	var bar_spacing := 10.0
 	for i in visualizer_bars.size():
 		var bar: ColorRect = visualizer_bars[i]
@@ -211,11 +179,6 @@ func _update_background(_delta: float) -> void:
 	if int(time_elapsed) % 5 == 0:
 		visualizer_index_order.shuffle()
 
-
-# ═══════════════════════════════════════════════════════════════
-# ROLLING BALL — single ball left-to-right near bottom
-# ═══════════════════════════════════════════════════════════════
-
 func _build_rolling_ball() -> void:
 	rolling_ball = ColorRect.new()
 	rolling_ball.size = Vector2(BALL_SIZE, BALL_SIZE)
@@ -225,7 +188,6 @@ func _build_rolling_ball() -> void:
 	rolling_ball.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(rolling_ball)
 
-
 func _update_rolling_ball(delta: float) -> void:
 	ball_x += BALL_SPEED * delta
 	if ball_x > SCREEN_W + 60.0:
@@ -234,7 +196,6 @@ func _update_rolling_ball(delta: float) -> void:
 	rolling_ball.position.y = BALL_Y + sin(time_elapsed * 2.5) * 3.0
 	ball_rotation += delta * (BALL_SPEED / (BALL_SIZE * 0.5))
 	rolling_ball.rotation = ball_rotation
-
 
 func _build_mute_button() -> void:
 	mute_btn = Button.new()
@@ -260,21 +221,13 @@ func _build_mute_button() -> void:
 	mute_btn.pressed.connect(_on_mute_pressed)
 	add_child(mute_btn)
 
-
-# ═══════════════════════════════════════════════════════════════
 func _update_title_animation(_delta: float) -> void:
 	if title_label and title_label.has_meta("base_y"):
 		title_bob_offset = sin(time_elapsed * 1.5) * 3.0
 		title_label.position.y = title_label.get_meta("base_y") + title_bob_offset
-
 	if subtitle_label and subtitle_label.has_meta("base_y"):
 		var sub_bob := sin(time_elapsed * 1.2 + 0.5) * 2.0
 		subtitle_label.position.y = subtitle_label.get_meta("base_y") + sub_bob
-
-
-# ═══════════════════════════════════════════════════════════════
-# MAIN MENU PANEL — left-aligned
-# ═══════════════════════════════════════════════════════════════
 
 func _build_main_panel() -> void:
 	main_panel = Control.new()
@@ -282,8 +235,6 @@ func _build_main_panel() -> void:
 	main_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(main_panel)
 	panels["main"] = main_panel
-
-	# ── Title block — plain text, left-aligned, B&W ──
 	title_label = Label.new()
 	title_label.text = "CHANGES"
 	title_label.position = Vector2(LEFT_MARGIN, TITLE_Y)
@@ -291,7 +242,6 @@ func _build_main_panel() -> void:
 	title_label.add_theme_font_size_override("font_size", 80)
 	title_label.add_theme_color_override("font_color", Color.WHITE)
 	main_panel.add_child(title_label)
-
 	subtitle_label = Label.new()
 	subtitle_label.text = "the game"
 	subtitle_label.position = Vector2(LEFT_MARGIN + 4, TITLE_Y + 92)
@@ -299,22 +249,18 @@ func _build_main_panel() -> void:
 	subtitle_label.add_theme_font_size_override("font_size", 22)
 	subtitle_label.add_theme_color_override("font_color", Color(0.45, 0.45, 0.45))
 	main_panel.add_child(subtitle_label)
-
-	# thin horizontal rule under title
 	var rule := ColorRect.new()
 	rule.position = Vector2(LEFT_MARGIN, TITLE_Y + 140)
 	rule.size = Vector2(320, 1)
 	rule.color = Color(1.0, 1.0, 1.0, 0.18)
 	main_panel.add_child(rule)
 
-	# ── Play button ──
 	var play_btn := Button.new()
 	play_btn.text = "PLAY"
 	play_btn.custom_minimum_size = Vector2(200, 48)
 	play_btn.position = Vector2(LEFT_MARGIN, BUTTONS_START_Y)
 	play_btn.size = Vector2(200, 48)
 	play_btn.add_theme_font_size_override("font_size", 22)
-
 	var play_n := StyleBoxFlat.new()
 	play_n.bg_color = Color(1.0, 1.0, 1.0, 1.0)
 	play_n.border_width_left = 0
@@ -337,7 +283,6 @@ func _build_main_panel() -> void:
 	menu_buttons.append(play_btn)
 	main_panel.add_child(play_btn)
 
-	# ── Vertical button column ──
 	var btn_data := [
 		{"text": "Continue", "cb": "_on_continue_pressed"},
 		{"text": "Worlds",   "cb": "_on_worlds_pressed"},
@@ -360,7 +305,6 @@ func _build_main_panel() -> void:
 		main_panel.add_child(btn)
 		btn_y += 50.0
 
-	# ── Version footer ──
 	version_label = Label.new()
 	version_label.text = "v0.2.0 / godot 4.2"
 	version_label.position = Vector2(LEFT_MARGIN, SCREEN_H - 30)
@@ -376,10 +320,6 @@ func _build_main_panel() -> void:
 	if is_instance_valid(subtitle_label):
 		subtitle_label.set_meta("base_y", subtitle_label.position.y)
 
-
-# ═══════════════════════════════════════════════════════════════
-# WORLD SELECT PANEL
-# ═══════════════════════════════════════════════════════════════
 
 func _build_world_panel() -> void:
 	world_panel = Control.new()
@@ -421,12 +361,10 @@ func _build_world_panel() -> void:
 		var cx: float = start_x + (card_w + gap_x) * col
 		var cy: float = start_y + (card_h + gap_y) * row
 		_build_world_card(WORLDS[i], i, cx, cy, card_w, card_h)
-
 	var back_btn := _create_menu_button("<- back", 16)
 	back_btn.position = Vector2(SCREEN_W / 2.0 - 190, SCREEN_H - 65)
 	back_btn.pressed.connect(_on_back_to_main)
 	world_panel.add_child(back_btn)
-
 
 func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float, h: float) -> void:
 	var card := Panel.new()
@@ -518,10 +456,6 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	card.add_child(pbtn)
 
 
-# ═══════════════════════════════════════════════════════════════
-# SETTINGS PANEL
-# ═══════════════════════════════════════════════════════════════
-
 func _build_settings_panel() -> void:
 	settings_panel = Control.new()
 	settings_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -529,7 +463,6 @@ func _build_settings_panel() -> void:
 	settings_panel.visible = false
 	add_child(settings_panel)
 	panels["settings"] = settings_panel
-
 	var card := Panel.new()
 	card.position = Vector2(SCREEN_W / 2.0 - 250, 100)
 	card.size = Vector2(500, 520)
@@ -542,7 +475,6 @@ func _build_settings_panel() -> void:
 	card_style.border_color = Color(1.0, 1.0, 1.0, 0.2)
 	card.add_theme_stylebox_override("panel", card_style)
 	settings_panel.add_child(card)
-
 	var stitle := Label.new()
 	stitle.text = "Settings"
 	stitle.position = Vector2(0, 20)
@@ -551,13 +483,11 @@ func _build_settings_panel() -> void:
 	stitle.add_theme_font_size_override("font_size", 32)
 	stitle.add_theme_color_override("font_color", Color.WHITE)
 	card.add_child(stitle)
-
 	var sdiv := ColorRect.new()
 	sdiv.position = Vector2(50, 65)
 	sdiv.size = Vector2(400, 1)
 	sdiv.color = Color(1.0, 1.0, 1.0, 0.12)
 	card.add_child(sdiv)
-
 	var audio_hdr := Label.new()
 	audio_hdr.text = "Audio"
 	audio_hdr.position = Vector2(40, 85)
@@ -565,11 +495,9 @@ func _build_settings_panel() -> void:
 	audio_hdr.add_theme_font_size_override("font_size", 18)
 	audio_hdr.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	card.add_child(audio_hdr)
-
 	_build_slider(card, "Master Volume", 120, master_vol, "_on_master_vol_changed")
 	_build_slider(card, "Music Volume",  175, music_vol,  "_on_music_vol_changed")
 	_build_slider(card, "SFX Volume",    230, sfx_vol,    "_on_sfx_vol_changed")
-
 	var disp_hdr := Label.new()
 	disp_hdr.text = "Display"
 	disp_hdr.position = Vector2(40, 295)
@@ -577,7 +505,6 @@ func _build_settings_panel() -> void:
 	disp_hdr.add_theme_font_size_override("font_size", 18)
 	disp_hdr.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	card.add_child(disp_hdr)
-
 	var fs_label := Label.new()
 	fs_label.text = "Fullscreen"
 	fs_label.position = Vector2(40, 330)
@@ -590,7 +517,6 @@ func _build_settings_panel() -> void:
 	fs_btn.button_pressed = fullscreen
 	fs_btn.toggled.connect(_on_fullscreen_toggled)
 	card.add_child(fs_btn)
-
 	var shake_label := Label.new()
 	shake_label.text = "Screen Shake"
 	shake_label.position = Vector2(40, 370)
@@ -603,7 +529,6 @@ func _build_settings_panel() -> void:
 	shake_btn.button_pressed = screen_shake
 	shake_btn.toggled.connect(_on_shake_toggled)
 	card.add_child(shake_btn)
-
 	var reset_btn := Button.new()
 	reset_btn.text = "Reset All Progress"
 	reset_btn.position = Vector2(125, 430)
@@ -626,12 +551,10 @@ func _build_settings_panel() -> void:
 	reset_btn.add_theme_color_override("font_hover_color", Color(0.85, 0.85, 0.85))
 	reset_btn.pressed.connect(_on_reset_progress)
 	card.add_child(reset_btn)
-
 	var back_btn := _create_menu_button("<- back", 16)
 	back_btn.position = Vector2(SCREEN_W / 2.0 - 190, SCREEN_H - 65)
 	back_btn.pressed.connect(_on_back_to_main)
 	settings_panel.add_child(back_btn)
-
 
 func _build_slider(parent: Control, label_text: String, y_pos: float, initial: float, callback: String) -> void:
 	var lbl := Label.new()
@@ -641,7 +564,6 @@ func _build_slider(parent: Control, label_text: String, y_pos: float, initial: f
 	lbl.add_theme_font_size_override("font_size", 15)
 	lbl.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	parent.add_child(lbl)
-
 	var slider := HSlider.new()
 	slider.position = Vector2(200, y_pos + 3)
 	slider.size = Vector2(180, 20)
@@ -651,7 +573,6 @@ func _build_slider(parent: Control, label_text: String, y_pos: float, initial: f
 	slider.value = initial
 	slider.value_changed.connect(Callable(self, callback))
 	parent.add_child(slider)
-
 	var val_lbl := Label.new()
 	val_lbl.text = "%d%%" % int(initial * 100)
 	val_lbl.position = Vector2(395, y_pos)
@@ -659,15 +580,9 @@ func _build_slider(parent: Control, label_text: String, y_pos: float, initial: f
 	val_lbl.add_theme_font_size_override("font_size", 14)
 	val_lbl.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 	parent.add_child(val_lbl)
-
 	slider.value_changed.connect(func(val: float) -> void:
 		val_lbl.text = "%d%%" % int(val * 100)
 	)
-
-
-# ═══════════════════════════════════════════════════════════════
-# CREDITS PANEL
-# ═══════════════════════════════════════════════════════════════
 
 func _build_credits_panel() -> void:
 	credits_panel = Control.new()
@@ -676,7 +591,6 @@ func _build_credits_panel() -> void:
 	credits_panel.visible = false
 	add_child(credits_panel)
 	panels["credits"] = credits_panel
-
 	var card := Panel.new()
 	card.position = Vector2(SCREEN_W / 2.0 - 280, 80)
 	card.size = Vector2(560, 560)
@@ -689,7 +603,6 @@ func _build_credits_panel() -> void:
 	cs.border_color = Color(1.0, 1.0, 1.0, 0.2)
 	card.add_theme_stylebox_override("panel", cs)
 	credits_panel.add_child(card)
-
 	var cr_title := Label.new()
 	cr_title.text = "Credits"
 	cr_title.position = Vector2(0, 25)
@@ -698,13 +611,11 @@ func _build_credits_panel() -> void:
 	cr_title.add_theme_font_size_override("font_size", 34)
 	cr_title.add_theme_color_override("font_color", Color.WHITE)
 	card.add_child(cr_title)
-
 	var cdiv := ColorRect.new()
 	cdiv.position = Vector2(60, 75)
 	cdiv.size = Vector2(440, 1)
 	cdiv.color = Color(1.0, 1.0, 1.0, 0.12)
 	card.add_child(cdiv)
-
 	var entries := [
 		{"role": "Game Design & Development", "name": "Changes Team"},
 		{"role": "Engine",                    "name": "Godot 4.2 (godotengine.org)"},
@@ -715,7 +626,6 @@ func _build_credits_panel() -> void:
 		{"role": "Art Style",                 "name": "Abstract Minimalist"},
 		{"role": "Special Thanks",            "name": "The Godot Community"},
 	]
-
 	var y_offset: float = 100.0
 	for entry in entries:
 		var role_lbl := Label.new()
@@ -726,7 +636,6 @@ func _build_credits_panel() -> void:
 		role_lbl.add_theme_font_size_override("font_size", 12)
 		role_lbl.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4))
 		card.add_child(role_lbl)
-
 		var name_lbl := Label.new()
 		name_lbl.text = entry["name"]
 		name_lbl.position = Vector2(40, y_offset + 18)
@@ -745,16 +654,10 @@ func _build_credits_panel() -> void:
 	love_lbl.add_theme_font_size_override("font_size", 13)
 	love_lbl.add_theme_color_override("font_color", Color(0.35, 0.35, 0.35))
 	card.add_child(love_lbl)
-
 	var back_btn := _create_menu_button("<- back", 16)
 	back_btn.position = Vector2(SCREEN_W / 2.0 - 190, SCREEN_H - 65)
 	back_btn.pressed.connect(_on_back_to_main)
 	credits_panel.add_child(back_btn)
-
-
-# ═══════════════════════════════════════════════════════════════
-# SHOP PANEL
-# ═══════════════════════════════════════════════════════════════
 
 func _build_shop_panel() -> void:
 	var shop = ShopMenuScene.new()
@@ -776,17 +679,11 @@ func _on_shop_pressed() -> void:
 		_build_shop_panel()
 	_show_panel("shop")
 
-
-# ═══════════════════════════════════════════════════════════════
-# UI HELPERS
-# ═══════════════════════════════════════════════════════════════
-
 func _create_menu_button(text: String, font_size: int) -> Button:
 	var btn := Button.new()
 	btn.text = text
 	btn.custom_minimum_size = Vector2(280, 42)
 	btn.add_theme_font_size_override("font_size", font_size)
-
 	var style_n := StyleBoxFlat.new()
 	style_n.bg_color = Color(0.0, 0.0, 0.0, 0.0)
 	style_n.border_width_left = 1
@@ -796,17 +693,13 @@ func _create_menu_button(text: String, font_size: int) -> Button:
 	style_n.border_color = Color(1.0, 1.0, 1.0, 0.5)
 	style_n.content_margin_left = 16
 	style_n.content_margin_right = 16
-
 	var style_h := style_n.duplicate()
 	style_h.bg_color = Color(1.0, 1.0, 1.0, 0.12)
 	style_h.border_color = Color(1.0, 1.0, 1.0, 1.0)
-
 	var style_p := style_n.duplicate()
 	style_p.bg_color = Color(1.0, 1.0, 1.0, 0.06)
-
 	var style_d := style_n.duplicate()
 	style_d.border_color = Color(1.0, 1.0, 1.0, 0.15)
-
 	btn.add_theme_stylebox_override("normal", style_n)
 	btn.add_theme_stylebox_override("hover", style_h)
 	btn.add_theme_stylebox_override("pressed", style_p)
@@ -818,25 +711,18 @@ func _create_menu_button(text: String, font_size: int) -> Button:
 	menu_buttons.append(btn)
 	return btn
 
-
-# ═══════════════════════════════════════════════════════════════
-# TV-CLOSE TRANSITION — bars slide from top & bottom to centre
-# ═══════════════════════════════════════════════════════════════
-
 func _build_tv_overlay() -> void:
 	tv_overlay = Control.new()
 	tv_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	tv_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tv_overlay.visible = false
 	add_child(tv_overlay)
-
 	tv_top_bar = ColorRect.new()
 	tv_top_bar.color = Color.BLACK
 	tv_top_bar.position = Vector2(0, -SCREEN_H / 2.0)
 	tv_top_bar.size = Vector2(SCREEN_W, SCREEN_H / 2.0)
 	tv_top_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tv_overlay.add_child(tv_top_bar)
-
 	tv_bottom_bar = ColorRect.new()
 	tv_bottom_bar.color = Color.BLACK
 	tv_bottom_bar.position = Vector2(0, SCREEN_H)
@@ -844,17 +730,14 @@ func _build_tv_overlay() -> void:
 	tv_bottom_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tv_overlay.add_child(tv_bottom_bar)
 
-
 func _play_tv_close_and_load(callback: Callable) -> void:
 	if is_transitioning:
 		return
 	is_transitioning = true
-
 	tv_overlay.visible = true
 	tv_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	tv_top_bar.position.y = -SCREEN_H / 2.0
 	tv_bottom_bar.position.y = SCREEN_H
-
 	var tw := create_tween()
 	tw.set_parallel(true)
 	tw.tween_property(tv_top_bar,    "position:y", 0.0,             0.6).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
@@ -863,16 +746,10 @@ func _play_tv_close_and_load(callback: Callable) -> void:
 	tw.tween_interval(0.15)
 	tw.tween_callback(callback)
 
-
-# ═══════════════════════════════════════════════════════════════
-# PANEL TRANSITIONS
-# ═══════════════════════════════════════════════════════════════
-
 func _show_panel(panel_name: String) -> void:
 	if is_transitioning:
 		return
 	is_transitioning = true
-
 	for key in panels:
 		var panel: Control = panels[key]
 		if key == panel_name:
@@ -885,9 +762,7 @@ func _show_panel(panel_name: String) -> void:
 	var target: Control = panels[panel_name]
 	target.modulate.a = 0.0
 	target.visible = true
-
 	await get_tree().create_timer(0.15).timeout
-
 	var tw := create_tween()
 	tw.tween_property(target, "modulate:a", 1.0, 0.3).set_ease(Tween.EASE_OUT)
 	tw.tween_callback(func() -> void: is_transitioning = false)
@@ -899,11 +774,6 @@ func _show_panel(panel_name: String) -> void:
 		"credits":  current_state = MenuState.CREDITS
 		"shop":     current_state = MenuState.SHOP
 
-
-# ═══════════════════════════════════════════════════════════════
-# SIGNAL HANDLERS
-# ═══════════════════════════════════════════════════════════════
-
 func _on_button_hover(btn: Button) -> void:
 	var tw := create_tween()
 	tw.tween_property(btn, "scale", Vector2(1.02, 1.02), 0.1).set_ease(Tween.EASE_OUT)
@@ -912,67 +782,54 @@ func _on_button_hover(btn: Button) -> void:
 		tw2.tween_property(btn, "scale", Vector2.ONE, 0.1).set_ease(Tween.EASE_IN)
 	, CONNECT_ONE_SHOT)
 
-
 func _on_play_pressed() -> void:
 	_play_tv_close_and_load(func() -> void:
 		
 		LevelManager.load_world(1)
 	)
 
-
 func _on_continue_pressed() -> void:
 	_play_tv_close_and_load(func() -> void:
 		LevelManager.load_world(GameState.current_world)
 	)
 
-
 func _on_worlds_pressed() -> void:
 	_show_panel("world")
-
 
 func _on_settings_pressed() -> void:
 	_show_panel("settings")
 
-
 func _on_credits_pressed() -> void:
 	_show_panel("credits")
 
-
 func _on_back_to_main() -> void:
 	_show_panel("main")
-
 
 func _on_quit_pressed() -> void:
 	var tw := create_tween()
 	tw.tween_property(self, "modulate:a", 0.0, 0.4).set_ease(Tween.EASE_IN)
 	tw.tween_callback(func() -> void: get_tree().quit())
 
-
 func _on_world_play(world_index: int) -> void:
 	_play_tv_close_and_load(func() -> void:
 		LevelManager.load_world(world_index)
 	)
-
 
 func _on_mute_pressed() -> void:
 	if AudioManager:
 		AudioManager.music_muted = not AudioManager.music_muted
 		mute_btn.text = "[✕]" if AudioManager.music_muted else "[♪]"
 
-
 func _on_master_vol_changed(val: float) -> void:
 	master_vol = val
-
 
 func _on_music_vol_changed(val: float) -> void:
 	music_vol = val
 	GameState.music_muted = (val < 0.01)
 
-
 func _on_sfx_vol_changed(val: float) -> void:
 	sfx_vol = val
 	GameState.sfx_muted = (val < 0.01)
-
 
 func _on_fullscreen_toggled(pressed: bool) -> void:
 	fullscreen = pressed
@@ -981,10 +838,8 @@ func _on_fullscreen_toggled(pressed: bool) -> void:
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 
-
 func _on_shake_toggled(pressed: bool) -> void:
 	screen_shake = pressed
-
 
 func _on_reset_progress() -> void:
 	GameState.reset()
@@ -992,7 +847,6 @@ func _on_reset_progress() -> void:
 		child.queue_free()
 	await get_tree().process_frame
 	_build_world_panel()
-
 
 func _on_back_pressed() -> void:
 	if panels.has("shop"):

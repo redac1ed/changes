@@ -16,7 +16,7 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 
 [autoload]
 
-GameState="*res://scripts/game_state_enhanced.gd"
+GameState="*res://scripts/game_state.gd"
 LevelManager="*res://scripts/level_manager.gd"
 AudioManager="*res://scripts/audio_manager.gd"
 TransitionManager="*res://scripts/transition_manager.gd"

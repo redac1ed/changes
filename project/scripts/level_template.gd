@@ -1,80 +1,324 @@
 extends Node2D
+class_name LevelTemplate
 
+@export_category("Level Info")
 @export var level_number: int = 1
 @export var world_number: int = 1
+@export var level_name: String = ""
+
+@export_category("Camera")
+@export var camera_limits: Rect2 = Rect2(0, 0, 1200, 800)
+@export var camera_zoom: float = 1.0
+
+@export_category("Level Settings")
+@export var par_shots: int = 3
+@export var time_limit: float = 0.0
+@export var enable_parallax: bool = true
+@export var enable_hud: bool = true
+@export var enable_pause: bool = true
+@export var enable_music: bool = true
+@export var music_track: String = ""
 
 var ball_scene: PackedScene = preload("res://scenes/ball.tscn")
-var goal_scene: PackedScene = preload("res://scenes/goal.tscn")
-
-@onready var ball_spawn: Marker2D = $BallSpawn
-@onready var goal_zone: Area2D = $GoalZone
-
-@export var camera_limits: Rect2 = Rect2(0, 0, 1200, 800)
 
 var ball: RigidBody2D
 var camera: Camera2D
+var hud: GameHUD
+var pause_overlay: PauseOverlay
+var complete_screen: LevelCompleteScreen
+var builder: LevelBuilder
+var transition_fx: SceneTransitionFX
+
+var level_complete: bool = false
+var level_time: float = 0.0
+var coins_collected: int = 0
+var total_coins: int = 0
+var deaths: int = 0
+var _restart_cooldown: float = 0.0
+var _spawn_position: Vector2
+
 
 func _ready() -> void:
-	print("[LevelTemplate] _ready() — world=%d level=%d" % [world_number, level_number])
+	print("[Level] Initializing world=%d level=%d" % [world_number, level_number])
 
-	# Tutorial (world 0) has no background music
-	if world_number == 0:
-		if AudioManager:
-			AudioManager.stop_music(0.5)
+	builder = LevelBuilder.new()
+	builder.set_level(self)
+	add_child(builder)
 
-	# Spawn ball at spawn point
-	if ball_spawn:
-		ball = ball_scene.instantiate()
-		ball.position = ball_spawn.position
-		ball.world_bounds = camera_limits
-		add_child(ball)
-		print("[LevelTemplate] Ball spawned at %s" % str(ball_spawn.position))
-	else:
-		print("[LevelTemplate] WARNING: No BallSpawn node found!")
-	
-	# Set up goal
-	if goal_zone:
-		goal_zone.body_entered.connect(_on_goal_entered)
-		print("[LevelTemplate] GoalZone connected at %s" % str(goal_zone.position))
-	else:
-		print("[LevelTemplate] WARNING: No GoalZone node found!")
-	
-	# Set up camera to follow ball
-	camera = Camera2D.new()
-	var camera_script = load("res://scripts/game_camera_advanced.gd")
-	camera.set_script(camera_script)
-	
-	# Configure camera BEFORE adding to tree so _ready sees correct values
-	camera.world_bounds = camera_limits
-	camera.use_limits = true
-	camera.center_if_missized = true
-	if ball:
-		camera.target_path = NodePath()  # will resolve in _ready via fallback
-		camera.global_position = ball.global_position
-	
-	add_child(camera)
-	camera.make_current()
-	print("[LevelTemplate] Camera added, limits=%s" % str(camera_limits))
-	
-	# Resolve target path now that both are in tree
-	if ball and "target_path" in camera:
-		camera.target_path = camera.get_path_to(ball)
-		print("[LevelTemplate] Camera target set to: %s" % str(camera.target_path))
+	_setup_ball()
+	_setup_camera()
 
-func _on_goal_entered(body: Node2D) -> void:
-	print("[LevelTemplate] _on_goal_entered: body=%s (class=%s)" % [body.name, body.get_class()])
-	if body == ball:
-		print("[LevelTemplate] GOAL! world=%d level=%d shots=%d" % [world_number, level_number, ball.shot_count])
-		# Level complete — defer to avoid removing CollisionObjects during physics callback
-		GameState.complete_level(world_number, level_number, ball.shot_count)
-		LevelManager.call_deferred("load_next_level")
-	else:
-		print("[LevelTemplate] body != ball, ignoring")
+	if enable_hud:
+		_setup_hud()
+
+	if enable_pause:
+		_setup_pause()
+
+	_setup_complete_screen()
+	_setup_transitions()
+
+	if enable_parallax:
+		var bg := ParallaxDecoration.create_for_world(world_number)
+		add_child(bg)
+		move_child(bg, 0)
+
+	if enable_music and AudioManager:
+		if music_track.is_empty():
+			_play_world_music()
+		else:
+			AudioManager.play_music(music_track)
+
+	_build_level()
+	_connect_goal_zone()
+
+	total_coins = _count_coins()
+	if hud:
+		hud.total_coins_in_level = total_coins
+		hud.set_level_info(world_number, level_number)
+
+	if transition_fx:
+		transition_fx.play_out(SceneTransitionFX.TransitionType.FADE, 0.5)
+
+	print("[Level] Ready — %d coins, bounds=%s" % [total_coins, camera_limits])
+
+
+func _process(delta: float) -> void:
+	if level_complete:
+		return
+
+	if _restart_cooldown > 0:
+		_restart_cooldown -= delta
+
+	level_time += delta
+
+	if time_limit > 0 and level_time >= time_limit:
+		_on_time_up()
+
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and event.keycode == KEY_R:
-		# Reset ball position
-		if ball:
-			ball.position = ball_spawn.position
-			ball.linear_velocity = Vector2.ZERO
-			ball.shot_count = 0
+	if event is InputEventKey and event.pressed:
+		match event.keycode:
+			KEY_R:
+				if _restart_cooldown <= 0 and not level_complete:
+					_restart_level()
+			KEY_ENTER:
+				if level_complete:
+					_next_level()
+
+
+func _build_level() -> void:
+	pass
+
+
+func _on_level_complete_custom() -> void:
+	pass
+
+
+func _on_ball_reset() -> void:
+	pass
+
+
+func _setup_ball() -> void:
+	var spawn: Marker2D = get_node_or_null("BallSpawn")
+	if spawn:
+		_spawn_position = spawn.position
+	else:
+		_spawn_position = Vector2(100, 400)
+		var marker := Marker2D.new()
+		marker.name = "BallSpawn"
+		marker.position = _spawn_position
+		add_child(marker)
+
+	ball = ball_scene.instantiate()
+	ball.position = _spawn_position
+	if "world_bounds" in ball:
+		ball.world_bounds = camera_limits
+	add_child(ball)
+
+	if ball.has_signal("shot_fired"):
+		ball.shot_fired.connect(_on_shot_fired)
+
+
+func _setup_camera() -> void:
+	var cam_script := load("res://scripts/game_camera.gd")
+	camera = Camera2D.new()
+	if cam_script:
+		camera.set_script(cam_script)
+
+	camera.world_bounds = camera_limits
+	camera.use_limits = true
+	if "center_if_undersized" in camera:
+		camera.center_if_undersized = true
+	elif "center_if_missized" in camera:
+		camera.center_if_missized = true
+
+	if camera_zoom != 1.0:
+		camera.zoom = Vector2(camera_zoom, camera_zoom)
+		if "default_zoom" in camera:
+			camera.default_zoom = Vector2(camera_zoom, camera_zoom)
+
+	if ball:
+		camera.global_position = ball.global_position
+
+	add_child(camera)
+	camera.make_current()
+
+	if ball and "target_path" in camera:
+		camera.target_path = camera.get_path_to(ball)
+
+
+func _setup_hud() -> void:
+	hud = GameHUD.new()
+	add_child(hud)
+
+
+func _setup_pause() -> void:
+	pause_overlay = PauseOverlay.new()
+	pause_overlay.restarted.connect(_restart_level)
+	pause_overlay.quit_to_menu.connect(_quit_to_menu)
+	add_child(pause_overlay)
+
+
+func _setup_complete_screen() -> void:
+	complete_screen = LevelCompleteScreen.new()
+	complete_screen.next_level_pressed.connect(_next_level)
+	complete_screen.retry_pressed.connect(_restart_level)
+	complete_screen.menu_pressed.connect(_quit_to_menu)
+	add_child(complete_screen)
+
+
+func _setup_transitions() -> void:
+	transition_fx = SceneTransitionFX.new()
+	add_child(transition_fx)
+
+
+func _connect_goal_zone() -> void:
+	var goal_zone := get_node_or_null("GoalZone") as Area2D
+	if goal_zone and not goal_zone.body_entered.is_connected(on_goal_reached):
+		goal_zone.body_entered.connect(on_goal_reached)
+
+
+func _on_shot_fired(_count: int) -> void:
+	if hud:
+		hud.add_shot()
+
+	if GameState:
+		GameState.add_shots(1)
+
+
+func complete_level() -> void:
+	if level_complete:
+		return
+
+	level_complete = true
+	var shots: int = ball.shot_count if ball else 0
+
+	var result: Dictionary = {}
+	if GameState:
+		result = GameState.complete_level(world_number, level_number, shots)
+
+	var stars: int = result.get("stars", GameState.calculate_stars(shots) if GameState else 0)
+	var is_new_record: bool = result.get("is_new_record", false)
+
+	if complete_screen:
+		complete_screen.show_screen(shots, stars, coins_collected, total_coins, is_new_record, level_time)
+
+	if hud:
+		hud.show_notification("Level Complete!", Color(0.3, 0.9, 0.45))
+
+	_on_level_complete_custom()
+
+
+func on_goal_reached(body: Node2D) -> void:
+	if body == ball:
+		complete_level()
+
+
+func on_coin_collected(coin_value: int) -> void:
+	coins_collected += 1
+	if hud:
+		hud.add_coin(coin_value)
+
+
+func reset_ball() -> void:
+	if not ball:
+		return
+
+	deaths += 1
+
+	var checkpoint_pos := _spawn_position
+	for child in get_children():
+		if child is Checkpoint and child._is_activated:
+			checkpoint_pos = child.global_position + Vector2(0, -15)
+			break
+
+	ball.global_position = checkpoint_pos
+	ball.linear_velocity = Vector2.ZERO
+	ball.angular_velocity = 0.0
+
+	if camera and "add_trauma" in camera:
+		camera.add_trauma(0.3)
+
+	if hud:
+		hud.show_notification("Respawned", Color(0.9, 0.5, 0.2))
+
+	_on_ball_reset()
+
+
+func _on_time_up() -> void:
+	if hud:
+		hud.show_notification("Time's Up!", Color(1.0, 0.3, 0.2))
+	reset_ball()
+
+
+func _restart_level() -> void:
+	_restart_cooldown = 0.5
+	if transition_fx:
+		transition_fx.play(SceneTransitionFX.TransitionType.FADE, 0.5, func():
+			get_tree().reload_current_scene()
+		)
+	else:
+		get_tree().reload_current_scene()
+
+
+func _next_level() -> void:
+	_restart_cooldown = 0.5
+	if transition_fx:
+		transition_fx.play(SceneTransitionFX.TransitionType.CIRCLE_WIPE, 0.8, func():
+			LevelManager.load_next_level()
+		)
+	else:
+		LevelManager.load_next_level()
+
+
+func _quit_to_menu() -> void:
+	if transition_fx:
+		transition_fx.play(SceneTransitionFX.TransitionType.CURTAIN, 0.6, func():
+			get_tree().change_scene_to_file("res://scenes/ui/title_screen.tscn")
+		)
+	else:
+		get_tree().change_scene_to_file("res://scenes/ui/title_screen.tscn")
+
+
+func _play_world_music() -> void:
+	if not AudioManager:
+		return
+	match world_number:
+		0: AudioManager.stop_music(0.5)
+		1: AudioManager.play_music("meadow")
+		2: AudioManager.play_music("volcano")
+		3: AudioManager.play_music("sky")
+		4: AudioManager.play_music("ocean")
+		5: AudioManager.play_music("space")
+		6: AudioManager.play_music("bonus")
+
+
+func _count_coins() -> int:
+	var count := 0
+	for child in get_children():
+		if child is CoinCollectible:
+			count += 1
+		for grandchild in child.get_children():
+			if grandchild is CoinCollectible:
+				count += 1
+	return count

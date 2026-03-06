@@ -1,17 +1,9 @@
 extends CanvasLayer
 class_name LevelCompleteScreen
 
-## ═══════════════════════════════════════════════════════════════════════════════
-## LevelCompleteScreen — Animated overlay shown when a level is finished
-## ═══════════════════════════════════════════════════════════════════════════════
-##
-## Features star reveal animation, shot summary, coin tally, and buttons
-## for next level / retry / menu. All custom _draw().
-
 const SCREEN_W := 1200.0
 const SCREEN_H := 800.0
 
-# ─── Signals ─────────────────────────────────────────────────────────────────
 signal next_level_pressed
 signal retry_pressed
 signal menu_pressed

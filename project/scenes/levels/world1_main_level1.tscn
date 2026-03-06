@@ -1,6 +1,6 @@
 [gd_scene load_steps=11 format=3 uid="uid://level_main"]
 
-[ext_resource type="Script" path="res://scripts/levels/level_1_improved.gd" id="1_level"]
+[ext_resource type="Script" path="res://scripts/levels/level_1.gd" id="1_level"]
 [ext_resource type="Script" path="res://scripts/goal.gd" id="2_goal"]
 [ext_resource type="Script" path="res://scripts/platforms/bounce_platform.gd" id="3_bounce"]
 [ext_resource type="Script" path="res://scripts/platforms/moving_platform_advanced.gd" id="4_moving"]

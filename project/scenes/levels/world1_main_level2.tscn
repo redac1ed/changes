@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://76bb0sd1rejb"]
 
-[ext_resource type="Script" path="res://scripts/level_template.gd" id="1_level"]
+[ext_resource type="Script" path="res://scripts/levels/level_2.gd" id="1_level"]
 
 [ext_resource type="Script" uid="uid://cqywxv8cwge47" path="res://scripts/items/coin_collectible.gd" id="1_x0rpe"]
 [ext_resource type="Script" uid="uid://bkyx37g0sbjtw" path="res://scripts/platforms/bounce_platform.gd" id="2_mjvil"]
