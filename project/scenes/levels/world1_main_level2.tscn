@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://cb22oq5jbtnd0" path="res://scripts/items/coin_collectible.gd" id="1_x0rpe"]
 [ext_resource type="Script" uid="uid://b0dy33wopbxul" path="res://scripts/platforms/bounce_platform.gd" id="2_mjvil"]
 [ext_resource type="Script" uid="uid://dusn86fy4y26b" path="res://scripts/hazards/spike_strip.gd" id="3_v5rsi"]
-[ext_resource type="Script" uid="uid://brye3fcvyicjj" path="res://scripts/platforms/moving_platform_advanced.gd" id="4_fheg2"]
+[ext_resource type="Script" uid="uid://brye3fcvyicjj" path="res://scripts/platforms/moving_platform.gd" id="4_fheg2"]
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="5_pgto0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t5w2r"]

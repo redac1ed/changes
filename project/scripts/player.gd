@@ -61,7 +61,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	var conveyor_velocity := Vector2.ZERO
 	for i in range(state.get_contact_count()):
 		var collider := state.get_contact_collider_object(i)
-		if collider is ConveyorPlatform:
+		if collider is MovingPlatform and collider.surface_mode == MovingPlatform.SurfaceMode.CONVEYOR:
 			var contact_normal := state.get_contact_local_normal(i)
 			if contact_normal.y < -0.2:
 				conveyor_velocity = collider.get_belt_velocity()

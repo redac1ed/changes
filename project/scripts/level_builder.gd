@@ -185,7 +185,7 @@ func _create_static_platform(size: Vector2) -> StaticBody2D:
 
 func _create_moving_platform(size: Vector2) -> StaticBody2D:
 	var body = StaticBody2D.new()
-	var script = load("res://scripts/platforms/moving_platform_advanced.gd")
+	var script = load("res://scripts/platforms/moving_platform.gd")
 	if script:
 		body.set_script(script)
 		body.move_distance = 150.0
