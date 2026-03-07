@@ -13,31 +13,53 @@ var _reverse_timer: float = 0.0
 var _current_direction: Vector2
 var _balls_on_belt: Array[RigidBody2D] = []
 
+# Smooth reversal
+var _speed_scale: float = 1.0
+var _target_speed_scale: float = 1.0
+@export var reverse_ramp_time: float = 0.5
+
 func _platform_ready() -> void:
 	platform_type = PlatformType.CONVEYOR
 	platform_color = Color(0.5, 0.5, 0.55, 1.0)
 	outline_color = Color(0.35, 0.35, 0.4, 1.0)
 	particle_color = Color(0.6, 0.6, 0.65, 0.5)
 	_current_direction = conveyor_direction.normalized()
+	_speed_scale = 1.0
+	_target_speed_scale = 1.0
+	var mat := PhysicsMaterial.new()
+	mat.friction = 1.0
+	mat.bounce = 0.0
+	mat.absorbent = true
+	physics_material_override = mat
 
 func _platform_physics_process(delta: float) -> void:
-	# Animate belt
-	_belt_offset += belt_animation_speed * delta * conveyor_speed * 0.01
+	# Animate belt visual
+	_belt_offset += belt_animation_speed * delta * conveyor_speed * 0.01 * _speed_scale
 	if _belt_offset > 1.0:
 		_belt_offset -= 1.0
-	
-	# Reverse timer
+	elif _belt_offset < 0.0:
+		_belt_offset += 1.0
+
+	# Reverse timer — trigger a smooth ramp instead of instant flip
 	if reversible:
 		_reverse_timer += delta
 		if _reverse_timer >= reverse_interval:
 			_reverse_timer = 0.0
-			_current_direction = -_current_direction
-	
-	# Apply force to all balls on belt
+			_target_speed_scale = -_target_speed_scale
+
+	# Smoothly ramp _speed_scale toward _target_speed_scale
+	var ramp_step := delta / maxf(reverse_ramp_time, 0.01)
+	_speed_scale = move_toward(_speed_scale, _target_speed_scale, ramp_step * 2.0)
+
+	# Carry balls along the belt by directly setting their horizontal velocity
+	var belt_vel := _current_direction * conveyor_speed * _speed_scale
 	for ball in _balls_on_belt:
 		if is_instance_valid(ball):
-			var force := _current_direction * conveyor_speed
-			ball.apply_central_force(force)
+			var vel := ball.linear_velocity
+			vel.x = move_toward(vel.x, belt_vel.x, conveyor_speed * delta * 5.0)
+			if abs(_current_direction.y) > 0.5:
+				vel.y = move_toward(vel.y, belt_vel.y, conveyor_speed * delta * 5.0)
+			ball.linear_velocity = vel
 
 func _on_ball_landed(ball: RigidBody2D) -> void:
 	if not _balls_on_belt.has(ball):
@@ -63,24 +85,24 @@ func _draw_platform_details(rect: Rect2) -> void:
 	)
 	
 	# Animated chevrons showing direction
-	var chevron_color := Color(1.0, 1.0, 1.0, 0.3)
+	# Use effective direction (base direction × speed_scale sign) so chevrons
+	# flip correctly during smooth reversal.
+	var effective_dir_x := _current_direction.x * _speed_scale
+	var chevron_color := Color(1.0, 1.0, 1.0, 0.3 * absf(_speed_scale))
 	var spacing := 16.0
 	var chevron_count := int(rect.size.x / spacing) + 2
 	var center_y := rect.position.y + rect.size.y / 2.0
 	for i in range(chevron_count):
 		var base_x: float = rect.position.x + i * spacing
-		# Apply scrolling offset
-		if _current_direction.x >= 0:
-			base_x += _belt_offset * spacing
-		else:
-			base_x -= _belt_offset * spacing
+		# Scroll offset already encodes direction via _belt_offset sign
+		base_x += _belt_offset * spacing
 		# Wrap around
 		base_x = rect.position.x + fmod(base_x - rect.position.x, rect.size.x)
 		if base_x < rect.position.x or base_x > rect.position.x + rect.size.x - 4:
 			continue
-		# Draw chevron pointing in conveyor direction
+		# Draw chevron pointing in effective direction
 		var ch_size := 4.0
-		if _current_direction.x >= 0:
+		if effective_dir_x >= 0.0:
 			draw_line(Vector2(base_x - ch_size, center_y - ch_size), Vector2(base_x, center_y), chevron_color, 1.5)
 			draw_line(Vector2(base_x, center_y), Vector2(base_x - ch_size, center_y + ch_size), chevron_color, 1.5)
 		else:

@@ -129,7 +129,7 @@ func _setup_detection_area() -> void:
 	area_shape.position = Vector2(0, -4)
 	_detection_area.add_child(area_shape)
 	_detection_area.collision_layer = 0
-	_detection_area.collision_mask = 1  # Detect ball (layer 1)
+	_detection_area.collision_mask = 3  # Detect ball (layer 1 and 2)
 	_detection_area.body_entered.connect(_on_detection_body_entered)
 	_detection_area.body_exited.connect(_on_detection_body_exited)
 	add_child(_detection_area)
