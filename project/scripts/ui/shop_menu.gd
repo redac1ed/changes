@@ -171,4 +171,3 @@ func _on_buy_pressed() -> void:
 	else:
 		if AudioManager:
 			AudioManager.play_ui_sfx("buy_fail")
-

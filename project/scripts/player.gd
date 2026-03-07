@@ -132,8 +132,7 @@ func _input(event: InputEvent) -> void:
 			_end_drag()
 
 	elif event is InputEventMouseMotion and is_dragging:
-		drag_offset += event.relative
-		drag_current = drag_start + drag_offset
+		drag_current = get_global_mouse_position()
 
 
 # ===========================================================================
@@ -261,9 +260,6 @@ func _start_drag(mpos: Vector2) -> void:
 	drag_offset = Vector2.ZERO
 	drag_current = drag_start
 
-	# Setting the mouse to capture beyond the window
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-
 	if _is_resting():
 		# Ball is already still — freeze and aim like normal
 		_drag_slow_mode = false
@@ -278,9 +274,6 @@ func _start_drag(mpos: Vector2) -> void:
 func _end_drag() -> void:
 	if not is_dragging:
 		return
-
-	# Stop the mouse capture
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 	is_dragging = false
 	_drag_slow_mode = false
