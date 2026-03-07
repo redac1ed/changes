@@ -20,6 +20,7 @@ signal platform_respawned()
 @export var fall_acceleration: float = 1200.0
 @export var respawn_delay: float = 3.0
 @export var respawn_fade_duration: float = 0.5
+@export var respawn_retract_duration: float = 0.8
 @export var max_fall_distance: float = 800.0
 @export var shake_intensity: float = 3.0
 
@@ -31,7 +32,9 @@ var _fall_velocity: float = 0.0
 var _respawn_timer: float = 0.0
 var _shake_offset: Vector2 = Vector2.ZERO
 var _respawn_alpha: float = 1.0
+var _respawn_progress: float = 0.0
 var _fall_distance: float = 0.0
+var _fallen_position: Vector2 = Vector2.ZERO
 var _warning_particles: CPUParticles2D
 
 
@@ -81,7 +84,7 @@ func _process_shaking(delta: float) -> void:
 	var intensity := shake_intensity * (0.5 + shake_progress * 0.5)
 	_shake_offset = Vector2(
 		randf_range(-intensity, intensity),
-		randf_range(-intensity * 0.5, intensity * 0.5)
+		0.0
 	)
 	position = _original_position + _shake_offset
 	
@@ -123,6 +126,7 @@ func _process_falling(delta: float) -> void:
 func _start_waiting() -> void:
 	_fall_state = FallState.WAITING
 	_respawn_timer = respawn_delay
+	_fallen_position = position
 	visible = false
 	_collision_shape.disabled = true
 
@@ -135,18 +139,24 @@ func _process_waiting(delta: float) -> void:
 
 func _start_respawning() -> void:
 	_fall_state = FallState.RESPAWNING
-	position = _original_position
+	position = _fallen_position
 	visible = true
 	modulate.a = 0.0
 	_respawn_alpha = 0.0
+	_respawn_progress = 0.0
 
 
 func _process_respawning(delta: float) -> void:
-	_respawn_alpha += delta / respawn_fade_duration
+	_respawn_progress += delta / maxf(respawn_retract_duration, 0.001)
+	var t := clampf(_respawn_progress, 0.0, 1.0)
+	position = _fallen_position.lerp(_original_position, t)
+
+	_respawn_alpha += delta / maxf(respawn_fade_duration, 0.001)
 	modulate.a = clampf(_respawn_alpha, 0.0, 1.0)
 	
-	if _respawn_alpha >= 1.0:
+	if _respawn_alpha >= 1.0 and t >= 1.0:
 		_fall_state = FallState.IDLE
+		position = _original_position
 		_collision_shape.disabled = false
 		modulate.a = 1.0
 		platform_respawned.emit()
@@ -194,8 +204,10 @@ func _draw_platform_details(rect: Rect2) -> void:
 func reset() -> void:
 	_fall_state = FallState.IDLE
 	position = _original_position
+	_fallen_position = _original_position
 	visible = true
 	modulate.a = 1.0
+	_respawn_progress = 1.0
 	_collision_shape.disabled = false
 	_shake_offset = Vector2.ZERO
 	_warning_particles.emitting = false

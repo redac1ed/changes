@@ -1,14 +1,6 @@
 extends PlatformBase
 class_name ConveyorPlatform
 
-## ═══════════════════════════════════════════════════════════════════════════════
-## ConveyorPlatform — Pushes ball along its surface in a set direction
-## ═══════════════════════════════════════════════════════════════════════════════
-##
-## Applies continuous force to the ball while in contact.
-## Animated belt arrows show the conveyor direction.
-
-# ─── Exports ─────────────────────────────────────────────────────────────────
 @export_category("Conveyor Settings")
 @export var conveyor_speed: float = 120.0
 @export var conveyor_direction: Vector2 = Vector2.RIGHT
@@ -16,12 +8,10 @@ class_name ConveyorPlatform
 @export var reversible: bool = false
 @export var reverse_interval: float = 4.0
 
-# ─── Internal ────────────────────────────────────────────────────────────────
 var _belt_offset: float = 0.0
 var _reverse_timer: float = 0.0
 var _current_direction: Vector2
 var _balls_on_belt: Array[RigidBody2D] = []
-
 
 func _platform_ready() -> void:
 	platform_type = PlatformType.CONVEYOR
@@ -29,7 +19,6 @@ func _platform_ready() -> void:
 	outline_color = Color(0.35, 0.35, 0.4, 1.0)
 	particle_color = Color(0.6, 0.6, 0.65, 0.5)
 	_current_direction = conveyor_direction.normalized()
-
 
 func _platform_physics_process(delta: float) -> void:
 	# Animate belt
@@ -50,15 +39,12 @@ func _platform_physics_process(delta: float) -> void:
 			var force := _current_direction * conveyor_speed
 			ball.apply_central_force(force)
 
-
 func _on_ball_landed(ball: RigidBody2D) -> void:
 	if not _balls_on_belt.has(ball):
 		_balls_on_belt.append(ball)
 
-
 func _on_ball_left(ball: RigidBody2D) -> void:
 	_balls_on_belt.erase(ball)
-
 
 func _draw_platform_details(rect: Rect2) -> void:
 	# Belt track lines
@@ -81,7 +67,6 @@ func _draw_platform_details(rect: Rect2) -> void:
 	var spacing := 16.0
 	var chevron_count := int(rect.size.x / spacing) + 2
 	var center_y := rect.position.y + rect.size.y / 2.0
-	
 	for i in range(chevron_count):
 		var base_x: float = rect.position.x + i * spacing
 		# Apply scrolling offset
@@ -89,12 +74,10 @@ func _draw_platform_details(rect: Rect2) -> void:
 			base_x += _belt_offset * spacing
 		else:
 			base_x -= _belt_offset * spacing
-		
 		# Wrap around
 		base_x = rect.position.x + fmod(base_x - rect.position.x, rect.size.x)
 		if base_x < rect.position.x or base_x > rect.position.x + rect.size.x - 4:
 			continue
-		
 		# Draw chevron pointing in conveyor direction
 		var ch_size := 4.0
 		if _current_direction.x >= 0:
