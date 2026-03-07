@@ -27,7 +27,7 @@ func _platform_ready() -> void:
 	_speed_scale = 1.0
 	_target_speed_scale = 1.0
 	var mat := PhysicsMaterial.new()
-	mat.friction = 1.0
+	mat.friction = 0.0 # 0 friction so our manual forces don't fight the physics solver
 	mat.bounce = 0.0
 	mat.absorbent = true
 	physics_material_override = mat
@@ -51,15 +51,9 @@ func _platform_physics_process(delta: float) -> void:
 	var ramp_step := delta / maxf(reverse_ramp_time, 0.01)
 	_speed_scale = move_toward(_speed_scale, _target_speed_scale, ramp_step * 2.0)
 
-	# Carry balls along the belt by directly setting their horizontal velocity
-	var belt_vel := _current_direction * conveyor_speed * _speed_scale
-	for ball in _balls_on_belt:
-		if is_instance_valid(ball):
-			var vel := ball.linear_velocity
-			vel.x = move_toward(vel.x, belt_vel.x, conveyor_speed * delta * 5.0)
-			if abs(_current_direction.y) > 0.5:
-				vel.y = move_toward(vel.y, belt_vel.y, conveyor_speed * delta * 5.0)
-			ball.linear_velocity = vel
+
+func get_belt_velocity() -> Vector2:
+	return _current_direction * conveyor_speed * _speed_scale
 
 func _on_ball_landed(ball: RigidBody2D) -> void:
 	if not _balls_on_belt.has(ball):
@@ -96,9 +90,12 @@ func _draw_platform_details(rect: Rect2) -> void:
 		var base_x: float = rect.position.x + i * spacing
 		# Scroll offset already encodes direction via _belt_offset sign
 		base_x += _belt_offset * spacing
-		# Wrap around
-		base_x = rect.position.x + fmod(base_x - rect.position.x, rect.size.x)
-		if base_x < rect.position.x or base_x > rect.position.x + rect.size.x - 4:
+		# Wrap around properly, GDScript fmod doesn't wrap negatives!
+		var local_x := base_x - rect.position.x
+		local_x = wrapf(local_x, 0.0, rect.size.x)
+		base_x = rect.position.x + local_x
+		
+		if base_x < rect.position.x + 2 or base_x > rect.position.x + rect.size.x - 2:
 			continue
 		# Draw chevron pointing in effective direction
 		var ch_size := 4.0

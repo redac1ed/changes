@@ -40,6 +40,7 @@ var _delay_timer: float = 0.0
 var _current_waypoint_idx: int = 0
 var _velocity: Vector2 = Vector2.ZERO
 var _previous_position: Vector2
+var _balls_on_platform: Array[RigidBody2D] = []
 
 
 func _platform_ready() -> void:
@@ -78,14 +79,19 @@ func _platform_physics_process(delta: float) -> void:
 	if _pause_timer > 0.0:
 		_pause_timer -= delta
 		_velocity = Vector2.ZERO
+		_carry_balls(delta)
 		return
 	
 	if waypoints.size() < 2:
 		return
 	
 	# Advance progress
+	var to_idx_calc: int = _current_waypoint_idx + _direction
+	if to_idx_calc < 0 or to_idx_calc >= waypoints.size():
+		to_idx_calc = _current_waypoint_idx
+		
 	var segment_length := waypoints[_current_waypoint_idx].distance_to(
-		waypoints[(_current_waypoint_idx + 1) % waypoints.size()]
+		waypoints[to_idx_calc]
 	)
 	if segment_length < 0.01:
 		segment_length = 1.0
@@ -94,28 +100,31 @@ func _platform_physics_process(delta: float) -> void:
 	
 	# Handle segment completion
 	if _progress >= 1.0:
-		_progress = 0.0
+		_progress -= 1.0 # Keep fractional progress
 		_current_waypoint_idx += _direction
 		
 		if _current_waypoint_idx >= waypoints.size() - 1:
 			if loop_path and waypoints.size() > 2:
 				_current_waypoint_idx = 0
 			else:
+				# Reached the end: reverse direction instead of jumping back to index 0
 				_direction = -1
-				_current_waypoint_idx = waypoints.size() - 2
+				_current_waypoint_idx = waypoints.size() - 1
 				_pause_timer = pause_at_endpoints
 		elif _current_waypoint_idx < 0:
+			# Reached the start: go forward instead of jumping back to end
 			_direction = 1
 			_current_waypoint_idx = 0
 			_pause_timer = pause_at_endpoints
 	
 	# Calculate position
 	var from_idx: int = _current_waypoint_idx
-	var to_idx: int = (from_idx + 1) % waypoints.size()
-	if from_idx < 0:
-		from_idx = 0
+	var to_idx: int = _current_waypoint_idx + _direction
+	# Clamp indices to valid ranges so it stays exactly at the endpoint while paused or turning
 	if to_idx >= waypoints.size():
 		to_idx = waypoints.size() - 1
+	elif to_idx < 0:
+		to_idx = 0
 	
 	var from_pos: Vector2 = _original_position + waypoints[from_idx]
 	var to_pos: Vector2 = _original_position + waypoints[to_idx]
@@ -124,6 +133,31 @@ func _platform_physics_process(delta: float) -> void:
 	var new_pos := from_pos.lerp(to_pos, t)
 	_velocity = (new_pos - global_position) / maxf(delta, 0.001)
 	global_position = new_pos
+	_carry_balls(delta)
+
+
+func _carry_balls(delta: float) -> void:
+	var platform_top_y := global_position.y - (platform_size.y * 0.5)
+	var hold_y := platform_top_y - 20.0
+	for ball in _balls_on_platform:
+		if not is_instance_valid(ball):
+			continue
+		if ball.global_position.y > platform_top_y + 24.0:
+			continue
+
+		ball.sleeping = false
+		var ball_velocity := ball.linear_velocity
+		if not _velocity.is_zero_approx():
+			ball.global_position += _velocity * delta
+			ball_velocity.x = _velocity.x
+			if abs(_velocity.y) > 0.01:
+				ball_velocity.y = maxf(ball_velocity.y, _velocity.y)
+		else:
+			ball_velocity.x = 0.0
+			if abs(ball.global_position.y - hold_y) > 0.5:
+				ball.global_position.y = lerpf(ball.global_position.y, hold_y, minf(delta * 20.0, 1.0))
+			ball_velocity.y = minf(ball_velocity.y, 0.0)
+		ball.linear_velocity = ball_velocity
 
 
 func _apply_motion_profile(t: float) -> float:
@@ -190,9 +224,14 @@ func _draw_platform_details(rect: Rect2) -> void:
 
 
 func _on_ball_landed(ball: RigidBody2D) -> void:
-	# Transfer platform velocity to ball for realistic carrying
-	if ball and _velocity.length() > 5.0:
-		ball.apply_central_impulse(_velocity * 0.15)
+	if ball and not _balls_on_platform.has(ball):
+		_balls_on_platform.append(ball)
+		if _velocity.length() > 5.0:
+			ball.apply_central_impulse(_velocity * 0.15)
+
+
+func _on_ball_left(ball: RigidBody2D) -> void:
+	_balls_on_platform.erase(ball)
 
 
 func get_platform_velocity() -> Vector2:

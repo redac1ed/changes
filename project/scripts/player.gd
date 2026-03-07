@@ -57,6 +57,21 @@ func _ready() -> void:
 
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	# Apply conveyor motion inside the rigid body's physics step so the solver keeps it.
+	var conveyor_velocity := Vector2.ZERO
+	for i in range(state.get_contact_count()):
+		var collider := state.get_contact_collider_object(i)
+		if collider is ConveyorPlatform:
+			var contact_normal := state.get_contact_local_normal(i)
+			if contact_normal.y < -0.2:
+				conveyor_velocity = collider.get_belt_velocity()
+				break
+
+	if conveyor_velocity != Vector2.ZERO:
+		sleeping = false
+		state.linear_velocity.x = move_toward(state.linear_velocity.x, conveyor_velocity.x, 2400.0 * state.step)
+		state.linear_velocity.y = move_toward(state.linear_velocity.y, conveyor_velocity.y, 2400.0 * state.step)
+	
 	# Heavy deceleration while dragging a moving ball
 	if is_dragging and _drag_slow_mode:
 		state.linear_velocity *= 0.80
