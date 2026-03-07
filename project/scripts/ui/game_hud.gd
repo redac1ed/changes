@@ -9,7 +9,6 @@ const HUD_BG_COLOR := Color(0.08, 0.08, 0.12, 0.65)
 const HUD_BORDER_COLOR := Color(0.3, 0.35, 0.5, 0.5)
 const HUD_TEXT_COLOR := Color(0.9, 0.92, 0.95)
 const HUD_ACCENT := Color(0.45, 0.78, 1.0)
-const COIN_COLOR := Color(1.0, 0.85, 0.3)
 const STAR_COLOR := Color(1.0, 0.92, 0.35)
 const COMBO_COLOR := Color(1.0, 0.55, 0.2)
 
@@ -17,8 +16,6 @@ const PANEL_CORNER := 6.0
 const ICON_SIZE := 16.0
 
 var shot_count: int = 0
-var coin_count: int = 0
-var total_coins_in_level: int = 0
 var combo_multiplier: int = 1
 var combo_timer: float = 0.0
 var level_time: float = 0.0
@@ -29,7 +26,6 @@ var level_number: int = 1
 var _notifications: Array[Dictionary] = []
 var _notification_lifetime: float = 3.0
 
-var _coin_flash: float = 0.0
 var _shot_flash: float = 0.0
 var _combo_scale: float = 1.0
 var _time_elapsed: float = 0.0
@@ -46,12 +42,8 @@ func _ready() -> void:
 	_draw_node.draw.connect(_on_draw)
 	add_child(_draw_node)
 	
-	# Connect to GameState signals
-	if GameState:
-		if GameState.has_signal("collectible_collected"):
-			GameState.collectible_collected.connect(_on_collectible)
-		if GameState.has_signal("level_completed_signal"):
-			GameState.level_completed_signal.connect(_on_level_completed)
+	if GameState and GameState.has_signal("level_completed_event"):
+		GameState.level_completed_event.connect(_on_level_completed)
 
 
 func _process(delta: float) -> void:
@@ -59,11 +51,8 @@ func _process(delta: float) -> void:
 		return
 	
 	_time_elapsed += delta
-	level_time += delta
 	
 	# Animations
-	if _coin_flash > 0:
-		_coin_flash -= delta * 3.0
 	if _shot_flash > 0:
 		_shot_flash -= delta * 3.0
 	if combo_timer > 0:
@@ -96,16 +85,6 @@ func add_shot() -> void:
 	shot_count += 1
 	_shot_flash = 1.0
 
-func add_coin(points: int = 10) -> void:
-	coin_count += 1
-	_coin_flash = 1.0
-	combo_multiplier = min(combo_multiplier + 1, 8)
-	combo_timer = 3.0
-	_combo_scale = 1.5
-	
-	var actual_points := points * combo_multiplier
-	show_score_popup(actual_points)
-
 func show_notification(text: String, color: Color = HUD_TEXT_COLOR) -> void:
 	_notifications.append({
 		"text": text,
@@ -127,7 +106,6 @@ func show_score_popup(points: int, pos: Vector2 = Vector2(-1, -1)) -> void:
 
 func reset_hud() -> void:
 	shot_count = 0
-	coin_count = 0
 	combo_multiplier = 1
 	combo_timer = 0.0
 	level_time = 0.0
@@ -139,10 +117,8 @@ func set_level_info(world: int, level: int) -> void:
 		world_name = GameState.get_world_name(world)
 	level_number = level
 
-func _on_collectible(id: String, points: int) -> void:
-	add_coin(points)
-
-func _on_level_completed(_world: int, _level: int, _shots: int, stars: int) -> void:
+func _on_level_completed(_world: int, _level: int, stats: Dictionary) -> void:
+	var stars: int = stats.get("stars", 0)
 	var rating := ""
 	match stars:
 		3: rating = "★★★ Perfect!"
@@ -153,7 +129,6 @@ func _on_level_completed(_world: int, _level: int, _shots: int, stars: int) -> v
 
 func _on_draw() -> void:
 	_draw_top_bar()
-	_draw_coin_counter()
 	_draw_shot_counter()
 	_draw_timer()
 	_draw_combo_display()
@@ -178,31 +153,8 @@ func _draw_top_bar() -> void:
 		Color(0.3, 0.35, 0.55, 0.25), 1.0
 	)
 
-func _draw_coin_counter() -> void:
-	var x := HUD_MARGIN + 8
-	var y := 12.0
-	# Panel bg
-	var panel := Rect2(x - 4, y - 2, 110, 28)
-	_draw_panel(panel)
-	# Coin icon (circle)
-	var icon_x := x + 12
-	var icon_y := y + 12
-	var coin_c := COIN_COLOR
-	if _coin_flash > 0:
-		coin_c = coin_c.lerp(Color.WHITE, _coin_flash * 0.6)
-	_draw_node.draw_circle(Vector2(icon_x, icon_y), 8.0, coin_c)
-	_draw_node.draw_circle(Vector2(icon_x, icon_y), 5.0, coin_c.darkened(0.2))
-	_draw_node.draw_circle(Vector2(icon_x, icon_y), 3.0, coin_c)
-	# Count text
-	var count_text := "%d" % coin_count
-	if total_coins_in_level > 0:
-		count_text = "%d/%d" % [coin_count, total_coins_in_level]
-	var font := ThemeDB.fallback_font
-	var font_size := 16
-	_draw_node.draw_string(font, Vector2(icon_x + 14, icon_y + 5), count_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, HUD_TEXT_COLOR)
-
 func _draw_shot_counter() -> void:
-	var x := HUD_MARGIN + 130
+	var x := HUD_MARGIN + 8
 	var y := 12.0
 	var panel := Rect2(x - 4, y - 2, 100, 28)
 	_draw_panel(panel)
@@ -316,7 +268,7 @@ func _draw_score_popups() -> void:
 	for popup in _score_popup_items:
 		var alpha: float = 1.0 - (popup["time"] / 1.5)
 		var scale: float = 1.0 + popup["time"] * 0.3
-		var c := COIN_COLOR
+		var c := HUD_ACCENT
 		c.a = alpha
 		var text := "+%d" % popup["points"]
 		var size := int(18 * scale)

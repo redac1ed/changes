@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://76bb0sd1rejb"]
 
 [ext_resource type="Script" uid="uid://bmhnh3dh2brvi" path="res://scripts/levels/level_2.gd" id="1_level"]
-[ext_resource type="Script" uid="uid://cb22oq5jbtnd0" path="res://scripts/items/coin_collectible.gd" id="1_x0rpe"]
 [ext_resource type="Script" uid="uid://b0dy33wopbxul" path="res://scripts/platforms/bounce_platform.gd" id="2_mjvil"]
 [ext_resource type="Script" uid="uid://dusn86fy4y26b" path="res://scripts/hazards/spike_strip.gd" id="3_v5rsi"]
 [ext_resource type="Script" uid="uid://brye3fcvyicjj" path="res://scripts/platforms/moving_platform.gd" id="4_fheg2"]
@@ -145,10 +144,6 @@ offset_right = 75.0
 offset_bottom = 10.0
 color = Color(0.38, 0.58, 0.22, 1)
 metadata/_edit_use_anchors_ = true
-
-[node name="Coin" type="Area2D" parent="." unique_id=1066294108]
-position = Vector2(415, 212)
-script = ExtResource("1_x0rpe")
 
 [node name="BouncePlatform" type="StaticBody2D" parent="." unique_id=871739317]
 position = Vector2(1339, 747)

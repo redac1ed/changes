@@ -21,8 +21,6 @@ const SUCCESS_COLOR := Color(0.3, 0.9, 0.45)
 # ─── State ───────────────────────────────────────────────────────────────────
 var shots_taken: int = 0
 var stars_earned: int = 0
-var coins_collected: int = 0
-var total_coins: int = 0
 var is_new_record: bool = false
 var level_time: float = 0.0
 
@@ -51,11 +49,9 @@ func _ready() -> void:
 	add_child(_draw_node)
 
 
-func show_screen(p_shots: int, p_stars: int, p_coins: int, p_total_coins: int, p_new_record: bool, p_time: float) -> void:
+func show_screen(p_shots: int, p_stars: int, p_new_record: bool, p_time: float) -> void:
 	shots_taken = p_shots
 	stars_earned = p_stars
-	coins_collected = p_coins
-	total_coins = p_total_coins
 	is_new_record = p_new_record
 	level_time = p_time
 	
@@ -210,12 +206,6 @@ func _on_draw() -> void:
 	# Shots
 	_draw_node.draw_string(font, Vector2(left_x, stat_y), "Shots:", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, TEXT_COLOR.darkened(0.2))
 	_draw_node.draw_string(font, Vector2(left_x + 120, stat_y), "%d" % shots_taken, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, ACCENT)
-	
-	# Coins
-	stat_y += 28
-	_draw_node.draw_string(font, Vector2(left_x, stat_y), "Coins:", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, TEXT_COLOR.darkened(0.2))
-	var coin_text := "%d / %d" % [coins_collected, total_coins] if total_coins > 0 else "%d" % coins_collected
-	_draw_node.draw_string(font, Vector2(left_x + 120, stat_y), coin_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(1.0, 0.85, 0.3))
 	
 	# Time
 	stat_y += 28

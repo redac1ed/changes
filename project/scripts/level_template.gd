@@ -31,8 +31,6 @@ var transition_fx: SceneTransitionFX
 
 var level_complete: bool = false
 var level_time: float = 0.0
-var coins_collected: int = 0
-var total_coins: int = 0
 var deaths: int = 0
 var _restart_cooldown: float = 0.0
 var _spawn_position: Vector2
@@ -57,6 +55,9 @@ func _ready() -> void:
 	_setup_complete_screen()
 	_setup_transitions()
 
+	if GameState:
+		GameState.start_level(world_number, level_number)
+
 	if enable_parallax:
 		var bg := ParallaxDecoration.create_for_world(world_number)
 		add_child(bg)
@@ -71,15 +72,13 @@ func _ready() -> void:
 	_build_level()
 	_connect_goal_zone()
 
-	total_coins = _count_coins()
 	if hud:
-		hud.total_coins_in_level = total_coins
 		hud.set_level_info(world_number, level_number)
 
 	if transition_fx:
 		transition_fx.play_out(SceneTransitionFX.TransitionType.FADE, 0.5)
 
-	print("[Level] Ready — %d coins, bounds=%s" % [total_coins, camera_limits])
+	print("[Level] Ready — bounds=%s" % [camera_limits])
 
 
 func _process(delta: float) -> void:
@@ -90,6 +89,8 @@ func _process(delta: float) -> void:
 		_restart_cooldown -= delta
 
 	level_time += delta
+	if hud:
+		hud.level_time = level_time
 
 	if time_limit > 0 and level_time >= time_limit:
 		_on_time_up()
@@ -169,6 +170,8 @@ func _setup_camera() -> void:
 
 func _setup_hud() -> void:
 	hud = GameHUD.new()
+	hud.is_paused = false
+	hud.level_time = 0.0
 	add_child(hud)
 
 
@@ -218,12 +221,14 @@ func complete_level() -> void:
 		result = GameState.complete_level(world_number, level_number, shots)
 
 	var stars: int = result.get("stars", GameState.calculate_stars(shots) if GameState else 0)
-	var is_new_record: bool = result.get("is_new_record", false)
+	var is_new_record: bool = result.get("new_record", result.get("is_new_record", false))
 
 	if complete_screen:
-		complete_screen.show_screen(shots, stars, coins_collected, total_coins, is_new_record, level_time)
+		complete_screen.show_screen(shots, stars, is_new_record, level_time)
 
 	if hud:
+		hud.level_time = level_time
+		hud.is_paused = true
 		hud.show_notification("Level Complete!", Color(0.3, 0.9, 0.45))
 
 	_on_level_complete_custom()
@@ -232,12 +237,6 @@ func complete_level() -> void:
 func on_goal_reached(body: Node2D) -> void:
 	if body == ball:
 		complete_level()
-
-
-func on_coin_collected(coin_value: int) -> void:
-	coins_collected += 1
-	if hud:
-		hud.add_coin(coin_value)
 
 
 func reset_ball() -> void:
@@ -312,13 +311,3 @@ func _play_world_music() -> void:
 		5: AudioManager.play_music("space")
 		6: AudioManager.play_music("bonus")
 
-
-func _count_coins() -> int:
-	var count := 0
-	for child in get_children():
-		if child is CoinCollectible:
-			count += 1
-		for grandchild in child.get_children():
-			if grandchild is CoinCollectible:
-				count += 1
-	return count

@@ -154,6 +154,10 @@ func _complete_level() -> void:
 	# Find level info
 	var level_root := _find_level_root()
 	if level_root:
+		if level_root.has_method("complete_level"):
+			level_root.call_deferred("complete_level")
+			return
+
 		var world_num: int = level_root.get("world_number") if level_root.get("world_number") != null else 1
 		var level_num: int = level_root.get("level_number") if level_root.get("level_number") != null else 1
 		var shots: int = 0

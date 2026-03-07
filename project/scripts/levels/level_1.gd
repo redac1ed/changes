@@ -18,11 +18,6 @@ func _ready() -> void:
 	if hud:
 		hud.show_notification("Welcome to Meadow!", Color(0.4, 0.8, 0.5))
 
-	var gz = get_node_or_null("GoalZone")
-	if gz and not gz.body_entered.is_connected(on_goal_reached):
-		gz.body_entered.connect(on_goal_reached)
-		print("[Level1] Connected GoalZone manually")
-
 func _process(delta: float) -> void:
 	super._process(delta)
 

@@ -15,7 +15,7 @@ class_name LevelBuilder
 # ─── Enums ───────────────────────────────────────────────────────────────────
 enum PlatformType { STATIC, MOVING, BOUNCE, CRUMBLING, ICE, CONVEYOR, DISAPPEARING }
 enum EnemyType { PATROL, FLYING, TURRET, JUMPER }
-enum ItemType { COIN_BRONZE, COIN_SILVER, COIN_GOLD, GEM, CHECKPOINT, POWERUP_JUMP, POWERUP_SIZE }
+enum ItemType { CHECKPOINT, POWERUP_JUMP, POWERUP_SIZE }
 
 # ─── Configuration ───────────────────────────────────────────────────────────
 const TILE_SIZE := 40.0
@@ -88,10 +88,6 @@ func generate_level(difficulty: int, seed_val: int = -1) -> void:
 		if _rng.randf() < hazard_chance:
 			_add_hazard_to_platform(platform, difficulty)
 			
-		# Add coins?
-		if _rng.randf() < 0.4:
-			_add_coins_above(platform)
-			
 		# Add enemies?
 		if _rng.randf() < 0.2 + (difficulty * 0.05):
 			_add_enemy_on(platform, difficulty)
@@ -143,23 +139,6 @@ func add_goal(pos: Vector2) -> Area2D:
 		_level_root.add_child(goal)
 		return goal
 	return null
-
-
-func add_coin(pos: Vector2, type: ItemType = ItemType.COIN_GOLD) -> Area2D:
-	# Assuming script exists at known path
-	var coin = Area2D.new()
-	coin.set_script(load("res://scripts/items/coin_collectible.gd"))
-	coin.position = pos
-	
-	# Map ItemType to CoinType
-	match type:
-		ItemType.COIN_BRONZE: coin.coin_type = 0
-		ItemType.COIN_SILVER: coin.coin_type = 1
-		ItemType.COIN_GOLD: coin.coin_type = 2
-		ItemType.GEM: coin.coin_type = 3
-	
-	_level_root.add_child(coin)
-	return coin
 
 
 # ─── Internal: Platform Creation ────────────────────────────────────────────
@@ -298,20 +277,6 @@ func _add_hazard_to_platform(platform: Node2D, difficulty: int) -> void:
 	
 	hazard.position = Vector2(0, -25) # Above platform center
 	platform.add_child(hazard)
-
-
-func _add_coins_above(platform: Node2D) -> void:
-	var pattern = _rng.randi_range(0, 2)
-	match pattern:
-		0: # Single coin
-			add_coin(platform.global_position + Vector2(0, -80))
-		1: # Arc
-			for i in 3:
-				var offset = Vector2((i-1)*30, -80 - sin(i*PI/2)*20)
-				add_coin(platform.global_position + offset)
-		2: # Line
-			for i in 3:
-				add_coin(platform.global_position + Vector2((i-1)*40, -60))
 
 
 func _add_enemy_on(platform: Node2D, difficulty: int) -> void:
