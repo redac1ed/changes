@@ -262,7 +262,7 @@ func is_level_unlocked(world: int, level: int) -> bool:
 		prev_world -= 1
 		prev_level = LEVELS_PER_WORLD # Assuming 10 levels
 	
-	if prev_world < 1: return true # Tutorial always unlocked
+	if prev_world < 1: return true # First world always unlocked
 	
 	var prev_key = _get_level_key(prev_world, prev_level)
 	return _save_data.levels.has(prev_key)
@@ -568,7 +568,6 @@ func get_world_name(world: int) -> String:
 		return LevelManager.get_world_name(world)
 	# Fallback if LevelManager not available
 	var world_names := {
-		0: "Tutorial",
 		1: "Meadow",
 		2: "Volcano",
 		3: "Sky",

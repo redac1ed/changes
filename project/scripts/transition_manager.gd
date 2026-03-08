@@ -251,7 +251,6 @@ func show_loading(show: bool = true) -> void:
 
 func _get_world_name(world: int) -> String:
 	match world:
-		0: return "Tutorial"
 		1: return "Meadow"
 		2: return "Volcano"
 		3: return "Sky"
@@ -263,7 +262,6 @@ func _get_world_name(world: int) -> String:
 
 func _get_world_subtitle(world: int) -> String:
 	match world:
-		0: return "Learn the basics"
 		1: return "Gentle rolling hills"
 		2: return "Fiery obstacles await"
 		3: return "Floating through clouds"
@@ -275,7 +273,6 @@ func _get_world_subtitle(world: int) -> String:
 
 func _get_world_color(world: int) -> Color:
 	match world:
-		0: return Color(0.95, 0.88, 0.72)
 		1: return Color(0.45, 0.82, 0.45)
 		2: return Color(1.0, 0.4, 0.2)
 		3: return Color(0.6, 0.85, 1.0)

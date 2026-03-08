@@ -6,7 +6,6 @@ extends Node
 
 var WORLD_SCENES: Dictionary = {}
 var WORLD_CONFIG: Dictionary = {
-	0: {"name": "Tutorial", "theme": "core", "difficulty": 0, "levels": 1, "color": Color(0.95, 0.88, 0.72)},
 	1: {"name": "Meadow", "theme": "nature", "difficulty": 1, "levels": 3, "color": Color(0.45, 0.82, 0.45)},
 	2: {"name": "Volcano", "theme": "fire", "difficulty": 2, "levels": 3, "color": Color(0.95, 0.35, 0.2)},
 	3: {"name": "Sky", "theme": "wind", "difficulty": 2, "levels": 3, "color": Color(0.55, 0.78, 0.95)},
@@ -23,7 +22,6 @@ var _death_count_current: int = 0
 var _collectibles_found: Dictionary = {}  # world:level -> count
 
 func _ready():
-	WORLD_SCENES[0] = "res://scenes/tutorial.tscn"
 	# Bonus level removed - commented out
 	# WORLD_SCENES[6] = "res://scenes/levels/bonus.tscn"
 	
@@ -79,10 +77,8 @@ func load_next_level() -> void:
 	print("[LevelManager] load_next_level: world=%d level=%d" % [world, level])
 	
 	if WORLD_SCENES[world] is String:
-		# Single scene world (tutorial/bonus)
-		if world == 0:
-			load_world(1)
-		elif world == 6:
+		# Single scene world (bonus)
+		if world == 6:
 			# Game complete
 			GameState.game_completed = true
 	else:
@@ -168,7 +164,7 @@ func get_best_time(world: int, level: int) -> float:
 
 func is_world_unlocked(world: int) -> bool:
 	"""Check if a world is unlocked based on progression"""
-	if world == 0:
+	if world == 1:
 		return true
 	return GameState.worlds_completed >= (world - 1)
 

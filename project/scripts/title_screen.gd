@@ -6,7 +6,6 @@ enum MenuState { MAIN, WORLD_SELECT, SETTINGS, CREDITS, SHOP }
 var current_state: MenuState = MenuState.MAIN
 
 const WORLDS = [
-	{"name": "Tutorial", "subtitle": "Learn the basics", "color": Color(0.95, 0.88, 0.72), "icon": "T", "levels": 1},
 	{"name": "Meadow", "subtitle": "Rolling green hills", "color": Color(0.45, 0.82, 0.45), "icon": "M", "levels": 3},
 	{"name": "Volcano", "subtitle": "Fiery obstacles", "color": Color(0.95, 0.35, 0.2), "icon": "V", "levels": 3},
 	{"name": "Sky", "subtitle": "Wind-swept heights", "color": Color(0.55, 0.78, 0.95), "icon": "S", "levels": 3},
@@ -416,7 +415,14 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	bar_bg.color = Color(1.0, 1.0, 1.0, 0.1)
 	card.add_child(bar_bg)
 
-	var pct: float = 1.0 if idx == 0 else 0.0
+	var world_number: int = idx + 1
+	var unlocked: bool = true
+	if LevelManager:
+		unlocked = LevelManager.is_world_unlocked(world_number)
+	elif GameState:
+		unlocked = (world_number <= 1) or (GameState.worlds_completed >= (world_number - 1))
+
+	var pct: float = 1.0 if unlocked else 0.0
 	var bar_fill := ColorRect.new()
 	bar_fill.position = Vector2(bar_x, 118)
 	bar_fill.size = Vector2(bar_w * pct, 2)
@@ -452,7 +458,9 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	pbtn.add_theme_stylebox_override("pressed", bs)
 	pbtn.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
 	pbtn.add_theme_color_override("font_hover_color", Color.WHITE)
-	pbtn.pressed.connect(_on_world_play.bind(idx))
+	pbtn.disabled = not unlocked
+	pbtn.text = "Enter" if unlocked else "Locked"
+	pbtn.pressed.connect(_on_world_play.bind(world_number))
 	card.add_child(pbtn)
 
 
