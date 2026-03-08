@@ -97,68 +97,12 @@ position = Vector2(176, 544)
 
 [node name="GoalZone" type="Area2D" parent="." unique_id=1746458754]
 position = Vector2(1112, 240)
-collision_mask = 0
+collision_layer = 0
+collision_mask = 2
 script = ExtResource("2_goal")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone" unique_id=1647699248]
 shape = SubResource("CircleShape2D_4kmhl")
-
-[node name="HintBg" type="ColorRect" parent="." unique_id=807531377]
-offset_left = 543.0
-offset_top = 1202.0
-offset_right = 983.0
-offset_bottom = 1252.0
-color = Color(0.1, 0.12, 0.16, 0.8)
-metadata/_edit_use_anchors_ = true
-
-[node name="HintLabel" type="Label" parent="." unique_id=1881723326]
-offset_left = 553.0
-offset_top = 1208.0
-offset_right = 973.0
-offset_bottom = 1246.0
-theme_override_colors/font_color = Color(0.95, 0.88, 0.72, 1)
-theme_override_font_sizes/font_size = 16
-text = "Click & drag the ball, then release to shoot!"
-horizontal_alignment = 1
-metadata/_edit_use_anchors_ = true
-
-[node name="ArrowBg" type="ColorRect" parent="." unique_id=2086166275]
-offset_left = 683.0
-offset_top = 1322.0
-offset_right = 863.0
-offset_bottom = 1352.0
-color = Color(0.1, 0.12, 0.16, 0.7)
-metadata/_edit_use_anchors_ = true
-
-[node name="ArrowLabel" type="Label" parent="." unique_id=455984955]
-offset_left = 693.0
-offset_top = 1327.0
-offset_right = 858.0
-offset_bottom = 1348.0
-theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 1)
-theme_override_font_sizes/font_size = 14
-text = ">>  Aim here!  >>"
-horizontal_alignment = 1
-metadata/_edit_use_anchors_ = true
-
-[node name="GoalGlowBg" type="ColorRect" parent="." unique_id=417325993]
-offset_left = 1013.0
-offset_top = 1312.0
-offset_right = 1118.0
-offset_bottom = 1337.0
-color = Color(0.1, 0.2, 0.12, 0.7)
-metadata/_edit_use_anchors_ = true
-
-[node name="GoalGlowLabel" type="Label" parent="." unique_id=2113860948]
-offset_left = 1018.0
-offset_top = 1316.0
-offset_right = 1113.0
-offset_bottom = 1334.0
-theme_override_colors/font_color = Color(0.35, 0.9, 0.5, 1)
-theme_override_font_sizes/font_size = 12
-text = "GOAL"
-horizontal_alignment = 1
-metadata/_edit_use_anchors_ = true
 
 [node name="Layer0" type="TileMapLayer" parent="." unique_id=931296671]
 use_parent_material = true
