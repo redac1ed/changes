@@ -1,319 +1,209 @@
 [gd_scene format=3 uid="uid://76bb0sd1rejb"]
 
-[ext_resource type="Script" uid="uid://bmhnh3dh2brvi" path="res://scripts/levels/level_2.gd" id="1_level"]
-[ext_resource type="Script" uid="uid://b0dy33wopbxul" path="res://scripts/platforms/bounce_platform.gd" id="2_mjvil"]
-[ext_resource type="Script" uid="uid://dusn86fy4y26b" path="res://scripts/hazards/spike_strip.gd" id="3_v5rsi"]
-[ext_resource type="Script" uid="uid://brye3fcvyicjj" path="res://scripts/platforms/moving_platform.gd" id="4_fheg2"]
+[ext_resource type="Script" uid="uid://nm3wvs31qmiw" path="res://scripts/level_template.gd" id="1_0ish6"]
+[ext_resource type="PackedScene" path="res://scenes/tree_1.tscn" id="2_x0rpe"]
+[ext_resource type="PackedScene" path="res://scenes/tree_2.tscn" id="3_mjvil"]
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="5_pgto0"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_t5w2r"]
-size = Vector2(303.5039, 21.41446)
+[sub_resource type="RectangleShape2D" id="rect_floor"]
+size = Vector2(1200, 40)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_x0rpe"]
-size = Vector2(37, 799)
+[sub_resource type="RectangleShape2D" id="rect_plat_left"]
+size = Vector2(300, 20)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wqdbq"]
-size = Vector2(40, 1610)
+[sub_resource type="RectangleShape2D" id="rect_plat_right"]
+size = Vector2(260, 20)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_lwy4t"]
-size = Vector2(200, 20)
+[sub_resource type="RectangleShape2D" id="rect_wall_left"]
+size = Vector2(40, 800)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ornir"]
-size = Vector2(150, 20)
+[sub_resource type="RectangleShape2D" id="rect_wall_right"]
+size = Vector2(40, 800)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_qgrdp"]
-size = Vector2(80, 20)
+[sub_resource type="RectangleShape2D" id="rect_ceiling"]
+size = Vector2(1200, 40)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_5vkre"]
-size = Vector2(100, 20)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hcw17"]
-size = Vector2(120, 20)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_0ar77"]
-size = Vector2(100, 20)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_qn4js"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_4kmhl"]
 radius = 35.0
 
-[node name="World1MainLevel2" type="Node2D" unique_id=1126490249]
-script = ExtResource("1_level")
-level_number = 2
-camera_limits = Rect2(0, 0, 1600, 975)
+[node name="Tutorial" type="Node2D" unique_id=651641308]
+script = ExtResource("1_0ish6")
+level_number = 0
+world_number = 0
 
-[node name="Background" type="ColorRect" parent="." unique_id=435546695]
+[node name="Background" type="ColorRect" parent="." unique_id=34833350]
 z_index = -5
-offset_left = 1.0
-offset_top = 1.0
-offset_right = 1601.0
-offset_bottom = 975.0
-color = Color(0.4, 0.65, 0.9, 1)
+offset_right = 1200.0
+offset_bottom = 800.0
+color = Color(0.12, 0.11, 0.16, 1)
 
-[node name="Floor" type="StaticBody2D" parent="." unique_id=1319215229]
-position = Vector2(805, 960)
+[node name="SkyGrad" type="ColorRect" parent="." unique_id=440704505]
+z_index = -4
+offset_right = 1200.0
+offset_bottom = 400.0
+color = Color(0.08, 0.12, 0.22, 0.5)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=1041430830]
-position = Vector2(0.50006104, -3)
-scale = Vector2(5.2948246, 1.5301015)
-shape = SubResource("RectangleShape2D_t5w2r")
+[node name="TreeBg1" parent="." unique_id=794507417 instance=ExtResource("2_x0rpe")]
+modulate = Color(0.5, 0.5, 0.5, 0.4)
+z_index = -3
+position = Vector2(100, 600)
+scale = Vector2(0.25, 0.25)
 
-[node name="GrassTop" type="ColorRect" parent="Floor" unique_id=62376695]
-offset_left = -800.0
+[node name="TreeBg2" parent="." unique_id=1611584626 instance=ExtResource("3_mjvil")]
+modulate = Color(0.5, 0.5, 0.5, 0.35)
+z_index = -3
+position = Vector2(900, 600)
+scale = Vector2(0.3, 0.3)
+
+[node name="TreeBg3" parent="." unique_id=1105667530 instance=ExtResource("2_x0rpe")]
+modulate = Color(0.5, 0.5, 0.5, 0.3)
+z_index = -3
+position = Vector2(1100, 600)
+scale = Vector2(0.2, 0.2)
+
+[node name="Floor" type="StaticBody2D" parent="." unique_id=1065680018]
+position = Vector2(600, 620)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=638865099]
+shape = SubResource("rect_floor")
+
+[node name="GrassTop" type="ColorRect" parent="Floor" unique_id=1320951270]
+offset_left = -600.0
 offset_top = -20.0
-offset_right = 800.0
+offset_right = 600.0
 offset_bottom = -14.0
 color = Color(0.42, 0.72, 0.28, 1)
-metadata/_edit_use_anchors_ = true
 
-[node name="SoilBody" type="ColorRect" parent="Floor" unique_id=1501907582]
-offset_left = -800.0
+[node name="SoilBody" type="ColorRect" parent="Floor" unique_id=1125233263]
+offset_left = -600.0
 offset_top = -14.0
-offset_right = 800.0
+offset_right = 600.0
 offset_bottom = 20.0
-color = Color(0.45, 0.35, 0.25, 1)
-metadata/_edit_use_anchors_ = true
+color = Color(0.35, 0.28, 0.18, 1)
 
-[node name="Wall" type="StaticBody2D" parent="." unique_id=1196731547]
-position = Vector2(789, 770)
+[node name="DirtFill" type="ColorRect" parent="Floor" unique_id=2117259679]
+offset_left = -600.0
+offset_top = 20.0
+offset_right = 600.0
+offset_bottom = 180.0
+color = Color(0.28, 0.22, 0.14, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall" unique_id=1515838588]
-position = Vector2(-175.5, -226.5)
-shape = SubResource("RectangleShape2D_x0rpe")
+[node name="PlatformLeft" type="StaticBody2D" parent="." unique_id=839497084]
+position = Vector2(200, 500)
 
-[node name="StoneBody" type="ColorRect" parent="Wall" unique_id=704128101]
-offset_left = -198.0
-offset_top = -627.0
-offset_right = 1402.0
-offset_bottom = -593.0
-scale = Vector2(0.026696414, 23.732296)
-color = Color(0.38044125, 0.38044122, 0.38044116, 1)
-metadata/_edit_use_anchors_ = true
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformLeft" unique_id=870144463]
+shape = SubResource("rect_plat_left")
 
-[node name="WallLeft" type="StaticBody2D" parent="." unique_id=554383612]
-position = Vector2(-20, 350)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallLeft" unique_id=797587284]
-position = Vector2(0, 139)
-shape = SubResource("RectangleShape2D_wqdbq")
-
-[node name="WallRight" type="StaticBody2D" parent="." unique_id=1480230876]
-position = Vector2(1620, 350)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallRight" unique_id=1920892805]
-position = Vector2(2, 86)
-shape = SubResource("RectangleShape2D_wqdbq")
-
-[node name="StartPlatform" type="StaticBody2D" parent="." unique_id=825353663]
-position = Vector2(140, 156)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StartPlatform" unique_id=1482408136]
-shape = SubResource("RectangleShape2D_lwy4t")
-
-[node name="PlatformTop" type="ColorRect" parent="StartPlatform" unique_id=734250531]
-offset_left = -100.0
+[node name="TopSurface" type="ColorRect" parent="PlatformLeft" unique_id=1939640269]
+offset_left = -150.0
 offset_top = -10.0
-offset_right = 100.0
+offset_right = 150.0
 offset_bottom = -4.0
 color = Color(0.52, 0.78, 0.32, 1)
 
-[node name="PlatformBody" type="ColorRect" parent="StartPlatform" unique_id=1238426102]
-offset_left = -100.0
+[node name="Body" type="ColorRect" parent="PlatformLeft" unique_id=1279742896]
+offset_left = -150.0
 offset_top = -4.0
-offset_right = 100.0
+offset_right = 150.0
 offset_bottom = 10.0
 color = Color(0.38, 0.58, 0.22, 1)
 
-[node name="Platform2" type="StaticBody2D" parent="." unique_id=789162191]
-position = Vector2(384, 249)
+[node name="PlatformRight" type="StaticBody2D" parent="." unique_id=1719603293]
+position = Vector2(900, 460)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform2" unique_id=817546819]
-shape = SubResource("RectangleShape2D_ornir")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformRight" unique_id=580252122]
+shape = SubResource("rect_plat_right")
 
-[node name="PlatformTop" type="ColorRect" parent="Platform2" unique_id=1300712288]
-offset_left = -75.0
+[node name="TopSurface" type="ColorRect" parent="PlatformRight" unique_id=1606979183]
+offset_left = -130.0
 offset_top = -10.0
-offset_right = 75.0
+offset_right = 130.0
 offset_bottom = -4.0
 color = Color(0.52, 0.78, 0.32, 1)
-metadata/_edit_use_anchors_ = true
 
-[node name="PlatformBody" type="ColorRect" parent="Platform2" unique_id=1371179907]
-offset_left = -75.0
+[node name="Body" type="ColorRect" parent="PlatformRight" unique_id=342941294]
+offset_left = -130.0
 offset_top = -4.0
-offset_right = 75.0
+offset_right = 130.0
 offset_bottom = 10.0
 color = Color(0.38, 0.58, 0.22, 1)
-metadata/_edit_use_anchors_ = true
 
-[node name="BouncePlatform" type="StaticBody2D" parent="." unique_id=871739317]
-position = Vector2(1339, 747)
-script = ExtResource("2_mjvil")
-bounce_force = 700.0
-platform_size = Vector2(80, 20)
+[node name="WallLeft" type="StaticBody2D" parent="." unique_id=871121989]
+position = Vector2(-20, 400)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BouncePlatform" unique_id=2121523355]
-shape = SubResource("RectangleShape2D_qgrdp")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallLeft" unique_id=1886870580]
+shape = SubResource("rect_wall_left")
 
-[node name="BounceVisual" type="ColorRect" parent="BouncePlatform" unique_id=659429360]
-offset_left = -40.0
-offset_top = -10.0
-offset_right = 40.0
-offset_bottom = 10.0
-color = Color(0.95, 0.4, 0.35, 1)
-metadata/_edit_use_anchors_ = true
+[node name="WallRight" type="StaticBody2D" parent="." unique_id=747492226]
+position = Vector2(1220, 400)
 
-[node name="BounceHighlight" type="ColorRect" parent="BouncePlatform" unique_id=324131501]
-offset_left = -35.0
-offset_top = -8.0
-offset_right = 35.0
-offset_bottom = -4.0
-color = Color(1, 0.6, 0.5, 0.5)
-metadata/_edit_use_anchors_ = true
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallRight" unique_id=1581844785]
+shape = SubResource("rect_wall_right")
 
-[node name="Platform3" type="StaticBody2D" parent="." unique_id=1194256185]
-position = Vector2(1011, 796)
+[node name="Ceiling" type="StaticBody2D" parent="." unique_id=1251574019]
+position = Vector2(600, -20)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform3" unique_id=1784793661]
-shape = SubResource("RectangleShape2D_ornir")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ceiling" unique_id=1727164253]
+shape = SubResource("rect_ceiling")
 
-[node name="PlatformTop" type="ColorRect" parent="Platform3" unique_id=1690195594]
-offset_left = -75.0
-offset_top = -10.0
-offset_right = 75.0
-offset_bottom = -4.0
-color = Color(0.52, 0.78, 0.32, 1)
-metadata/_edit_use_anchors_ = true
+[node name="BallSpawn" type="Marker2D" parent="." unique_id=1842755036]
+position = Vector2(200, 460)
 
-[node name="PlatformBody" type="ColorRect" parent="Platform3" unique_id=517683272]
-offset_left = -75.0
-offset_top = -4.0
-offset_right = 75.0
-offset_bottom = 10.0
-color = Color(0.38, 0.58, 0.22, 1)
-metadata/_edit_use_anchors_ = true
-
-[node name="SpikeStrip" type="Area2D" parent="." unique_id=1089130046]
-position = Vector2(517, 933)
-script = ExtResource("3_v5rsi")
-trap_size = Vector2(100, 20)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeStrip" unique_id=1103219546]
-shape = SubResource("RectangleShape2D_5vkre")
-
-[node name="SpikeVisual" type="ColorRect" parent="SpikeStrip" unique_id=290302998]
-offset_left = -50.0
-offset_top = -10.0
-offset_right = 50.0
-offset_bottom = 10.0
-color = Color(0.6, 0.6, 0.65, 1)
-
-[node name="MovingPlatform" type="StaticBody2D" parent="." unique_id=364807637]
-position = Vector2(998, 304)
-script = ExtResource("4_fheg2")
-move_distance = 150.0
-move_speed = 60.0
-platform_size = Vector2(120, 20)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MovingPlatform" unique_id=1518595892]
-shape = SubResource("RectangleShape2D_hcw17")
-
-[node name="MovingVisual" type="ColorRect" parent="MovingPlatform" unique_id=1263769644]
-offset_left = -60.0
-offset_top = -10.0
-offset_right = 60.0
-offset_bottom = 10.0
-color = Color(0.45, 0.65, 0.85, 1)
-metadata/_edit_use_anchors_ = true
-
-[node name="MovingHighlight" type="ColorRect" parent="MovingPlatform" unique_id=392291047]
-offset_left = -55.0
-offset_top = -8.0
-offset_right = 55.0
-offset_bottom = -4.0
-color = Color(0.6, 0.8, 1, 0.4)
-metadata/_edit_use_anchors_ = true
-
-[node name="Platform4" type="StaticBody2D" parent="." unique_id=325243]
-position = Vector2(1125, 471)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform4" unique_id=1201428308]
-shape = SubResource("RectangleShape2D_ornir")
-
-[node name="PlatformTop" type="ColorRect" parent="Platform4" unique_id=1677751170]
-offset_left = -75.0
-offset_top = -10.0
-offset_right = 75.0
-offset_bottom = -4.0
-color = Color(0.52, 0.78, 0.32, 1)
-metadata/_edit_use_anchors_ = true
-
-[node name="PlatformBody" type="ColorRect" parent="Platform4" unique_id=1196453815]
-offset_left = -75.0
-offset_top = -4.0
-offset_right = 75.0
-offset_bottom = 10.0
-color = Color(0.38, 0.58, 0.22, 1)
-metadata/_edit_use_anchors_ = true
-
-[node name="GoalPlatform" type="StaticBody2D" parent="." unique_id=926212799]
-position = Vector2(1455, 254)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GoalPlatform" unique_id=1431209861]
-shape = SubResource("RectangleShape2D_0ar77")
-
-[node name="PlatformTop" type="ColorRect" parent="GoalPlatform" unique_id=2001410588]
-offset_left = -50.0
-offset_top = -10.0
-offset_right = 50.0
-offset_bottom = -4.0
-color = Color(0.35, 0.9, 0.5, 1)
-metadata/_edit_use_anchors_ = true
-
-[node name="PlatformBody" type="ColorRect" parent="GoalPlatform" unique_id=1005571356]
-offset_left = -50.0
-offset_top = -4.0
-offset_right = 50.0
-offset_bottom = 10.0
-color = Color(0.25, 0.7, 0.38, 1)
-metadata/_edit_use_anchors_ = true
-
-[node name="BallSpawn" type="Marker2D" parent="." unique_id=184693054]
-position = Vector2(140, 126)
-
-[node name="GoalZone" type="Area2D" parent="." unique_id=130418363]
-position = Vector2(1455, 214)
-collision_mask = 2
+[node name="GoalZone" type="Area2D" parent="." unique_id=1746458754]
+position = Vector2(900, 420)
+collision_mask = 0
 script = ExtResource("5_pgto0")
-goal_color = Color(0.35, 0.92, 0.5, 1)
-goal_radius = 35.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone" unique_id=50316883]
-shape = SubResource("CircleShape2D_qn4js")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone" unique_id=1647699248]
+shape = SubResource("CircleShape2D_4kmhl")
 
-[node name="StartHint" type="Label" parent="." unique_id=1294865626]
-offset_left = 70.0
-offset_top = 96.0
-offset_right = 233.0
-offset_bottom = 126.0
-text = "Click & Drag to Shoot"
+[node name="HintBg" type="ColorRect" parent="." unique_id=807531377]
+offset_left = 380.0
+offset_top = 260.0
+offset_right = 820.0
+offset_bottom = 310.0
+color = Color(0.1, 0.12, 0.16, 0.8)
+
+[node name="HintLabel" type="Label" parent="." unique_id=1881723326]
+offset_left = 390.0
+offset_top = 266.0
+offset_right = 810.0
+offset_bottom = 304.0
+theme_override_colors/font_color = Color(0.95, 0.88, 0.72, 1)
+theme_override_font_sizes/font_size = 16
+text = "Click & drag the ball, then release to shoot!"
 horizontal_alignment = 1
-vertical_alignment = 1
 
-[node name="BounceHint" type="Label" parent="." unique_id=291919580]
-offset_left = 1138.0
-offset_top = 782.0
-offset_right = 1258.0
-offset_bottom = 812.0
-text = "Bounce Pad!"
+[node name="ArrowBg" type="ColorRect" parent="." unique_id=2086166275]
+offset_left = 520.0
+offset_top = 380.0
+offset_right = 700.0
+offset_bottom = 410.0
+color = Color(0.1, 0.12, 0.16, 0.7)
+
+[node name="ArrowLabel" type="Label" parent="." unique_id=455984955]
+offset_left = 530.0
+offset_top = 385.0
+offset_right = 695.0
+offset_bottom = 406.0
+theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = ">>  Aim here!  >>"
 horizontal_alignment = 1
-vertical_alignment = 1
 
-[node name="GoalHint" type="Label" parent="." unique_id=1554056070]
-offset_left = 1393.0
-offset_top = 50.0
-offset_right = 1493.0
-offset_bottom = 80.0
+[node name="GoalGlowBg" type="ColorRect" parent="." unique_id=417325993]
+offset_left = 850.0
+offset_top = 370.0
+offset_right = 955.0
+offset_bottom = 395.0
+color = Color(0.1, 0.2, 0.12, 0.7)
+
+[node name="GoalGlowLabel" type="Label" parent="." unique_id=2113860948]
+offset_left = 855.0
+offset_top = 374.0
+offset_right = 950.0
+offset_bottom = 392.0
 theme_override_colors/font_color = Color(0.35, 0.9, 0.5, 1)
-text = ">> GOAL <<"
+theme_override_font_sizes/font_size = 12
+text = "GOAL"
 horizontal_alignment = 1
-vertical_alignment = 1

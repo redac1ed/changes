@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://tutorial"]
 
-[ext_resource type="Script" uid="uid://bvty6o4wyb6c7" path="res://scripts/level_template.gd" id="1_level"]
-[ext_resource type="Script" uid="uid://c0vam075mn165" path="res://scripts/goal.gd" id="2_goal"]
+[ext_resource type="Script" uid="uid://nm3wvs31qmiw" path="res://scripts/level_template.gd" id="1_level"]
+[ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="2_goal"]
 [ext_resource type="PackedScene" path="res://scenes/tree_1.tscn" id="3_tree1"]
 [ext_resource type="PackedScene" path="res://scenes/tree_2.tscn" id="4_tree2"]
 
@@ -23,7 +23,7 @@ size = Vector2(40, 800)
 [sub_resource type="RectangleShape2D" id="rect_ceiling"]
 size = Vector2(1200, 40)
 
-[sub_resource type="CircleShape2D" id="circle_goal"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_4kmhl"]
 radius = 35.0
 
 [node name="Tutorial" type="Node2D" unique_id=651641308]
@@ -154,8 +154,8 @@ position = Vector2(900, 420)
 collision_mask = 0
 script = ExtResource("2_goal")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone" unique_id=1587326245]
-shape = SubResource("circle_goal")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone" unique_id=1647699248]
+shape = SubResource("CircleShape2D_4kmhl")
 
 [node name="HintBg" type="ColorRect" parent="." unique_id=807531377]
 offset_left = 380.0
