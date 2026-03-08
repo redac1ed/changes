@@ -2,3 +2,4 @@
 /project/.godot
 /project/addons
 *.gd.uid
+/project/assets/swamp_assets/**/*.import
