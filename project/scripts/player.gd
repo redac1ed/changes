@@ -5,7 +5,7 @@ extends RigidBody2D
 ## Includes: squash/stretch, trail, trajectory preview, power ring, particles.
 
 @export_group("Power")
-@export var max_power: float = 600.0
+@export var max_power: float = 700.0
 @export var drag_radius: float = 60.0
 @export var drag_sensitivity: float = 5
 
