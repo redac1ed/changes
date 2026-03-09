@@ -310,4 +310,3 @@ func _play_world_music() -> void:
 		4: AudioManager.play_music("ocean")
 		5: AudioManager.play_music("space")
 		6: AudioManager.play_music("bonus")
-

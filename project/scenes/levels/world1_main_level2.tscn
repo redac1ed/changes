@@ -1,6 +1,7 @@
 [gd_scene format=4 uid="uid://76bb0sd1rejb"]
 
 [ext_resource type="Script" uid="uid://nm3wvs31qmiw" path="res://scripts/level_template.gd" id="1_0ish6"]
+[ext_resource type="Script" uid="uid://bmhnh3dh2brvi" path="res://scripts/levels/level_2.gd" id="2_lv2scr"]
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="3_t2kep"]
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="5_pgto0"]
 
@@ -19,10 +20,10 @@ size = Vector2(1200, 40)
 [sub_resource type="CircleShape2D" id="CircleShape2D_4kmhl"]
 radius = 35.0
 
-[node name="world1_main_level1" type="Node2D" unique_id=651641308]
-script = ExtResource("1_0ish6")
-level_number = 0
-world_number = 0
+[node name="world1_main_level2" type="Node2D" unique_id=651641308]
+script = ExtResource("2_lv2scr")
+level_number = 1
+world_number = 1
 
 [node name="Background" type="ColorRect" parent="." unique_id=34833350]
 z_index = -5
@@ -97,68 +98,12 @@ position = Vector2(176, 584)
 
 [node name="GoalZone" type="Area2D" parent="." unique_id=1746458754]
 position = Vector2(1112, 240)
-collision_mask = 0
+collision_layer = 0
+collision_mask = 2
 script = ExtResource("5_pgto0")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone" unique_id=1647699248]
 shape = SubResource("CircleShape2D_4kmhl")
-
-[node name="HintBg" type="ColorRect" parent="." unique_id=807531377]
-offset_left = 776.0
-offset_top = 1690.0
-offset_right = 1216.0
-offset_bottom = 1740.0
-color = Color(0.1, 0.12, 0.16, 0.8)
-metadata/_edit_use_anchors_ = true
-
-[node name="HintLabel" type="Label" parent="." unique_id=1881723326]
-offset_left = 786.0
-offset_top = 1696.0
-offset_right = 1206.0
-offset_bottom = 1734.0
-theme_override_colors/font_color = Color(0.95, 0.88, 0.72, 1)
-theme_override_font_sizes/font_size = 16
-text = "Click & drag the ball, then release to shoot!"
-horizontal_alignment = 1
-metadata/_edit_use_anchors_ = true
-
-[node name="ArrowBg" type="ColorRect" parent="." unique_id=2086166275]
-offset_left = 916.0
-offset_top = 1810.0
-offset_right = 1096.0
-offset_bottom = 1840.0
-color = Color(0.1, 0.12, 0.16, 0.7)
-metadata/_edit_use_anchors_ = true
-
-[node name="ArrowLabel" type="Label" parent="." unique_id=455984955]
-offset_left = 926.0
-offset_top = 1815.0
-offset_right = 1091.0
-offset_bottom = 1836.0
-theme_override_colors/font_color = Color(0.96, 0.86, 0.3, 1)
-theme_override_font_sizes/font_size = 14
-text = ">>  Aim here!  >>"
-horizontal_alignment = 1
-metadata/_edit_use_anchors_ = true
-
-[node name="GoalGlowBg" type="ColorRect" parent="." unique_id=417325993]
-offset_left = 1246.0
-offset_top = 1800.0
-offset_right = 1351.0
-offset_bottom = 1825.0
-color = Color(0.1, 0.2, 0.12, 0.7)
-metadata/_edit_use_anchors_ = true
-
-[node name="GoalGlowLabel" type="Label" parent="." unique_id=2113860948]
-offset_left = 1251.0
-offset_top = 1804.0
-offset_right = 1346.0
-offset_bottom = 1822.0
-theme_override_colors/font_color = Color(0.35, 0.9, 0.5, 1)
-theme_override_font_sizes/font_size = 12
-text = "GOAL"
-horizontal_alignment = 1
-metadata/_edit_use_anchors_ = true
 
 [node name="Layer0" type="TileMapLayer" parent="." unique_id=931296671]
 use_parent_material = true
