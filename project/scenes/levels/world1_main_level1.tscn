@@ -25,24 +25,6 @@ script = ExtResource("6_lv1scr")
 level_number = 0
 world_number = 1
 
-[node name="Background" type="ColorRect" parent="." unique_id=34833350]
-z_index = -5
-offset_left = 275.0
-offset_top = 1319.0
-offset_right = 1475.0
-offset_bottom = 2119.0
-color = Color(0.12, 0.11, 0.16, 1)
-metadata/_edit_use_anchors_ = true
-
-[node name="SkyGrad" type="ColorRect" parent="." unique_id=440704505]
-z_index = -4
-offset_left = 288.0
-offset_top = 1303.0
-offset_right = 1488.0
-offset_bottom = 1703.0
-color = Color(0.08, 0.12, 0.22, 0.5)
-metadata/_edit_use_anchors_ = true
-
 [node name="Floor" type="StaticBody2D" parent="." unique_id=1065680018]
 position = Vector2(763, 1562)
 

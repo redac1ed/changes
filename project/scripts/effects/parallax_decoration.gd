@@ -62,21 +62,46 @@ func _add_layer(motion_scale: Vector2, color: Color, draw_callback: Callable) ->
 	_layers.append(layer)
 	return layer
 
+
+## Adds a sprite-based parallax layer from a texture file.
+## The texture is scaled to fill the viewport height (default 800 px) and
+## motion_mirroring is set so it tiles seamlessly when the camera scrolls.
+func _add_sprite_layer(tex_path: String, motion_scale: Vector2,
+		viewport_h: float = 800.0) -> void:
+	var tex: Texture2D = load(tex_path)
+	if tex == null:
+		push_warning("[ParallaxDecoration] Could not load texture: " + tex_path)
+		return
+
+	var tex_w := float(tex.get_width())
+	var tex_h := float(tex.get_height())
+	var scale_factor := viewport_h / tex_h if tex_h > 0.0 else 1.0
+	var scaled_w := tex_w * scale_factor
+
+	var layer := ParallaxLayer.new()
+	layer.motion_scale = motion_scale
+	layer.motion_mirroring = Vector2(scaled_w, 0.0)
+
+	var spr := Sprite2D.new()
+	spr.texture = tex
+	spr.centered = false
+	spr.scale = Vector2(scale_factor, scale_factor)
+	spr.position = Vector2.ZERO
+	layer.add_child(spr)
+
+	add_child(layer)
+	_layers.append(layer)
+
 func _build_meadow() -> void:
-	# Far sky gradient
-	_add_layer(Vector2(0.0, 0.0), Color(0.55, 0.78, 0.95), _draw_sky_gradient)
-	
-	# Clouds
-	_add_layer(Vector2(0.1, 0.0), Color(1, 1, 1, 0.7), _draw_clouds)
-	
-	# Far mountains
-	_add_layer(Vector2(0.2, 0.1), Color(0.45, 0.55, 0.5, 0.5), _draw_mountains)
-	
-	# Hills
-	_add_layer(Vector2(0.4, 0.2), Color(0.35, 0.65, 0.3, 0.4), _draw_hills)
-	
-	# Trees silhouette
-	_add_layer(Vector2(0.6, 0.3), Color(0.25, 0.5, 0.2, 0.3), _draw_tree_line)
+	# Swamp background — 5 sprite layers from far (sky) to near (foreground trees).
+	# motion_scale: how strongly each layer scrolls with the camera.
+	# Layer 1 = furthest/sky — barely moves; Layer 5 = nearest — moves most.
+	const BG := "res://assets/swamp_assets/2 Background/Layers/"
+	_add_sprite_layer(BG + "1.png", Vector2(0.05, 0.0))
+	_add_sprite_layer(BG + "2.png", Vector2(0.15, 0.0))
+	_add_sprite_layer(BG + "3.png", Vector2(0.3,  0.05))
+	_add_sprite_layer(BG + "4.png", Vector2(0.45, 0.1))
+	_add_sprite_layer(BG + "5.png", Vector2(0.6,  0.15))
 
 
 func _build_volcano() -> void:
