@@ -4,15 +4,12 @@ class_name LevelTemplate
 @export_category("Level Info")
 @export var level_number: int = 1
 @export var world_number: int = 1
-@export var level_name: String = ""
 
 @export_category("Camera")
 @export var camera_limits: Rect2 = Rect2(0, 0, 1200, 800)
 @export var camera_zoom: float = 1.0
 
 @export_category("Level Settings")
-@export var par_shots: int = 3
-@export var time_limit: float = 0.0
 @export var enable_parallax: bool = true
 @export var enable_hud: bool = true
 @export var enable_pause: bool = true
@@ -26,22 +23,16 @@ var camera: Camera2D
 var hud: GameHUD
 var pause_overlay: PauseOverlay
 var complete_screen: LevelCompleteScreen
-var builder: LevelBuilder
 var transition_fx: SceneTransitionFX
 
 var level_complete: bool = false
 var level_time: float = 0.0
-var deaths: int = 0
 var _restart_cooldown: float = 0.0
 var _spawn_position: Vector2
 
 
 func _ready() -> void:
 	print("[Level] Initializing world=%d level=%d" % [world_number, level_number])
-
-	builder = LevelBuilder.new()
-	builder.set_level(self)
-	add_child(builder)
 
 	_setup_ball()
 	_setup_camera()
@@ -92,9 +83,6 @@ func _process(delta: float) -> void:
 	if hud:
 		hud.level_time = level_time
 
-	if time_limit > 0 and level_time >= time_limit:
-		_on_time_up()
-
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
@@ -108,14 +96,6 @@ func _input(event: InputEvent) -> void:
 
 
 func _build_level() -> void:
-	pass
-
-
-func _on_level_complete_custom() -> void:
-	pass
-
-
-func _on_ball_reset() -> void:
 	pass
 
 
@@ -231,43 +211,10 @@ func complete_level() -> void:
 		hud.is_paused = true
 		hud.show_notification("Level Complete!", Color(0.3, 0.9, 0.45))
 
-	_on_level_complete_custom()
-
 
 func on_goal_reached(body: Node2D) -> void:
 	if body == ball:
 		complete_level()
-
-
-func reset_ball() -> void:
-	if not ball:
-		return
-
-	deaths += 1
-
-	var checkpoint_pos := _spawn_position
-	for child in get_children():
-		if child is Checkpoint and child._is_activated:
-			checkpoint_pos = child.global_position + Vector2(0, -15)
-			break
-
-	ball.global_position = checkpoint_pos
-	ball.linear_velocity = Vector2.ZERO
-	ball.angular_velocity = 0.0
-
-	if camera and "add_trauma" in camera:
-		camera.add_trauma(0.3)
-
-	if hud:
-		hud.show_notification("Respawned", Color(0.9, 0.5, 0.2))
-
-	_on_ball_reset()
-
-
-func _on_time_up() -> void:
-	if hud:
-		hud.show_notification("Time's Up!", Color(1.0, 0.3, 0.2))
-	reset_ball()
 
 
 func _restart_level() -> void:
