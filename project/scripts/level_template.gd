@@ -8,6 +8,11 @@ class_name LevelTemplate
 @export_category("Camera")
 @export var camera_limits: Rect2 = Rect2(-2000, -2000, 8000, 6000)
 @export var camera_zoom: float = 1.0
+@export var use_camera_stop_markers: bool = true
+@export var left_stop_marker: NodePath = ^"CameraLeftStop"
+@export var right_stop_marker: NodePath = ^"CameraRightStop"
+@export var top_stop_marker: NodePath = ^"CameraTopStop"
+@export var bottom_stop_marker: NodePath = ^"CameraBottomStop"
 
 @export_category("Level Settings")
 @export var enable_parallax: bool = true
@@ -61,6 +66,9 @@ func _ready() -> void:
 			AudioManager.play_music(music_track)
 
 	_build_level()
+	if not _apply_camera_stop_markers():
+		_auto_detect_camera_limits()
+	_apply_camera_limits()
 	_connect_goal_zone()
 
 	if hud:
@@ -97,6 +105,74 @@ func _input(event: InputEvent) -> void:
 
 func _build_level() -> void:
 	pass
+
+
+func _apply_camera_stop_markers() -> bool:
+	if not use_camera_stop_markers:
+		return false
+
+	var left_node := get_node_or_null(left_stop_marker) as Node2D
+	var right_node := get_node_or_null(right_stop_marker) as Node2D
+	if left_node == null or right_node == null:
+		return false
+
+	var left_x := minf(left_node.global_position.x, right_node.global_position.x)
+	var right_x := maxf(left_node.global_position.x, right_node.global_position.x)
+
+	var top_y := camera_limits.position.y
+	var bottom_y := camera_limits.end.y
+
+	var top_node := get_node_or_null(top_stop_marker) as Node2D
+	if top_node:
+		top_y = top_node.global_position.y
+
+	var bottom_node := get_node_or_null(bottom_stop_marker) as Node2D
+	if bottom_node:
+		bottom_y = bottom_node.global_position.y
+
+	if bottom_y <= top_y:
+		bottom_y = top_y + 800.0
+
+	camera_limits = Rect2(left_x, top_y, right_x - left_x, bottom_y - top_y)
+	print("[Level] Camera limits from stop markers: %s" % [camera_limits])
+	return true
+
+
+func _auto_detect_camera_limits() -> void:
+	var found := false
+	var min_pos := Vector2(INF, INF)
+	var max_pos := Vector2(-INF, -INF)
+	for child in get_children():
+		if child is TileMapLayer:
+			var tilemap: TileMapLayer = child
+			var used := tilemap.get_used_rect()
+			if used.size == Vector2i.ZERO:
+				continue
+			var tile_size := Vector2(tilemap.tile_set.tile_size) if tilemap.tile_set else Vector2(16, 16)
+			var sc: Vector2 = tilemap.scale
+			var top_left := tilemap.position + Vector2(used.position) * tile_size * sc
+			var bottom_right := tilemap.position + Vector2(used.end) * tile_size * sc
+			min_pos.x = minf(min_pos.x, minf(top_left.x, bottom_right.x))
+			min_pos.y = minf(min_pos.y, minf(top_left.y, bottom_right.y))
+			max_pos.x = maxf(max_pos.x, maxf(top_left.x, bottom_right.x))
+			max_pos.y = maxf(max_pos.y, maxf(top_left.y, bottom_right.y))
+			found = true
+	if found:
+		var margin := 32.0
+		camera_limits = Rect2(
+			min_pos.x - margin,
+			min_pos.y - margin,
+			(max_pos.x - min_pos.x) + margin * 2,
+			(max_pos.y - min_pos.y) + margin * 2
+		)
+		print("[Level] Auto camera limits: %s" % [camera_limits])
+
+
+func _apply_camera_limits() -> void:
+	if camera and "world_bounds" in camera:
+		camera.world_bounds = camera_limits
+	if ball and "world_bounds" in ball:
+		ball.world_bounds = camera_limits
 
 
 func _setup_ball() -> void:
