@@ -13,6 +13,8 @@ class_name LevelTemplate
 @export var right_stop_marker: NodePath = ^"CameraRightStop"
 @export var top_stop_marker: NodePath = ^"CameraTopStop"
 @export var bottom_stop_marker: NodePath = ^"CameraBottomStop"
+@export var bottom_stop_offset: float = -200.0
+@export var auto_detect_bottom_offset: float = -200.0
 
 @export_category("Level Settings")
 @export var enable_parallax: bool = true
@@ -128,7 +130,7 @@ func _apply_camera_stop_markers() -> bool:
 
 	var bottom_node := get_node_or_null(bottom_stop_marker) as Node2D
 	if bottom_node:
-		bottom_y = bottom_node.global_position.y
+		bottom_y = bottom_node.global_position.y + bottom_stop_offset
 
 	if bottom_y <= top_y:
 		bottom_y = top_y + 800.0
@@ -159,11 +161,17 @@ func _auto_detect_camera_limits() -> void:
 			found = true
 	if found:
 		var margin := 32.0
+		var min_x := min_pos.x - margin
+		var min_y := min_pos.y - margin
+		var max_x := max_pos.x + margin
+		var max_y := max_pos.y + margin + auto_detect_bottom_offset
+		if max_y <= min_y + 64.0:
+			max_y = min_y + 64.0
 		camera_limits = Rect2(
-			min_pos.x - margin,
-			min_pos.y - margin,
-			(max_pos.x - min_pos.x) + margin * 2,
-			(max_pos.y - min_pos.y) + margin * 2
+			min_x,
+			min_y,
+			max_x - min_x,
+			max_y - min_y
 		)
 		print("[Level] Auto camera limits: %s" % [camera_limits])
 
