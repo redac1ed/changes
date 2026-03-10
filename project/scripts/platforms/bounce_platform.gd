@@ -17,6 +17,12 @@ var _cooldown_timer: float = 0.0
 var _launch_flash: float = 0.0
 var _ring_scale: float = 0.0
 
+
+# Use scene-provided Sprite2D/AnimatedSprite2D visuals instead of
+# PlatformBase procedural drawing.
+func _draw() -> void:
+	pass
+
 func _platform_ready() -> void:
 	platform_type = PlatformType.BOUNCE
 	platform_color = Color(0.95, 0.4, 0.35, 1.0)
