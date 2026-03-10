@@ -1,21 +1,8 @@
 [gd_scene format=4 uid="uid://cpxl2qexs7cd6"]
 
-[ext_resource type="Script" uid="uid://nm3wvs31qmiw" path="res://scripts/level_template.gd" id="1_ep4t1"]
-[ext_resource type="Script" uid="uid://burhr5pldq80i" path="res://scripts/levels/level_1.gd" id="6_lv1scr"]
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="2_goal"]
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="5_p1mov"]
-
-[sub_resource type="RectangleShape2D" id="rect_floor"]
-size = Vector2(1200, 40)
-
-[sub_resource type="RectangleShape2D" id="rect_wall_left"]
-size = Vector2(40, 797)
-
-[sub_resource type="RectangleShape2D" id="rect_wall_right"]
-size = Vector2(40, 800)
-
-[sub_resource type="RectangleShape2D" id="rect_ceiling"]
-size = Vector2(1200, 40)
+[ext_resource type="Script" uid="uid://burhr5pldq80i" path="res://scripts/levels/level_1.gd" id="6_lv1scr"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4kmhl"]
 radius = 35.0
@@ -23,57 +10,6 @@ radius = 35.0
 [node name="world1_main_level1" type="Node2D" unique_id=651641308]
 script = ExtResource("6_lv1scr")
 level_number = 0
-world_number = 1
-
-[node name="Floor" type="StaticBody2D" parent="." unique_id=1065680018]
-position = Vector2(763, 1562)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=638865099]
-shape = SubResource("rect_floor")
-
-[node name="GrassTop" type="ColorRect" parent="Floor" unique_id=1320951270]
-offset_left = -600.0
-offset_top = -20.0
-offset_right = 600.0
-offset_bottom = -14.0
-color = Color(0.42, 0.72, 0.28, 1)
-metadata/_edit_use_anchors_ = true
-
-[node name="SoilBody" type="ColorRect" parent="Floor" unique_id=1125233263]
-offset_left = -442.0
-offset_top = 245.0
-offset_right = 758.0
-offset_bottom = 279.0
-color = Color(0.35, 0.28, 0.18, 1)
-metadata/_edit_use_anchors_ = true
-
-[node name="DirtFill" type="ColorRect" parent="Floor" unique_id=2117259679]
-offset_left = -484.0
-offset_top = 206.0
-offset_right = 716.0
-offset_bottom = 366.0
-color = Color(0.28, 0.22, 0.14, 1)
-metadata/_edit_use_anchors_ = true
-
-[node name="WallLeft" type="StaticBody2D" parent="." unique_id=871121989]
-position = Vector2(39, 1104)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallLeft" unique_id=1886870580]
-position = Vector2(47, 542)
-shape = SubResource("rect_wall_left")
-
-[node name="WallRight" type="StaticBody2D" parent="." unique_id=747492226]
-position = Vector2(1383, 1342)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallRight" unique_id=1581844785]
-shape = SubResource("rect_wall_right")
-
-[node name="Ceiling" type="StaticBody2D" parent="." unique_id=1251574019]
-position = Vector2(710, 1194)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Ceiling" unique_id=1727164253]
-position = Vector2(611, 785)
-shape = SubResource("rect_ceiling")
 
 [node name="BallSpawn" type="Marker2D" parent="." unique_id=1842755036]
 position = Vector2(176, 544)
