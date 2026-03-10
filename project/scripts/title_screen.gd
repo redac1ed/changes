@@ -625,34 +625,42 @@ func _build_credits_panel() -> void:
 	cdiv.color = Color(1.0, 1.0, 1.0, 0.12)
 	card.add_child(cdiv)
 	var entries := [
-		{"role": "Game Design & Development", "name": "Changes Team"},
-		{"role": "Engine",                    "name": "Godot 4.2 (godotengine.org)"},
-		{"role": "Physics Puzzles",           "name": "Pull-and-Shoot Mechanic"},
-		{"role": "World Design",              "name": "Meadow - Volcano - Sky - Ocean - Space"},
-		{"role": "Sound Design",              "name": "To be added"},
-		{"role": "Music",                     "name": "To be added"},
-		{"role": "Art Style",                 "name": "Abstract Minimalist"},
-		{"role": "Special Thanks",            "name": "The Godot Community"},
+		{"role": "Game Design",           "name": "redac1ed"},
+		{"role": "Programming",           "name": "redac1ed & sarcasmking"},
+		{"role": "World & Level Design",  "name": "sarcasmking"},
+		{"role": "Music",                 "name": "sarcasmking"},
+		{"role": "Engine",                "name": "Godot Engine 4.2"},
+		{"role": "Special Thanks",        "name": "The Godot Community"},
 	]
 	var y_offset: float = 100.0
-	for entry in entries:
+	for i in entries.size():
+		var entry: Dictionary = entries[i]
+		# Hairline divider between entries
+		if i > 0:
+			var div := ColorRect.new()
+			div.position = Vector2(80, y_offset - 10)
+			div.size = Vector2(400, 1)
+			div.color = Color(1.0, 1.0, 1.0, 0.07)
+			card.add_child(div)
+		# Role — small uppercase accent label
 		var role_lbl := Label.new()
-		role_lbl.text = entry["role"]
+		role_lbl.text = entry["role"].to_upper()
 		role_lbl.position = Vector2(40, y_offset)
-		role_lbl.size = Vector2(480, 20)
+		role_lbl.size = Vector2(480, 18)
 		role_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		role_lbl.add_theme_font_size_override("font_size", 12)
-		role_lbl.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4))
+		role_lbl.add_theme_font_size_override("font_size", 10)
+		role_lbl.add_theme_color_override("font_color", Color(0.45, 0.72, 1.0, 0.75))
 		card.add_child(role_lbl)
+		# Name — larger, near-white
 		var name_lbl := Label.new()
 		name_lbl.text = entry["name"]
-		name_lbl.position = Vector2(40, y_offset + 18)
-		name_lbl.size = Vector2(480, 25)
+		name_lbl.position = Vector2(40, y_offset + 17)
+		name_lbl.size = Vector2(480, 28)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_lbl.add_theme_font_size_override("font_size", 18)
-		name_lbl.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+		name_lbl.add_theme_font_size_override("font_size", 20)
+		name_lbl.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
 		card.add_child(name_lbl)
-		y_offset += 52.0
+		y_offset += 56.0
 
 	var love_lbl := Label.new()
 	love_lbl.text = "Made with patience and curiosity"

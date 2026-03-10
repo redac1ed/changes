@@ -97,11 +97,11 @@ func _build_meadow() -> void:
 	# motion_scale: how strongly each layer scrolls with the camera.
 	# Layer 1 = furthest/sky — barely moves; Layer 5 = nearest — moves most.
 	const BG := "res://assets/swamp_assets/2 Background/Layers/"
-	_add_sprite_layer(BG + "1.png", Vector2(0.05, 0.0))
-	_add_sprite_layer(BG + "2.png", Vector2(0.15, 0.0))
-	_add_sprite_layer(BG + "3.png", Vector2(0.3,  0.05))
-	_add_sprite_layer(BG + "4.png", Vector2(0.45, 0.1))
-	_add_sprite_layer(BG + "5.png", Vector2(0.6,  0.15))
+	_add_sprite_layer(BG + "1.png", Vector2(0.05, 0.05))
+	_add_sprite_layer(BG + "2.png", Vector2(0.15, 0.15))
+	_add_sprite_layer(BG + "3.png", Vector2(0.3,  0.3))
+	_add_sprite_layer(BG + "4.png", Vector2(0.45, 0.45))
+	_add_sprite_layer(BG + "5.png", Vector2(0.6,  0.6))
 
 
 func _build_volcano() -> void:
