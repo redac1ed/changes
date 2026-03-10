@@ -80,8 +80,10 @@ func _add_sprite_layer(tex_path: String, motion_scale: Vector2,
 
 	var layer := ParallaxLayer.new()
 	layer.motion_scale = motion_scale
+	# Horizontal tiling only — vertical mirroring in Godot 4 causes disappearing sprites
 	layer.motion_mirroring = Vector2(scaled_w, 0.0)
 
+	# Single sprite (no vertical tiling/repetition artifacts).
 	var spr := Sprite2D.new()
 	spr.texture = tex
 	spr.centered = false
@@ -97,12 +99,12 @@ func _build_meadow() -> void:
 	# motion_scale: how strongly each layer scrolls with the camera.
 	# Layer 1 = furthest/sky — barely moves; Layer 5 = nearest — moves most.
 	const BG := "res://assets/swamp_assets/2 Background/Layers/"
-	_add_sprite_layer(BG + "1.png", Vector2(0.05, 0.05))
-	_add_sprite_layer(BG + "2.png", Vector2(0.15, 0.15))
-	_add_sprite_layer(BG + "3.png", Vector2(0.3,  0.3))
-	_add_sprite_layer(BG + "4.png", Vector2(0.45, 0.45))
-	_add_sprite_layer(BG + "5.png", Vector2(0.6,  0.6))
-
+	# Horizontal parallax (X varies per depth), vertical sticky (Y=0 follows camera).
+	_add_sprite_layer(BG + "1.png", Vector2(0.05, 0.0))
+	_add_sprite_layer(BG + "2.png", Vector2(0.15, 0.0))
+	_add_sprite_layer(BG + "3.png", Vector2(0.3,  0.0))
+	_add_sprite_layer(BG + "4.png", Vector2(0.45, 0.0))
+	_add_sprite_layer(BG + "5.png", Vector2(0.6,  0.0))
 
 func _build_volcano() -> void:
 	_add_layer(Vector2(0.0, 0.0), Color(0.25, 0.08, 0.05), _draw_sky_gradient)
@@ -110,13 +112,11 @@ func _build_volcano() -> void:
 	_add_layer(Vector2(0.2, 0.1), Color(0.4, 0.15, 0.08, 0.6), _draw_mountains)
 	_add_layer(Vector2(0.5, 0.2), Color(0.3, 0.1, 0.05, 0.4), _draw_rocky_terrain)
 
-
 func _build_sky() -> void:
 	_add_layer(Vector2(0.0, 0.0), Color(0.6, 0.82, 1.0), _draw_sky_gradient)
 	_add_layer(Vector2(0.05, 0.0), Color(1, 1, 1, 0.8), _draw_clouds)
 	_add_layer(Vector2(0.15, 0.0), Color(1, 1, 1, 0.5), _draw_clouds)
 	_add_layer(Vector2(0.3, 0.1), Color(0.85, 0.9, 1.0, 0.3), _draw_distant_clouds)
-
 
 func _build_ocean() -> void:
 	_add_layer(Vector2(0.0, 0.0), Color(0.1, 0.25, 0.5), _draw_sky_gradient)
@@ -124,22 +124,17 @@ func _build_ocean() -> void:
 	_add_layer(Vector2(0.3, 0.1), Color(0.15, 0.4, 0.7, 0.4), _draw_waves)
 	_add_layer(Vector2(0.5, 0.2), Color(0.1, 0.35, 0.6, 0.3), _draw_waves)
 
-
 func _build_space() -> void:
 	_add_layer(Vector2(0.0, 0.0), Color(0.02, 0.01, 0.05), _draw_sky_gradient)
 	_add_layer(Vector2(0.05, 0.05), Color(1, 1, 1, 0.6), _draw_stars)
 	_add_layer(Vector2(0.1, 0.1), Color(0.5, 0.3, 0.8, 0.2), _draw_nebula)
 	_add_layer(Vector2(0.15, 0.15), Color(1, 1, 1, 0.8), _draw_stars)
 
-
 func _build_city() -> void:
 	_add_layer(Vector2(0.0, 0.0), Color(0.08, 0.06, 0.15), _draw_sky_gradient)
 	_add_layer(Vector2(0.05, 0.0), Color(1, 1, 1, 0.3), _draw_stars)
 	_add_layer(Vector2(0.2, 0.1), Color(0.15, 0.12, 0.25, 0.7), _draw_buildings_far)
 	_add_layer(Vector2(0.4, 0.2), Color(0.1, 0.08, 0.2, 0.5), _draw_buildings_near)
-
-
-# ─── Drawing Functions ──────────────────────────────────────────────────────
 
 func _draw_sky_gradient(canvas: Control, color: Color) -> void:
 	var h := 800.0
@@ -148,7 +143,6 @@ func _draw_sky_gradient(canvas: Control, color: Color) -> void:
 		var t := float(i) / h
 		var c := color.lerp(color.darkened(0.4), t)
 		canvas.draw_line(Vector2(0, i), Vector2(w, i), c, 1.0)
-
 
 func _draw_clouds(canvas: Control, color: Color) -> void:
 	var rng := RandomNumberGenerator.new()

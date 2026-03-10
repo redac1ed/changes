@@ -6,7 +6,7 @@ class_name LevelTemplate
 @export var world_number: int = 1
 
 @export_category("Camera")
-@export var camera_limits: Rect2 = Rect2(0, -400, 3200, 2000)
+@export var camera_limits: Rect2 = Rect2(-2000, -2000, 8000, 6000)
 @export var camera_zoom: float = 1.0
 
 @export_category("Level Settings")
