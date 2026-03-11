@@ -102,9 +102,9 @@ func _draw() -> void:
 	var hh := pool_size.y / 2.0
 	
 	# Pool container (walls)
-	draw_rect(Rect2(-hw - 3, -hh, 3, pool_size.y + 4), Color(0.35, 0.35, 0.4), true)
-	draw_rect(Rect2(hw, -hh, 3, pool_size.y + 4), Color(0.35, 0.35, 0.4), true)
-	draw_rect(Rect2(-hw - 3, hh, pool_size.x + 6, 4), Color(0.3, 0.3, 0.35), true)
+	# draw_rect(Rect2(-hw - 3, -hh, 3, pool_size.y + 4), Color(0.35, 0.35, 0.4), true)
+	# draw_rect(Rect2(hw, -hh, 3, pool_size.y + 4), Color(0.35, 0.35, 0.4), true)
+	# draw_rect(Rect2(-hw - 3, hh, pool_size.x + 6, 4), Color(0.3, 0.3, 0.35), true)
 	
 	# Acid body
 	var body := PackedVector2Array()
