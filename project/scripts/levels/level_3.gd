@@ -3,7 +3,7 @@ extends LevelTemplate
 func _ready() -> void:
 	super._ready()
 	if hud:
-		hud.show_notification("Level 2", Color(0.5, 0.9, 0.7))
+		hud.show_notification("Level 3", Color(0.5, 0.9, 0.7))
 
 func _play_world_music() -> void:
 	if not AudioManager:

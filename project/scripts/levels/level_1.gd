@@ -9,7 +9,7 @@ func _ready() -> void:
 	add_child(_subtitles)
 	super._ready()
 	if hud:
-		hud.show_notification("Welcome to Meadow!", Color(0.4, 0.8, 0.5))
+		hud.show_notification("Level 1", Color(0.4, 0.8, 0.5))
 
 func _play_world_music() -> void:
 	if not AudioManager:

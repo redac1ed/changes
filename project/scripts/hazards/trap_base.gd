@@ -1,20 +1,10 @@
 extends Area2D
 class_name TrapBase
 
-## ═══════════════════════════════════════════════════════════════════════════════
-## TrapBase — Foundation class for all hazards/traps
-## ═══════════════════════════════════════════════════════════════════════════════
-##
-## Provides shared functionality for spike strips, saw blades, fire jets,
-## and other hazards. Handles ball detection, death triggering, visual
-## feedback, and respawn management.
-
-# ─── Signals ─────────────────────────────────────────────────────────────────
 signal ball_killed(ball: RigidBody2D)
 signal trap_activated()
 signal trap_deactivated()
 
-# ─── Enums ───────────────────────────────────────────────────────────────────
 enum TrapType {
 	SPIKE,       ## Static sharp points
 	SAW_BLADE,   ## Rotating circular blade
@@ -24,65 +14,48 @@ enum TrapType {
 	ACID_POOL,   ## Dissolving liquid
 }
 
-# ─── Exports ─────────────────────────────────────────────────────────────────
 @export_category("Trap Properties")
 @export var trap_type: TrapType = TrapType.SPIKE
 @export var trap_size: Vector2 = Vector2(64, 24)
 @export var damage_color: Color = Color(0.95, 0.2, 0.15, 1.0)
 @export var body_color: Color = Color(0.5, 0.5, 0.55, 1.0)
-@export var is_lethal: bool = true
 @export var is_active: bool = true
 @export var activation_delay: float = 0.0
-
 @export_category("Death Effect")
 @export var death_particle_count: int = 16
-@export var screen_shake_intensity: float = 8.0
-@export var respawn_delay: float = 0.8
 @export var death_slowmo_duration: float = 0.15
 @export var death_slowmo_scale: float = 0.3
 
-# ─── Internal ────────────────────────────────────────────────────────────────
 var _collision_shape: CollisionShape2D
 var _time_elapsed: float = 0.0
 var _death_particles: CPUParticles2D
 var _flash_timer: float = 0.0
 var _activation_timer: float = 0.0
-var _warning_alpha: float = 0.0
-
 
 func _ready() -> void:
 	_setup_collision()
 	_setup_death_particles()
-	
 	collision_layer = 0
-	collision_mask = 1  # Detect ball
-	
+	collision_mask = 2  # Detect ball
 	body_entered.connect(_on_body_entered)
-	
 	if activation_delay > 0:
 		is_active = false
 		_activation_timer = activation_delay
-	
 	_trap_ready()
-
 
 func _process(delta: float) -> void:
 	_time_elapsed += delta
-	
 	# Activation delay
 	if _activation_timer > 0:
 		_activation_timer -= delta
 		if _activation_timer <= 0:
 			is_active = true
 			trap_activated.emit()
-	
 	# Flash decay
 	if _flash_timer > 0:
 		_flash_timer -= delta
-	
 	_trap_process(delta)
 	queue_redraw()
-
 
 func _setup_collision() -> void:
 	_collision_shape = CollisionShape2D.new()
@@ -90,7 +63,6 @@ func _setup_collision() -> void:
 	shape.size = trap_size
 	_collision_shape.shape = shape
 	add_child(_collision_shape)
-
 
 func _setup_death_particles() -> void:
 	_death_particles = CPUParticles2D.new()
@@ -109,26 +81,22 @@ func _setup_death_particles() -> void:
 	_death_particles.color = damage_color
 	add_child(_death_particles)
 
-
 func _on_body_entered(body: Node2D) -> void:
 	if not is_active:
 		return
 	if body is RigidBody2D:
 		_kill_ball(body)
 
-
 func _kill_ball(ball: RigidBody2D) -> void:
 	# Death particles
 	_death_particles.restart()
 	_death_particles.emitting = true
 	_flash_timer = 0.3
-	
 	# Slow-motion effect
 	if death_slowmo_duration > 0:
 		Engine.time_scale = death_slowmo_scale
 		await get_tree().create_timer(death_slowmo_duration * death_slowmo_scale).timeout
 		Engine.time_scale = 1.0
-	
 	ball_killed.emit(ball)
 	
 	# Find spawn point and respawn
@@ -141,19 +109,16 @@ func _kill_ball(ball: RigidBody2D) -> void:
 			tw.tween_property(ball, "scale", Vector2.ZERO, 0.15)
 			tw.parallel().tween_property(ball, "modulate:a", 0.0, 0.15)
 			await tw.finished
-			
 			# Respawn
 			ball.linear_velocity = Vector2.ZERO
 			ball.angular_velocity = 0.0
 			ball.global_position = spawn.global_position
 			ball.scale = Vector2.ONE
 			ball.modulate.a = 1.0
-			
 			# Respawn tween
 			var tw2 := create_tween()
 			tw2.tween_property(ball, "scale", Vector2(1.2, 1.2), 0.1)
 			tw2.tween_property(ball, "scale", Vector2.ONE, 0.1)
-
 
 func _find_level_root() -> Node:
 	var node: Node = get_parent()
@@ -163,14 +128,10 @@ func _find_level_root() -> Node:
 		node = node.get_parent()
 	return null
 
-
-# ─── Drawing ─────────────────────────────────────────────────────────────────
-
 func _draw() -> void:
 	if not is_active:
 		_draw_inactive()
 		return
-	
 	match trap_type:
 		TrapType.SPIKE:
 			_draw_spikes()
@@ -184,7 +145,6 @@ func _draw() -> void:
 			_draw_crusher()
 		TrapType.ACID_POOL:
 			_draw_acid_pool()
-	
 	# Flash overlay on kill
 	if _flash_timer > 0:
 		var flash_alpha := _flash_timer / 0.3
@@ -193,17 +153,14 @@ func _draw() -> void:
 			Color(1.0, 0.3, 0.2, flash_alpha * 0.4), true
 		)
 
-
 func _draw_inactive() -> void:
 	var half := trap_size / 2.0
 	var rect := Rect2(-half, trap_size)
 	draw_rect(rect, Color(body_color.r, body_color.g, body_color.b, 0.3), true)
 	draw_rect(rect, Color(0.5, 0.5, 0.5, 0.2), false, 1.0)
 
-
 func _draw_spikes() -> void:
 	var half := trap_size / 2.0
-	
 	# Base
 	var base_height := trap_size.y * 0.35
 	var base_rect := Rect2(
@@ -212,24 +169,20 @@ func _draw_spikes() -> void:
 	)
 	draw_rect(base_rect, body_color, true)
 	draw_rect(base_rect, body_color.darkened(0.2), false, 1.0)
-	
 	# Spike triangles
 	var spike_count := int(trap_size.x / 12.0)
 	var spike_width := trap_size.x / float(spike_count)
 	var spike_height := trap_size.y * 0.65
-	
 	for i in range(spike_count):
 		var spike_x := -half.x + i * spike_width
 		var spike_base_y := half.y - base_height
 		var spike_tip_y := -half.y
-		
 		var points := PackedVector2Array([
 			Vector2(spike_x, spike_base_y),
 			Vector2(spike_x + spike_width / 2.0, spike_tip_y),
 			Vector2(spike_x + spike_width, spike_base_y),
 		])
 		draw_colored_polygon(points, damage_color)
-		
 		# Highlight on spike
 		var highlight := Color(1.0, 1.0, 1.0, 0.2)
 		draw_line(
@@ -237,7 +190,6 @@ func _draw_spikes() -> void:
 			Vector2(spike_x + spike_width / 2.0, spike_tip_y),
 			highlight, 1.0
 		)
-
 
 func _draw_saw_blade() -> void:
 	var radius := minf(trap_size.x, trap_size.y) / 2.0 - 2
@@ -385,16 +337,11 @@ func _draw_acid_pool() -> void:
 		Color(0.5, 1.0, 0.3, 0.9), 2.0
 	)
 
-
-# ─── Virtual Methods ────────────────────────────────────────────────────────
-
 func _trap_ready() -> void:
 	pass
 
 func _trap_process(_delta: float) -> void:
 	pass
-
-# ─── Public API ──────────────────────────────────────────────────────────────
 
 func activate() -> void:
 	is_active = true
