@@ -125,12 +125,11 @@ collision_enabled = false
 [node name="GoalZone" type="Area2D" parent="." unique_id=147267672]
 top_level = true
 visibility_layer = 31
-position = Vector2(2939.39, 633.35)
+position = Vector2(4400, 249.81)
 collision_layer = 0
 collision_mask = 2
 script = ExtResource("7_iuoyx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone" unique_id=1614185980]
 z_index = 1
-position = Vector2(1460.6101, -393.34998)
 shape = SubResource("CircleShape2D_q6heo")
