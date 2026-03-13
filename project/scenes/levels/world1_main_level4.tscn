@@ -1,10 +1,10 @@
 [gd_scene format=4 uid="uid://dpgdm272r55dx"]
 
-[ext_resource type="Script" uid="uid://bvp5sltcitj5" path="res://scripts/levels/level_4.gd" id="1_6eeb8"]
+[ext_resource type="Script" uid="uid://b1d7mo0qt1nfk" path="res://scripts/levels/level_4.gd" id="1_6eeb8"]
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="1_hkq3p"]
 [ext_resource type="Script" uid="uid://cjqevsprxqc8g" path="res://scripts/platforms/crumbling_platform.gd" id="2_6eeb8"]
 [ext_resource type="Script" uid="uid://b0dy33wopbxul" path="res://scripts/platforms/bounce_platform.gd" id="4_g3rql"]
-[ext_resource type="Script" uid="uid://iusfux0eef6l" path="res://scripts/hazards/acid_pool.gd" id="5_nkl0b"]
+[ext_resource type="Script" uid="uid://c6efpsjrh0xpl" path="res://scripts/hazards/acid_pool.gd" id="5_nkl0b"]
 [ext_resource type="Script" uid="uid://psmkmssy1pom" path="res://scripts/hazards/saw_blade.gd" id="6_nkl0b"]
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="7_iuoyx"]
 
@@ -68,6 +68,7 @@ trap_type = 5
 position = Vector2(4222.425, 1853.645)
 script = ExtResource("5_nkl0b")
 pool_size = Vector2(1280, 700)
+acid_glow = Color(1, 1, 1, 0)
 trap_type = 5
 
 [node name="Jump" type="Label" parent="." unique_id=1898978384]

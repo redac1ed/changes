@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://bwwh7oyn6devv"]
 
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="1_adsyl"]
-[ext_resource type="Script" uid="uid://dw2oj2prytn4t" path="res://scripts/levels/level_5.gd" id="1_y387w"]
+[ext_resource type="Script" uid="uid://hk3olxtvtfnn" path="res://scripts/levels/level_5.gd" id="1_y387w"]
 
 [node name="World1MainLevel5" type="Node2D" unique_id=951292796]
 script = ExtResource("1_y387w")

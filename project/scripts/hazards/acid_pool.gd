@@ -4,7 +4,6 @@ class_name AcidPool
 @export_category("Acid Pool")
 @export var pool_size: Vector2 = Vector2(120, 16)
 @export var acid_color: Color = Color(0.35, 0.85, 0.15, 0.85)
-@export var acid_glow: Color = Color(0.5, 1.0, 0.2, 0.3)
 @export var bubble_rate: float = 3.0
 @export var wave_speed: float = 2.5
 @export var wave_height: float = 3.0
@@ -104,11 +103,6 @@ func _draw() -> void:
 			draw_line(p1 + Vector2(0, 1), p2 + Vector2(0, 1), highlight_color, 1.5)
 	# Surface outline
 	draw_polyline(_surface_points, Color(0.5, 1.0, 0.2, 0.7), 2.0)
-	# Glow underneath surface
-	for glow_i in range(3):
-		var gy := -hh + glow_i * 3.0 + 3
-		var glow_alpha := (1.0 - float(glow_i) / 3.0) * 0.15
-		draw_line(Vector2(-hw, gy), Vector2(hw, gy), Color(acid_glow.r, acid_glow.g, acid_glow.b, glow_alpha), pool_size.x)
 	# Bubbles
 	for b in _bubbles:
 		var alpha := 0.6
