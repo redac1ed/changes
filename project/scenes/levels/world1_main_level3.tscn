@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://iusfux0eef6l" path="res://scripts/hazards/acid_pool.gd" id="2_ph2mh"]
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="3_2eyss"]
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="4_y7mlo"]
+[ext_resource type="Script" uid="uid://dusn86fy4y26b" path="res://scripts/hazards/spike_strip.gd" id="6_ph2mh"]
 [ext_resource type="Script" uid="uid://b0dy33wopbxul" path="res://scripts/platforms/bounce_platform.gd" id="6_tdwkj"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4kmhl"]
@@ -75,3 +76,8 @@ position = Vector2(3248, 0)
 
 [node name="CameraLeftStop" type="Node2D" parent="." unique_id=1884686147]
 position = Vector2(-48, 0)
+
+[node name="Spike_Strip" type="Area2D" parent="." unique_id=1980153609]
+position = Vector2(344, 696)
+script = ExtResource("6_ph2mh")
+spike_count = 36
