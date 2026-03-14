@@ -93,8 +93,9 @@ func _process(delta: float) -> void:
 	if hud:
 		hud.level_time = level_time
 
-
 func _input(event: InputEvent) -> void:
+	if complete_screen and complete_screen.visible:
+		return
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
 			KEY_R:
@@ -104,43 +105,33 @@ func _input(event: InputEvent) -> void:
 				if level_complete:
 					_next_level()
 
-
 func _build_level() -> void:
 	pass
-
 
 func _apply_camera_stop_markers() -> bool:
 	if not use_camera_stop_markers:
 		return false
-
 	var left_node := get_node_or_null(left_stop_marker) as Node2D
 	var right_node := get_node_or_null(right_stop_marker) as Node2D
 	if left_node == null or right_node == null:
 		return false
-
 	var left_x := minf(left_node.global_position.x, right_node.global_position.x)
 	var right_x := maxf(left_node.global_position.x, right_node.global_position.x)
-
 	var top_y := camera_limits.position.y
 	var bottom_y := camera_limits.end.y
-
 	var top_node := get_node_or_null(top_stop_marker) as Node2D
 	if top_node:
 		top_y = top_node.global_position.y
-
 	var bottom_node := get_node_or_null(bottom_stop_marker) as Node2D
 	if bottom_node:
 		bottom_y = bottom_node.global_position.y + bottom_stop_offset
-
 	if bottom_y <= top_y:
 		bottom_y = top_y + 800.0
-
 	camera_limits = Rect2(left_x, top_y, right_x - left_x, bottom_y - top_y)
 	print("[Level] Camera limits from stop markers: %s" % [camera_limits])
 	return true
 
-
-func _auto_detect_camera_limits() -> void:
+func _auto_detect_camera_limits() -> void: # important for lvl enhancement!!!!
 	var found := false
 	var min_pos := Vector2(INF, INF)
 	var max_pos := Vector2(-INF, -INF)
@@ -175,13 +166,11 @@ func _auto_detect_camera_limits() -> void:
 		)
 		print("[Level] Auto camera limits: %s" % [camera_limits])
 
-
 func _apply_camera_limits() -> void:
 	if camera and "world_bounds" in camera:
 		camera.world_bounds = camera_limits
 	if ball and "world_bounds" in ball:
 		ball.world_bounds = camera_limits
-
 
 func _setup_ball() -> void:
 	var spawn: Marker2D = get_node_or_null("BallSpawn")
@@ -193,44 +182,35 @@ func _setup_ball() -> void:
 		marker.name = "BallSpawn"
 		marker.position = _spawn_position
 		add_child(marker)
-
 	ball = ball_scene.instantiate()
 	ball.position = _spawn_position
 	if "world_bounds" in ball:
 		ball.world_bounds = camera_limits
 	add_child(ball)
-
 	if ball.has_signal("shot_fired"):
 		ball.shot_fired.connect(_on_shot_fired)
-
 
 func _setup_camera() -> void:
 	var cam_script := load("res://scripts/game_camera.gd")
 	camera = Camera2D.new()
 	if cam_script:
 		camera.set_script(cam_script)
-
 	camera.world_bounds = camera_limits
 	camera.use_limits = true
 	if "center_if_undersized" in camera:
 		camera.center_if_undersized = true
 	elif "center_if_missized" in camera:
 		camera.center_if_missized = true
-
 	if camera_zoom != 1.0:
 		camera.zoom = Vector2(camera_zoom, camera_zoom)
 		if "default_zoom" in camera:
 			camera.default_zoom = Vector2(camera_zoom, camera_zoom)
-
 	if ball:
 		camera.global_position = ball.global_position
-
 	add_child(camera)
 	camera.make_current()
-
 	if ball and "target_path" in camera:
 		camera.target_path = camera.get_path_to(ball)
-
 
 func _setup_hud() -> void:
 	hud = GameHUD.new()
@@ -238,13 +218,11 @@ func _setup_hud() -> void:
 	hud.level_time = 0.0
 	add_child(hud)
 
-
 func _setup_pause() -> void:
 	pause_overlay = PauseOverlay.new()
 	pause_overlay.restarted.connect(_restart_level)
 	pause_overlay.quit_to_menu.connect(_quit_to_menu)
 	add_child(pause_overlay)
-
 
 func _setup_complete_screen() -> void:
 	complete_screen = LevelCompleteScreen.new()
@@ -253,53 +231,41 @@ func _setup_complete_screen() -> void:
 	complete_screen.menu_pressed.connect(_quit_to_menu)
 	add_child(complete_screen)
 
-
 func _setup_transitions() -> void:
 	transition_fx = SceneTransitionFX.new()
 	add_child(transition_fx)
-
 
 func _connect_goal_zone() -> void:
 	var goal_zone := get_node_or_null("GoalZone") as Area2D
 	if goal_zone and not goal_zone.body_entered.is_connected(on_goal_reached):
 		goal_zone.body_entered.connect(on_goal_reached)
 
-
 func _on_shot_fired(_count: int) -> void:
 	if hud:
 		hud.add_shot()
-
 	if GameState:
 		GameState.add_shots(1)
-
 
 func complete_level() -> void:
 	if level_complete:
 		return
-
 	level_complete = true
 	var shots: int = ball.shot_count if ball else 0
-
 	var result: Dictionary = {}
 	if GameState:
 		result = GameState.complete_level(world_number, level_number, shots)
-
 	var stars: int = result.get("stars", GameState.calculate_stars(shots) if GameState else 0)
 	var is_new_record: bool = result.get("new_record", result.get("is_new_record", false))
-
 	if complete_screen:
 		complete_screen.show_screen(shots, stars, is_new_record, level_time)
-
 	if hud:
 		hud.level_time = level_time
 		hud.is_paused = true
 		hud.show_notification("Level Complete!", Color(0.3, 0.9, 0.45))
 
-
 func on_goal_reached(body: Node2D) -> void:
 	if body == ball:
 		complete_level()
-
 
 func _restart_level() -> void:
 	_restart_cooldown = 0.5
@@ -310,7 +276,6 @@ func _restart_level() -> void:
 	else:
 		get_tree().reload_current_scene()
 
-
 func _next_level() -> void:
 	_restart_cooldown = 0.5
 	if transition_fx:
@@ -320,7 +285,6 @@ func _next_level() -> void:
 	else:
 		LevelManager.load_next_level()
 
-
 func _quit_to_menu() -> void:
 	if transition_fx:
 		transition_fx.play(SceneTransitionFX.TransitionType.CURTAIN, 0.6, func():
@@ -328,7 +292,6 @@ func _quit_to_menu() -> void:
 		)
 	else:
 		get_tree().change_scene_to_file("res://scenes/ui/title_screen.tscn")
-
 
 func _play_world_music() -> void:
 	if not AudioManager:
