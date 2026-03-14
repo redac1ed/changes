@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dcgiw5rfae427"
-path="res://.godot/imported/tileset.jpg-8f715647abe62ada20670ba5821c2ae4.ctex"
+uid="uid://cp43ayqnh8ui7"
+path="res://.godot/imported/game_background_2.png-89839660250bc19ca9c8c780c9d1dcce.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/volcano_assets/tileset.jpg"
-dest_files=["res://.godot/imported/tileset.jpg-8f715647abe62ada20670ba5821c2ae4.ctex"]
+source_file="res://assets/volcano-assets/game_background_2.png"
+dest_files=["res://.godot/imported/game_background_2.png-89839660250bc19ca9c8c780c9d1dcce.ctex"]
 
 [params]
 
