@@ -18,7 +18,7 @@ radius = 35.0
 script = ExtResource("1_y387w")
 
 [node name="BallSpawn" type="Marker2D" parent="." unique_id=1220340921]
-position = Vector2(-112, 744)
+position = Vector2(87, 532)
 
 [node name="CameraTopStop" type="Node2D" parent="." unique_id=1442113264]
 position = Vector2(-8, -496)
@@ -50,17 +50,6 @@ physics_material_override = SubResource("PhysicsMaterial_f5r7f")
 script = ExtResource("4_vqgcf")
 bounce_direction = Vector2(0.05, -1)
 platform_size = Vector2(96, 24)
-
-[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=321716638]
-position = Vector2(1856, 280)
-script = ExtResource("5_f5r7f")
-
-[node name="Label" type="Label" parent="StaticBody2D" unique_id=1168748305]
-offset_left = -136.0
-offset_top = -96.0
-offset_right = 146.0
-offset_bottom = -40.0
-text = "alien object found in swamp 👽👽👽"
 
 [node name="Saw_blade2" type="Area2D" parent="." unique_id=1858790197]
 z_index = -1
@@ -94,20 +83,22 @@ bounce_direction = Vector2(0.05, -1)
 platform_size = Vector2(96, 24)
 
 [node name="jump" type="Label" parent="." unique_id=236312162]
-offset_left = 4608.0
-offset_top = -344.0
-offset_right = 4727.0
-offset_bottom = -321.0
+offset_left = 4691.0
+offset_top = -336.0
+offset_right = 5014.8984
+offset_bottom = -282.0
 scale = Vector2(1.3646262, 1.8727422)
-text = "jump downn :)"
+theme_override_font_sizes/font_size = 39
+text = "Jump down 😀"
 
 [node name="was it that hard?" type="Label" parent="." unique_id=1150220488]
-offset_left = 4688.0
-offset_top = 560.0
-offset_right = 4807.0
-offset_bottom = 583.0
+offset_left = 4597.0
+offset_top = 532.00006
+offset_right = 4823.0
+offset_bottom = 574.00006
 scale = Vector2(1.3646262, 1.8727422)
-text = "see? no trap 👽"
+theme_override_font_sizes/font_size = 30
+text = "See? No trap!"
 
 [node name="Spike_Strip" type="Area2D" parent="." unique_id=495783413]
 z_index = -1
