@@ -3,3 +3,4 @@
 /project/addons
 *.gd.uid
 /project/assets/swamp_assets/**/*.import
+/project/assets/volcano_assets/*/.import
