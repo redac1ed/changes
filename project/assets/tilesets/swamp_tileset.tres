@@ -1,8 +1,8 @@
 [gd_resource type="TileSet" format=3 uid="uid://ddudc0vym1a4v"]
 
-[ext_resource type="Texture2D" uid="uid://bh7v0qvgwu23w" path="res://assets/swamp_assets/1 Tiles/Tileset.png" id="1_47541"]
-[ext_resource type="Texture2D" uid="uid://cos5jx2mufxqi" path="res://assets/volcano-assets/tileset.png" id="2_u4k25"]
-[ext_resource type="Texture2D" uid="uid://dcjwjn6uge23a" path="res://assets/snow_assets/snow_tileset.png" id="3_u8bfj"]
+[ext_resource type="Texture2D" uid="uid://c8aremeomwxwy" path="res://assets/swamp_assets/1 Tiles/Tileset.png" id="1_47541"]
+[ext_resource type="Texture2D" uid="uid://cos5jx2mufxqi" path="res://assets/volcano-assets/Tileset.png" id="2_u4k25"]
+[ext_resource type="Texture2D" uid="uid://dcjwjn6uge23a" path="res://assets/snow_assets/Tileset.png" id="3_u8bfj"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_u4k25"]
 texture = ExtResource("1_47541")
