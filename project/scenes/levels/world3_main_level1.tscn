@@ -1,8 +1,10 @@
 [gd_scene format=4 uid="uid://ywkmotlpqkbm"]
 
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="1_gpro7"]
+[ext_resource type="Script" uid="uid://dtfgailexb0n3" path="res://scripts/levels/level_11.gd" id="1_u7vba"]
 
 [node name="World3MainLevel1" type="Node2D" unique_id=1844345164]
+script = ExtResource("1_u7vba")
 
 [node name="main_layer" type="TileMapLayer" parent="." unique_id=1216569979]
 scale = Vector2(2, 2)
