@@ -184,11 +184,9 @@ func add_shots(count: int) -> void:
 	_is_dirty = true
 	state_changed.emit("shots_total", _save_data.meta.total_shots)
 
-
 func add_score(points: int) -> void:
 	# Legacy API compatibility: score maps to coins in enhanced state.
 	add_currency(points)
-
 
 func complete_level(world: int, level: int, shots: int, coins: int = 0) -> Dictionary:
 	var level_key := _get_level_key(world, level)

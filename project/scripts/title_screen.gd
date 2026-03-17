@@ -6,13 +6,12 @@ enum MenuState { MAIN, WORLD_SELECT, SETTINGS, CREDITS, SHOP }
 var current_state: MenuState = MenuState.MAIN
 
 const WORLDS = [
-	{"name": "Meadow", "subtitle": "Rolling green hills", "color": Color(0.45, 0.82, 0.45), "icon": "M", "levels": 3},
+	{"name": "Meadow", "subtitle": "Rolling green hills", "color": Color(0.45, 0.82, 0.45), "icon": "M", "levels": 5},
 	{"name": "Volcano", "subtitle": "Fiery obstacles", "color": Color(0.95, 0.35, 0.2), "icon": "V", "levels": 3},
 	{"name": "Sky", "subtitle": "Wind-swept heights", "color": Color(0.55, 0.78, 0.95), "icon": "S", "levels": 3},
 	{"name": "Ocean", "subtitle": "Deep currents", "color": Color(0.2, 0.5, 0.85), "icon": "O", "levels": 3},
 	{"name": "Space", "subtitle": "Zero gravity", "color": Color(0.6, 0.4, 0.9), "icon": "X", "levels": 3},
 ]
-
 var bg_layer: Control
 var title_label: Label
 var subtitle_label: Label
@@ -25,45 +24,53 @@ var panels: Dictionary = {}
 var visualizer_bars: Array[ColorRect] = []
 var visualizer_index_order: Array[int] = []
 var menu_buttons: Array[Button] = []
-
-var rolling_ball: ColorRect
-var ball_x: float = -40.0
+var rolling_ball: Panel
+var ball_x: float = 0.0
+var ball_y: float = 0.0
 var ball_rotation: float = 0.0
-
 var tv_top_bar: ColorRect
 var tv_bottom_bar: ColorRect
 var tv_overlay: Control
-
 var time_elapsed: float = 0.0
 var is_transitioning: bool = false
 var title_bob_offset: float = 0.0
-
 var _spectrum_bus_idx: int = -1
 var _spectrum_effect_idx: int = -1
 var _spectrum_inst: AudioEffectSpectrumAnalyzerInstance = null
-
 var mute_btn: Button
-
 var master_vol: float = 1.0
 var music_vol: float = 0.8
 var sfx_vol: float = 1.0
 var screen_shake: bool = true
 var fullscreen: bool = false
-
+var visualizer_smoothed_heights: Array[float] = []
+var _next_visualizer_shuffle_time: float = 0.0
 const SCREEN_W: float = 1200.0
 const SCREEN_H: float = 800.0
-const VISUALIZER_BAR_COUNT: int = 18
+const VISUALIZER_BAR_COUNT: int = 40
 const VISUALIZER_CENTER_X: float = SCREEN_W / 2.0
 const VISUALIZER_CENTER_Y: float = SCREEN_H / 2.0
-const BALL_SIZE: float = 26.0
-const BALL_SPEED: float = 120.0
-const BALL_Y: float = SCREEN_H - 60.0
-
+const VISUALIZER_SIDE_PADDING: float = 40.0
+const VISUALIZER_BASELINE_Y: float = SCREEN_H - 36.0
+const VISUALIZER_MIN_HEIGHT: float = 4.0
+const VISUALIZER_MAX_HEIGHT: float = 120.0
+const VISUALIZER_SMOOTH_SPEED: float = 24.0
+const BALL_SIZE: float = 72.0
+const BALL_FALL_SPEED: float = 230.0
+const BALL_DRIFT_SPEED: float = 190.0
+const BALL_START_MIN_X: float = SCREEN_W * 0.50
+const BALL_START_MAX_X: float = SCREEN_W * 0.68
+const BALL_RESET_MARGIN: float = 180.0
+const BALL_VERTICAL_OFFSET: float = 70.0
+const BALL_COLOR: Color = Color(0.95, 0.88, 0.72, 0.95)
+const BALL_HIGHLIGHT_COLOR: Color = Color(1.0, 0.97, 0.92, 0.95)
+const BALL_OUTLINE_COLOR: Color = Color(0.6, 0.52, 0.38, 0.95)
 const LEFT_MARGIN: float = 80.0
 const TITLE_Y: float = 140.0
 const BUTTONS_START_Y: float = 380.0
 
 func _ready() -> void:
+	randomize()
 	_build_background()
 	_build_rolling_ball()
 	_build_main_panel()
@@ -110,24 +117,25 @@ func _build_background() -> void:
 	starfield_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bg_layer.add_child(starfield_tex)
 	# Visualizer bars — centered, white, translucent
-	var bar_width := 6.0
-	var bar_spacing := bar_width + 4.0
-	var total_visualizer_width := bar_spacing * VISUALIZER_BAR_COUNT
-	var start_x := VISUALIZER_CENTER_X - (total_visualizer_width / 2.0)
-	# create bars and record their logical frequency index order
+	var visualizer_width := SCREEN_W - VISUALIZER_SIDE_PADDING * 2.0
+	var bar_width := 4.0
+	var bar_spacing := visualizer_width / float(VISUALIZER_BAR_COUNT)
+	var start_x := VISUALIZER_SIDE_PADDING + (bar_spacing - bar_width) * 0.5
 	visualizer_index_order.resize(VISUALIZER_BAR_COUNT)
+	visualizer_smoothed_heights.resize(VISUALIZER_BAR_COUNT)
 	for i in VISUALIZER_BAR_COUNT:
 		visualizer_index_order[i] = i
+		visualizer_smoothed_heights[i] = VISUALIZER_MIN_HEIGHT
 	for i in VISUALIZER_BAR_COUNT:
 		var bar := ColorRect.new()
-		bar.size = Vector2(bar_width, 4)
-		bar.color = Color(1.0, 1.0, 1.0, 0.4)
-		bar.position = Vector2(start_x + i * bar_spacing, VISUALIZER_CENTER_Y)
+		bar.size = Vector2(bar_width, VISUALIZER_MIN_HEIGHT)
+		bar.color = Color(1.0, 1.0, 1.0, 0.35)
+		bar.position = Vector2(start_x + i * bar_spacing, VISUALIZER_BASELINE_Y - VISUALIZER_MIN_HEIGHT)
 		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		visualizer_bars.append(bar)
 		bg_layer.add_child(bar)
-	# randomize mapping so bars don't update sequentially left-to-right
 	visualizer_index_order.shuffle()
+	_next_visualizer_shuffle_time = time_elapsed + 5.0
 
 func _setup_spectrum() -> void:
 	# Find Music bus, fall back to Master
@@ -142,59 +150,95 @@ func _setup_spectrum() -> void:
 			AudioServer.remove_bus_effect(bus_idx, i)
 	var spectrum := AudioEffectSpectrumAnalyzer.new()
 	spectrum.fft_size = AudioEffectSpectrumAnalyzer.FFT_SIZE_1024
-	spectrum.tap_back_pos = 0.3
+	spectrum.tap_back_pos = 0.06
 	AudioServer.add_bus_effect(bus_idx, spectrum)
 	_spectrum_bus_idx = bus_idx
 	_spectrum_effect_idx = AudioServer.get_bus_effect_count(bus_idx) - 1
-
-func _update_background(_delta: float) -> void:
-	# Lazily resolve the instance (only valid after the bus effect is added)
+func _update_background(delta: float) -> void:
 	if _spectrum_inst == null and _spectrum_bus_idx >= 0 and _spectrum_effect_idx >= 0:
 		_spectrum_inst = AudioServer.get_bus_effect_instance(
 			_spectrum_bus_idx, _spectrum_effect_idx) as AudioEffectSpectrumAnalyzerInstance
-	var bar_spacing := 10.0
 	for i in visualizer_bars.size():
 		var bar: ColorRect = visualizer_bars[i]
-		var height: float
 		var idx: int = visualizer_index_order[i]
+		var target_height: float
 		if _spectrum_inst:
-			# Spread frequencies logarithmically for better visual response
-			var t := float(idx) / float(VISUALIZER_BAR_COUNT)
-			var freq_lo := 40.0 * pow(500.0, t)
-			var freq_hi := freq_lo * (1.0 + 1.5 / VISUALIZER_BAR_COUNT * 20.0)
+			var t := float(idx) / float(VISUALIZER_BAR_COUNT - 1)
+			var freq_lo := lerpf(40.0, 8000.0, pow(t, 1.8))
+			var freq_hi := freq_lo * 1.2
 			var mag := _spectrum_inst.get_magnitude_for_frequency_range(
 				freq_lo, freq_hi, AudioEffectSpectrumAnalyzerInstance.MAGNITUDE_AVERAGE)
-			var db := linear_to_db(mag.length())
-			height = clampf(remap(db, -80.0, -10.0, 3.0, 180.0), 3.0, 180.0)
+			var db := linear_to_db(max(mag.length(), 0.0001))
+			target_height = clampf(remap(db, -72.0, -8.0, VISUALIZER_MIN_HEIGHT, VISUALIZER_MAX_HEIGHT), VISUALIZER_MIN_HEIGHT, VISUALIZER_MAX_HEIGHT)
 		else:
-			height = 6.0 + sin(time_elapsed * 2.5 + idx * 0.35) * 4.0
-		# Center bars: grow both up and down from center
-		bar.size.y = height
-		bar.position.y = VISUALIZER_CENTER_Y - (height / 2.0)
-		# White translucent, dims slightly on silence
-		var alpha := clampf(height / 100.0, 0.3, 0.7)
-		bar.color = Color(1.0, 1.0, 1.0, alpha)
-	# periodically reshuffle to avoid static patterns
-	if int(time_elapsed) % 5 == 0:
+			target_height = VISUALIZER_MIN_HEIGHT + (sin(time_elapsed * 2.5 + idx * 0.35) + 1.0) * 8.0
+		visualizer_smoothed_heights[i] = lerpf(
+			visualizer_smoothed_heights[i],
+			target_height,
+			clampf(delta * VISUALIZER_SMOOTH_SPEED, 0.0, 1.0)
+		)
+		var h := visualizer_smoothed_heights[i]
+		bar.size.y = h
+		bar.position.y = VISUALIZER_BASELINE_Y - h
+		bar.color.a = clampf(0.22 + h / VISUALIZER_MAX_HEIGHT * 0.5, 0.22, 0.72)
+	if time_elapsed >= _next_visualizer_shuffle_time:
 		visualizer_index_order.shuffle()
-
+		_next_visualizer_shuffle_time = time_elapsed + 5.0
+		
 func _build_rolling_ball() -> void:
-	rolling_ball = ColorRect.new()
+	rolling_ball = Panel.new()
 	rolling_ball.size = Vector2(BALL_SIZE, BALL_SIZE)
-	rolling_ball.color = Color(1.0, 1.0, 1.0, 0.9)
 	rolling_ball.pivot_offset = Vector2(BALL_SIZE / 2.0, BALL_SIZE / 2.0)
-	rolling_ball.position = Vector2(ball_x, BALL_Y)
 	rolling_ball.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var outline := StyleBoxFlat.new()
+	outline.bg_color = BALL_OUTLINE_COLOR
+	outline.corner_radius_top_left = int(BALL_SIZE / 2.0)
+	outline.corner_radius_top_right = int(BALL_SIZE / 2.0)
+	outline.corner_radius_bottom_left = int(BALL_SIZE / 2.0)
+	outline.corner_radius_bottom_right = int(BALL_SIZE / 2.0)
+	rolling_ball.add_theme_stylebox_override("panel", outline)
+	var body := Panel.new()
+	body.size = Vector2(BALL_SIZE - 8.0, BALL_SIZE - 8.0)
+	body.position = Vector2(4.0, 4.0)
+	body.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var body_style := StyleBoxFlat.new()
+	body_style.bg_color = BALL_COLOR
+	body_style.corner_radius_top_left = int(body.size.x / 2.0)
+	body_style.corner_radius_top_right = int(body.size.x / 2.0)
+	body_style.corner_radius_bottom_left = int(body.size.x / 2.0)
+	body_style.corner_radius_bottom_right = int(body.size.x / 2.0)
+	body.add_theme_stylebox_override("panel", body_style)
+	rolling_ball.add_child(body)
+	var highlight := Panel.new()
+	highlight.size = Vector2(BALL_SIZE * 0.32, BALL_SIZE * 0.32)
+	highlight.position = Vector2(BALL_SIZE * 0.22, BALL_SIZE * 0.16)
+	highlight.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var highlight_style := StyleBoxFlat.new()
+	highlight_style.bg_color = BALL_HIGHLIGHT_COLOR
+	highlight_style.corner_radius_top_left = int(highlight.size.x / 2.0)
+	highlight_style.corner_radius_top_right = int(highlight.size.x / 2.0)
+	highlight_style.corner_radius_bottom_left = int(highlight.size.x / 2.0)
+	highlight_style.corner_radius_bottom_right = int(highlight.size.x / 2.0)
+	highlight.add_theme_stylebox_override("panel", highlight_style)
+	body.add_child(highlight)
+	_reset_falling_ball()
+	rolling_ball.position = Vector2(ball_x, ball_y)
 	add_child(rolling_ball)
 
 func _update_rolling_ball(delta: float) -> void:
-	ball_x += BALL_SPEED * delta
-	if ball_x > SCREEN_W + 60.0:
-		ball_x = -BALL_SIZE - 40.0
-	rolling_ball.position.x = ball_x
-	rolling_ball.position.y = BALL_Y + sin(time_elapsed * 2.5) * 3.0
-	ball_rotation += delta * (BALL_SPEED / (BALL_SIZE * 0.5))
+	ball_x += BALL_DRIFT_SPEED * delta
+	ball_y += BALL_FALL_SPEED * delta
+	if ball_y > SCREEN_H + BALL_RESET_MARGIN or ball_x > SCREEN_W + BALL_RESET_MARGIN:
+		_reset_falling_ball()
+	var wobble := sin(time_elapsed * 4.0) * 1.8
+	rolling_ball.position = Vector2(ball_x + wobble, ball_y + BALL_VERTICAL_OFFSET)
+	ball_rotation += delta * 2.8
 	rolling_ball.rotation = ball_rotation
+
+func _reset_falling_ball() -> void:
+	ball_x = randf_range(BALL_START_MIN_X, BALL_START_MAX_X)
+	ball_y = randf_range(-520.0, -120.0)
+	ball_rotation = randf_range(-0.25, 0.25)
 
 func _build_mute_button() -> void:
 	mute_btn = Button.new()
@@ -233,6 +277,25 @@ func _build_main_panel() -> void:
 	main_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	main_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(main_panel)
+	var options_backdrop := ColorRect.new()
+	options_backdrop.position = Vector2(0,0)
+	options_backdrop.size = Vector2(SCREEN_W * 0.42, SCREEN_H)
+	options_backdrop.color = Color(0.0, 0.0, 0.0, 0.72)
+	options_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	main_panel.add_child(options_backdrop)
+	var options_border := Panel.new()
+	options_border.position = options_backdrop.position
+	options_border.size = options_backdrop.size
+	options_border.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var ob_style := StyleBoxFlat.new()
+	ob_style.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+	ob_style.border_width_left = 1
+	ob_style.border_width_top = 1
+	ob_style.border_width_right = 1
+	ob_style.border_width_bottom = 1
+	ob_style.border_color = Color(1.0, 1.0, 1.0, 0.14)
+	options_border.add_theme_stylebox_override("panel", ob_style)
+	main_panel.add_child(options_border)
 	panels["main"] = main_panel
 	title_label = Label.new()
 	title_label.text = "CHANGES"
@@ -303,22 +366,11 @@ func _build_main_panel() -> void:
 			btn.modulate.a = 0.4
 		main_panel.add_child(btn)
 		btn_y += 50.0
-
-	version_label = Label.new()
-	version_label.text = "v0.2.0 / godot 4.2"
-	version_label.position = Vector2(LEFT_MARGIN, SCREEN_H - 30)
-	version_label.size = Vector2(300, 20)
-	version_label.add_theme_font_size_override("font_size", 11)
-	version_label.add_theme_color_override("font_color", Color(0.3, 0.3, 0.3))
-	version_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	main_panel.add_child(version_label)
-
 	await get_tree().process_frame
 	if is_instance_valid(title_label):
 		title_label.set_meta("base_y", title_label.position.y)
 	if is_instance_valid(subtitle_label):
 		subtitle_label.set_meta("base_y", subtitle_label.position.y)
-
 
 func _build_world_panel() -> void:
 	world_panel = Control.new()

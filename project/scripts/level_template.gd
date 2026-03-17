@@ -250,6 +250,12 @@ func complete_level() -> void:
 	if level_complete:
 		return
 	level_complete = true
+	if ball:
+		ball.freeze = true
+		ball.linear_velocity = Vector2.ZERO
+		ball.angular_velocity = 0.0
+		ball.sleeping = true
+		ball.set_process_input(false)
 	var shots: int = ball.shot_count if ball else 0
 	var result: Dictionary = {}
 	if GameState:
