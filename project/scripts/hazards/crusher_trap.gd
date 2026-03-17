@@ -1,16 +1,8 @@
 extends TrapBase
 class_name CrusherTrap
 
-## ═══════════════════════════════════════════════════════════════════════════════
-## CrusherTrap — Heavy block that periodically slams down
-## ═══════════════════════════════════════════════════════════════════════════════
-##
-## Cycles: wait at top → warning flash → slam down → hold → raise back up.
-## Inspired by classic 2D platformer crushers.
-
-# ─── Exports ─────────────────────────────────────────────────────────────────
 @export_category("Crusher Settings")
-@export var crush_distance: float = 120.0
+@export var crush_distance: float = 100.0
 @export var slam_speed: float = 800.0
 @export var raise_speed: float = 60.0
 @export var wait_time_up: float = 2.0
@@ -18,17 +10,14 @@ class_name CrusherTrap
 @export var warning_time: float = 0.6
 @export var slam_shake: float = 12.0
 
-# ─── State ───────────────────────────────────────────────────────────────────
 enum CrusherState { UP, WARNING, SLAMMING, DOWN, RAISING }
 var _state: CrusherState = CrusherState.UP
 var _state_timer: float = 0.0
 var _slam_progress: float = 0.0
 var _impact_particles: CPUParticles2D
 
-
 func _trap_ready() -> void:
 	trap_type = TrapType.CRUSHER
-	
 	# Impact particles
 	_impact_particles = CPUParticles2D.new()
 	_impact_particles.emitting = false
@@ -46,29 +35,23 @@ func _trap_ready() -> void:
 	_impact_particles.color = Color(0.7, 0.7, 0.7, 0.6)
 	_impact_particles.position = Vector2(0, trap_size.y / 2.0 + crush_distance)
 	add_child(_impact_particles)
-	
 	_state_timer = wait_time_up
-
 
 func _trap_process(delta: float) -> void:
 	_state_timer -= delta
-	
 	match _state:
 		CrusherState.UP:
 			if _state_timer <= 0:
 				_state = CrusherState.WARNING
 				_state_timer = warning_time
-		
 		CrusherState.WARNING:
 			# Vibrate warning
 			var shake := sin(_time_elapsed * 30.0) * 2.0
 			position.x = _original_position_x() + shake
-			
 			if _state_timer <= 0:
 				_state = CrusherState.SLAMMING
 				_slam_progress = 0.0
 				position.x = _original_position_x()
-		
 		CrusherState.SLAMMING:
 			_slam_progress += slam_speed * delta
 			if _slam_progress >= crush_distance:
@@ -76,21 +59,17 @@ func _trap_process(delta: float) -> void:
 				_state = CrusherState.DOWN
 				_state_timer = wait_time_down
 				_on_slam_impact()
-		
 		CrusherState.DOWN:
 			if _state_timer <= 0:
 				_state = CrusherState.RAISING
-		
 		CrusherState.RAISING:
 			_slam_progress -= raise_speed * delta
 			if _slam_progress <= 0:
 				_slam_progress = 0
 				_state = CrusherState.UP
 				_state_timer = wait_time_up
-	
 	# Update collision position
 	_collision_shape.position = Vector2(0, _slam_progress)
-
 
 var _orig_x_cached: float = 0.0
 var _orig_x_set: bool = false

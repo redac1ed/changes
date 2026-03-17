@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://b7t8k6esamkhi"]
 
-[ext_resource type="Script" uid="uid://ckxgy4xxynb03" path="res://scripts/levels/level_6.gd" id="1_v1on2"]
+[ext_resource type="Script" uid="uid://cxknmvr2lk2jq" path="res://scripts/levels/level_6.gd" id="1_v1on2"]
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="2_2fgn7"]
 [ext_resource type="Script" uid="uid://dcha457qa82iu" path="res://scripts/hazards/crusher_trap.gd" id="3_2fgn7"]
 
@@ -16,6 +16,6 @@ tile_set = ExtResource("2_2fgn7")
 position = Vector2(224, 704)
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1078292331]
-position = Vector2(2344, 392)
+position = Vector2(2332, 343)
 script = ExtResource("3_2fgn7")
 crush_distance = 256.0
