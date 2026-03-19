@@ -15,7 +15,7 @@ const TEXT_COLOR := Color(0.92, 0.93, 0.96)
 const STAR_FILLED := Color(1.0, 0.92, 0.35)
 const STAR_EMPTY := Color(0.35, 0.35, 0.4, 0.5)
 const ACCENT := Color(0.45, 0.78, 1.0)
-const SUCCESS_COLOR := Color(0.3, 0.9, 0.45)
+const SUCCESS_COLOR := Color(1, 1, 1, 1)
 
 var shots_taken: int = 0
 var stars_earned: int = 0
@@ -149,8 +149,6 @@ func _on_draw() -> void:
 	_draw_node.draw_rect(Rect2(0, 0, SCREEN_W, SCREEN_H), Color(0.02, 0.02, 0.06, dim_alpha), true)
 	if _panel_scale <= 0:
 		return
-	
-	# Panel
 	var pw := 420.0 * _panel_scale
 	var ph := 340.0 * _panel_scale
 	var px := (SCREEN_W - pw) / 2.0
@@ -161,11 +159,9 @@ func _on_draw() -> void:
 		return
 	var font := ThemeDB.fallback_font
 	var cx := SCREEN_W / 2.0
-	
-	# Title
-	_draw_node.draw_string(font, Vector2(cx - 80, py + 40), "Level Complete!", HORIZONTAL_ALIGNMENT_CENTER, 160, 24, SUCCESS_COLOR)
-	
-	# Stars
+	var title := "Level Completed!"
+	var title_w := font.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, 24).x
+	_draw_node.draw_string(font, Vector2(cx - title_w * 0.5, py + 40), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 24, SUCCESS_COLOR)
 	var star_y := py + 80
 	for i in range(3):
 		var sx := cx + (i - 1) * 50.0
@@ -176,29 +172,19 @@ func _on_draw() -> void:
 			var t := (_anim_time - _star_reveal_times[i]) / 0.3
 			radius = 18.0 * (1.0 + (1.0 - t) * 0.5)
 		_draw_star(Vector2(sx, star_y), radius, color)
-	
-	# Stats
 	var stat_y := star_y + 45
 	var left_x := cx - 80
-	
-	# Shots
 	_draw_node.draw_string(font, Vector2(left_x, stat_y), "Shots:", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, TEXT_COLOR.darkened(0.2))
 	_draw_node.draw_string(font, Vector2(left_x + 120, stat_y), "%d" % shots_taken, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, ACCENT)
-	
-	# Time
 	stat_y += 28
 	var mins := int(level_time) / 60
 	var secs := int(level_time) % 60
 	_draw_node.draw_string(font, Vector2(left_x, stat_y), "Time:", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, TEXT_COLOR.darkened(0.2))
 	_draw_node.draw_string(font, Vector2(left_x + 120, stat_y), "%d:%02d" % [mins, secs], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, TEXT_COLOR)
-	
-	# New record badge
 	if is_new_record and _anim_time > 1.5:
 		var badge_alpha: float = min((_anim_time - 1.5) * 3.0, 1.0)
 		var badge_c := Color(1.0, 0.4, 0.2, badge_alpha)
 		_draw_node.draw_string(font, Vector2(cx - 40, stat_y + 35), "★ NEW RECORD ★", HORIZONTAL_ALIGNMENT_CENTER, 80, 14, badge_c)
-	
-	# Buttons
 	if _show_buttons:
 		var btn_y := py + ph - 55
 		var btn_labels := ["Next Level", "Retry", "Menu"]

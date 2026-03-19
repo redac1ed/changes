@@ -6,7 +6,7 @@ enum MenuState { MAIN, WORLD_SELECT, SETTINGS, CREDITS, SHOP }
 var current_state: MenuState = MenuState.MAIN
 
 const WORLDS = [
-	{"name": "Meadow", "subtitle": "Rolling green hills", "color": Color(0.45, 0.82, 0.45), "icon": "M", "levels": 5},
+		{"name": "Meadow", "subtitle": "Rolling green hills", "color": Color(0.45, 0.82, 0.45), "icon": "M", "levels": 3},
 	{"name": "Volcano", "subtitle": "Fiery obstacles", "color": Color(0.95, 0.35, 0.2), "icon": "V", "levels": 3},
 	{"name": "Sky", "subtitle": "Wind-swept heights", "color": Color(0.55, 0.78, 0.95), "icon": "S", "levels": 3},
 	{"name": "Ocean", "subtitle": "Deep currents", "color": Color(0.2, 0.5, 0.85), "icon": "O", "levels": 3},
@@ -474,21 +474,27 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	elif GameState:
 		unlocked = (world_number <= 1) or (GameState.worlds_completed >= (world_number - 1))
 
-	var pct: float = 1.0 if unlocked else 0.0
-	var bar_fill := ColorRect.new()
-	bar_fill.position = Vector2(bar_x, 118)
-	bar_fill.size = Vector2(bar_w * pct, 2)
-	bar_fill.color = Color(1.0, 1.0, 1.0, 0.7)
-	card.add_child(bar_fill)
-
+	var total_levels: int = LevelManager.get_level_count(world_number) if LevelManager else int(data["levels"])
+	var completed_levels := 0
 	var count_lbl := Label.new()
-	count_lbl.text = "0 / %d" % data["levels"]
+	count_lbl.text = "%d / %d" % [completed_levels, total_levels]
 	count_lbl.position = Vector2(0, 130)
 	count_lbl.size = Vector2(w, 18)
 	count_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	count_lbl.add_theme_font_size_override("font_size", 11)
 	count_lbl.add_theme_color_override("font_color", Color(0.35, 0.35, 0.35))
 	card.add_child(count_lbl)
+	if GameState:
+		for k in GameState._save_data.levels.keys():
+			if String(k).begins_with("w%d_" % world_number):
+				completed_levels += 1
+	count_lbl.text = "%d / %d" % [completed_levels, total_levels]
+	var pct: float = (float(completed_levels) / float(maxi(total_levels, 1))) if unlocked else 0.0
+	var bar_fill := ColorRect.new()
+	bar_fill.position = Vector2(bar_x, 118)
+	bar_fill.size = Vector2(bar_w * pct, 2)
+	bar_fill.color = Color(1.0, 1.0, 1.0, 0.7)
+	card.add_child(bar_fill)
 
 	var pbtn := Button.new()
 	pbtn.text = "Enter"
@@ -733,19 +739,21 @@ func _build_shop_panel() -> void:
 	shop.visible = false
 	add_child(shop)
 	panels["shop"] = shop
-	
-	# Add a back button manually since ShopMenu might not have one in its base
 	var back_btn = Button.new()
 	back_btn.text = "Back"
 	back_btn.position = Vector2(40, 40)
 	back_btn.size = Vector2(100, 40)
 	back_btn.pressed.connect(_on_back_pressed)
 	shop.add_child(back_btn)
+	shop.back_requested.connect(func():
+		_show_panel("main")
+	)
 
 func _on_shop_pressed() -> void:
 	if not panels.has("shop"):
 		_build_shop_panel()
 	_show_panel("shop")
+	move_child(mute_btn, get_child_count() - 1)
 
 func _create_menu_button(text: String, font_size: int) -> Button:
 	var btn := Button.new()

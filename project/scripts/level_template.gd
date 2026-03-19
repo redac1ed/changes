@@ -257,10 +257,10 @@ func complete_level() -> void:
 		ball.sleeping = true
 		ball.set_process_input(false)
 	var shots: int = ball.shot_count if ball else 0
+	var stars := _calculate_level_stars(shots, level_time)
 	var result: Dictionary = {}
 	if GameState:
-		result = GameState.complete_level(world_number, level_number, shots)
-	var stars: int = result.get("stars", GameState.calculate_stars(shots) if GameState else 0)
+		result = GameState.complete_level(world_number, level_number, shots, 0, stars)
 	var is_new_record: bool = result.get("new_record", result.get("is_new_record", false))
 	if complete_screen:
 		complete_screen.show_screen(shots, stars, is_new_record, level_time)
@@ -268,6 +268,18 @@ func complete_level() -> void:
 		hud.level_time = level_time
 		hud.is_paused = true
 		hud.show_notification("Level Complete!", Color(0.3, 0.9, 0.45))
+
+func get_custom_star_rules() -> Dictionary:
+	return {}
+
+func _calculate_level_stars(shots: int, time_s: float) -> int:
+	var r := get_custom_star_rules()
+	if r.is_empty():
+		return GameState.calculate_stars(shots) if GameState else 0
+	if shots <= r.get("three_shots", 1) and time_s <= r.get("three_time", 9999.0): return 3
+	if shots <= r.get("two_shots", 9999) and time_s <= r.get("two_time", 9999.0): return 2
+	if shots <= r.get("one_shots", 9999): return 1
+	return 0
 
 func on_goal_reached(body: Node2D) -> void:
 	if body == ball:

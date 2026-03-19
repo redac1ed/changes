@@ -1,5 +1,12 @@
 extends LevelTemplate
 
+func get_custom_star_rules() -> Dictionary:
+	return {
+		"three_shots": 2, "three_time": 18.0,
+		"two_shots": 4,   "two_time": 30.0,
+		"one_shots": 7
+	}
+
 func _ready() -> void:
 	super._ready()
 	if hud:

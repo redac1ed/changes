@@ -9,15 +9,24 @@ class_name CrusherTrap
 @export var wait_time_down: float = 0.5
 @export var warning_time: float = 0.6
 @export var slam_shake: float = 12.0
+@export var extra_length: float = 96.0
 
 enum CrusherState { UP, WARNING, SLAMMING, DOWN, RAISING }
 var _state: CrusherState = CrusherState.UP
 var _state_timer: float = 0.0
 var _slam_progress: float = 0.0
 var _impact_particles: CPUParticles2D
+var _impact_kill_window: float = 0.0
 
 func _trap_ready() -> void:
 	trap_type = TrapType.CRUSHER
+	# Extend crusher length (horizontal) while keeping height the same.
+	var crusher_size := Vector2(trap_size.x + extra_length, trap_size.y)
+	var shape := _collision_shape.shape as RectangleShape2D
+	if shape:
+		shape.size = crusher_size
+		trap_size = crusher_size
+
 	# Impact particles
 	_impact_particles = CPUParticles2D.new()
 	_impact_particles.emitting = false
@@ -38,6 +47,9 @@ func _trap_ready() -> void:
 	_state_timer = wait_time_up
 
 func _trap_process(delta: float) -> void:
+	if _impact_kill_window > 0.0:
+		_impact_kill_window -= delta
+
 	_state_timer -= delta
 	match _state:
 		CrusherState.UP:
@@ -51,6 +63,7 @@ func _trap_process(delta: float) -> void:
 			if _state_timer <= 0:
 				_state = CrusherState.SLAMMING
 				_slam_progress = 0.0
+				_impact_kill_window = 0.0
 				position.x = _original_position_x()
 		CrusherState.SLAMMING:
 			_slam_progress += slam_speed * delta
@@ -71,6 +84,16 @@ func _trap_process(delta: float) -> void:
 	# Update collision position
 	_collision_shape.position = Vector2(0, _slam_progress)
 
+
+func _on_body_entered(body: Node2D) -> void:
+	if not is_active:
+		return
+	# Crusher should only damage at the impact moment (full squash at the bottom).
+	if _impact_kill_window <= 0.0:
+		return
+	if body is RigidBody2D:
+		_kill_ball(body)
+
 var _orig_x_cached: float = 0.0
 var _orig_x_set: bool = false
 
@@ -85,6 +108,12 @@ func _on_slam_impact() -> void:
 	_impact_particles.restart()
 	_impact_particles.emitting = true
 	_flash_timer = 0.2
+	_impact_kill_window = 0.12
+
+	# Kill anything currently under the crusher right at impact.
+	for body in get_overlapping_bodies():
+		if body is RigidBody2D:
+			_kill_ball(body)
 	
 	# Screen shake via camera
 	var cam := get_viewport().get_camera_2d()
@@ -95,58 +124,90 @@ func _on_slam_impact() -> void:
 func _draw() -> void:
 	if not is_active:
 		return
-	
+
 	var half := trap_size / 2.0
 	var offset := Vector2(0, _slam_progress)
-	
+	var block_rect := Rect2(Vector2(-half.x, -half.y) + offset, trap_size)
+
 	# Mount rail
-	var rail_color := Color(0.4, 0.4, 0.45, 0.5)
 	draw_rect(
-		Rect2(Vector2(-4, 0), Vector2(8, crush_distance)),
-		rail_color, true
+		Rect2(Vector2(-5, 0), Vector2(10, crush_distance)),
+		Color(0.2, 0.2, 0.22, 0.45), true
 	)
-	
-	# Crusher block
-	var block_rect := Rect2(
-		Vector2(-half.x, -half.y) + offset,
-		trap_size
-	)
-	
+
+	# Big rectangular rock (chipped boulder slab)
+	var rock_points := PackedVector2Array([
+		block_rect.position + Vector2(4, 1),
+		block_rect.position + Vector2(block_rect.size.x - 3, 2),
+		block_rect.position + Vector2(block_rect.size.x - 1, block_rect.size.y * 0.28),
+		block_rect.position + Vector2(block_rect.size.x - 4, block_rect.size.y - 2),
+		block_rect.position + Vector2(block_rect.size.x * 0.62, block_rect.size.y),
+		block_rect.position + Vector2(3, block_rect.size.y - 1),
+		block_rect.position + Vector2(0, block_rect.size.y * 0.63),
+		block_rect.position + Vector2(1, 4),
+	])
+
 	# Shadow
-	draw_rect(
-		Rect2(block_rect.position + Vector2(3, 3), block_rect.size),
-		Color(0, 0, 0, 0.25), true
-	)
-	
-	# Main body
-	var block_color := body_color
+	var shadow_points := PackedVector2Array()
+	for p in rock_points:
+		shadow_points.append(p + Vector2(4, 4))
+	draw_colored_polygon(shadow_points, Color(0, 0, 0, 0.28))
+
+	# Main rock color + warning tint
+	var rock_color := Color(0.42, 0.4, 0.36, 1.0)
 	if _state == CrusherState.WARNING:
-		# Flash red during warning
 		var flash := sin(_time_elapsed * 15.0) * 0.5 + 0.5
-		block_color = body_color.lerp(damage_color, flash * 0.5)
-	draw_rect(block_rect, block_color, true)
-	draw_rect(block_rect, body_color.darkened(0.2), false, 2.0)
-	
-	# Danger stripes on bottom
-	var stripe_y := block_rect.position.y + block_rect.size.y - 6
-	var stripe_count := int(trap_size.x / 10)
+		rock_color = rock_color.lerp(damage_color, flash * 0.3)
+
+	draw_colored_polygon(rock_points, rock_color)
+	draw_polyline(rock_points, Color(0.24, 0.23, 0.21, 0.95), 2.2, true)
+
+	# Layered stone bands
+	draw_line(
+		block_rect.position + Vector2(6, block_rect.size.y * 0.34),
+		block_rect.position + Vector2(block_rect.size.x - 6, block_rect.size.y * 0.28),
+		Color(0.50, 0.48, 0.44, 0.35), 2.0
+	)
+	draw_line(
+		block_rect.position + Vector2(4, block_rect.size.y * 0.60),
+		block_rect.position + Vector2(block_rect.size.x - 8, block_rect.size.y * 0.57),
+		Color(0.35, 0.33, 0.30, 0.45), 1.8
+	)
+
+	# Cracks
+	var crack := Color(0.23, 0.22, 0.20, 0.8)
+	draw_line(
+		block_rect.position + Vector2(block_rect.size.x * 0.22, 6),
+		block_rect.position + Vector2(block_rect.size.x * 0.44, block_rect.size.y * 0.42),
+		crack, 1.8
+	)
+	draw_line(
+		block_rect.position + Vector2(block_rect.size.x * 0.56, block_rect.size.y * 0.2),
+		block_rect.position + Vector2(block_rect.size.x * 0.36, block_rect.size.y * 0.78),
+		crack, 1.6
+	)
+	draw_line(
+		block_rect.position + Vector2(block_rect.size.x * 0.62, block_rect.size.y * 0.52),
+		block_rect.position + Vector2(block_rect.size.x * 0.86, block_rect.size.y * 0.8),
+		crack, 1.2
+	)
+
+	# Bottom warning stripe (readability/gameplay clarity)
+	var stripe_h := 7.0
+	var stripe_y := block_rect.position.y + block_rect.size.y - stripe_h
+	var stripe_count := int(block_rect.size.x / 12.0)
 	for i in range(stripe_count):
 		if i % 2 == 0:
 			draw_rect(
-				Rect2(Vector2(block_rect.position.x + i * 10, stripe_y), Vector2(10, 6)),
-				damage_color, true
+				Rect2(
+					Vector2(block_rect.position.x + i * 12.0, stripe_y),
+					Vector2(12.0, stripe_h)
+				),
+				damage_color,
+				true
 			)
-	
-	# Bolts
-	var bolt_color := Color(0.6, 0.6, 0.65, 0.8)
-	var bolt_r := 2.5
-	draw_circle(block_rect.position + Vector2(8, 8), bolt_r, bolt_color)
-	draw_circle(block_rect.position + Vector2(block_rect.size.x - 8, 8), bolt_r, bolt_color)
-	
+
 	# Impact flash
 	if _flash_timer > 0:
 		var fa := _flash_timer / 0.2
-		draw_rect(
-			Rect2(block_rect.position - Vector2(4, 4), block_rect.size + Vector2(8, 8)),
-			Color(1.0, 0.9, 0.6, fa * 0.3), true
-		)
+		draw_colored_polygon(rock_points, Color(1.0, 0.92, 0.75, fa * 0.22))

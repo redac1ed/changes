@@ -1,8 +1,15 @@
 extends LevelTemplate
 
-const SUBTITLE_INTRO_1 := "Hey there, i'll be helping you out in the 'game'. Drag the ball to move."
+const SUBTITLE_INTRO_1 := "Hey there, I'll be helping you out in the 'game'. Drag the ball to move."
 const SUBTITLE_INTRO_2 := "Sorry, its just that no one has played the game in a long time."
 var _subtitles: SubtitleOverlay
+
+func get_custom_star_rules() -> Dictionary:
+	return {
+		"three_shots": 4, "three_time": 6.0,
+		"two_shots": 7,   "two_time": 10.0,
+		"one_shots": 10
+	}
 
 func _ready() -> void:
 	_subtitles = SubtitleOverlay.new()
@@ -20,15 +27,12 @@ func _play_world_music() -> void:
 		AudioManager.play_music("res://assets/audio/music/meadow_theme.ogg")
 		return
 	AudioManager.stop_music(0.0)
-
 	var player := AudioStreamPlayer.new()
 	player.bus = "Music"
 	add_child(player)
-
 	player.stream = intro1
 	player.play()
 	_subtitles.show_line(SUBTITLE_INTRO_1)
-
 	player.finished.connect(func():
 		_subtitles.hide_line()
 		player.stream = intro2

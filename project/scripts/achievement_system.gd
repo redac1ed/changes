@@ -5,7 +5,6 @@ signal progress_updated(id: String, current: int, target: int)
 
 const ICON_LOCKED := "🔒"
 const TOAST_DURATION := 4.0
-
 const ACHIEVEMENTS: Dictionary = {
 	# Progression
 	"first_steps": {

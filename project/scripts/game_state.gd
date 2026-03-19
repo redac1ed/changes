@@ -138,19 +138,13 @@ var current_level: int:
 	get: return _save_data.progression.current_level
 	set(value): _save_data.progression.current_level = value
 
-# ─── Lifecycle ──────────────────────────────────────────────────────────────
-
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS # Run even when paused
 	print("[GameState] Initializing Enhanced GameState...")
 	_session_start_time = Time.get_ticks_msec() / 1000.0
-	
 	load_settings()
 	load_game(1) # Default to slot 1 for now
-	
-	# Hook into tree for auto-quit saving
 	get_tree().auto_accept_quit = false
-
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -158,26 +152,19 @@ func _notification(what: int) -> void:
 		save_settings()
 		get_tree().quit()
 
-
 func _process(delta: float) -> void:
 	_save_data.meta.playtime += delta
 	_auto_save_timer += delta
-	
 	if _auto_save_timer >= AUTO_SAVE_INTERVAL:
 		_auto_save_timer = 0.0
 		if _is_dirty:
 			save_game()
 
-
-# ─── Public API: Level Progression ──────────────────────────────────────────
-
 func start_level(world: int, level: int) -> void:
 	_level_start_time = Time.get_ticks_msec() / 1000.0
 	print("[GameState] Starting World %d Level %d" % [world, level])
 
-
 func add_shots(count: int) -> void:
-	# Legacy API compatibility (old GameState.gd)
 	if count == 0:
 		return
 	_save_data.meta.total_shots += count
@@ -185,16 +172,13 @@ func add_shots(count: int) -> void:
 	state_changed.emit("shots_total", _save_data.meta.total_shots)
 
 func add_score(points: int) -> void:
-	# Legacy API compatibility: score maps to coins in enhanced state.
 	add_currency(points)
 
-func complete_level(world: int, level: int, shots: int, coins: int = 0) -> Dictionary:
+func complete_level(world: int, level: int, shots: int, coins: int = 0, forced_stars: int = -1) -> Dictionary:
 	var level_key := _get_level_key(world, level)
 	var time_taken := (Time.get_ticks_msec() / 1000.0) - _level_start_time
-	
 	# Calculate stars (logic could be moved to LevelTemplate, but good to have fallback)
-	var stars := calculate_stars(shots, world, level)
-	
+	var stars := forced_stars if forced_stars >= 0 else calculate_stars(shots, world, level)
 	# Create default entry if new
 	if not _save_data.levels.has(level_key):
 		_save_data.levels[level_key] = {
@@ -204,10 +188,13 @@ func complete_level(world: int, level: int, shots: int, coins: int = 0) -> Dicti
 			"times_played": 0,
 			"collected_coins": false
 		}
-	
 	var data = _save_data.levels[level_key]
 	var is_new_record := false
-	
+	var previous_stars := int(data.get("stars", 0))
+	var stars_gained := maxi(0, stars - previous_stars)
+	if stars > data.stars:
+		data.stars = stars
+	add_currency(stars_gained)
 	# Update stats
 	data.times_played += 1
 	if shots < data.best_shots:
@@ -217,37 +204,31 @@ func complete_level(world: int, level: int, shots: int, coins: int = 0) -> Dicti
 		data.best_time = time_taken
 	if stars > data.stars:
 		data.stars = stars
-	
 	# Update global counters
 	_save_data.meta.total_shots += shots
 	add_currency(coins)
-	
 	# Check progression
 	_update_progression(world, level)
-	
 	_is_dirty = true
 	save_game() # Checkpoint save
-	
 	var result := {
 		"stars": stars,
 		"time": time_taken,
 		"new_record": is_new_record,
-		"total_coins": _save_data.currency.coins
+		"total_coins": _save_data.currency.coins,
+		"stars_gained": stars_gained,	
+		"total_stars_currency": _save_data.currency.coins,
 	}
-	
 	level_completed_event.emit(world, level, result)
 	return result
-
 
 func fail_level() -> void:
 	_save_data.meta.death_count += 1
 	_is_dirty = true
 
-
 func get_level_data(world: int, level: int) -> Dictionary:
 	var key := _get_level_key(world, level)
 	return _save_data.levels.get(key, {})
-
 
 func is_level_unlocked(world: int, level: int) -> bool:
 	if world == 1 and level == 1: return true
@@ -259,12 +240,9 @@ func is_level_unlocked(world: int, level: int) -> bool:
 	if prev_level < 1:
 		prev_world -= 1
 		prev_level = LEVELS_PER_WORLD # Assuming 10 levels
-	
 	if prev_world < 1: return true # First world always unlocked
-	
 	var prev_key = _get_level_key(prev_world, prev_level)
 	return _save_data.levels.has(prev_key)
-
 
 func calculate_stars(shots: int, world: int = 1, level: int = 1) -> int:
 	# This should ideally fetch from a LevelDatabase or resource
@@ -275,22 +253,23 @@ func calculate_stars(shots: int, world: int = 1, level: int = 1) -> int:
 	if shots <= par + 4: return 1
 	return 0
 
-
 func _update_progression(world: int, level: int) -> void:
-	# Logic to advance max world/level reached
-	if world > _save_data.progression.max_world_reached:
-		_save_data.progression.max_world_reached = world
-		_save_data.progression.max_level_reached = 1
-	elif world == _save_data.progression.max_world_reached:
-		if level + 1 > _save_data.progression.max_level_reached:
-			_save_data.progression.max_level_reached = level + 1
-
+	var total_in_world := LevelManager.get_level_count(world) if LevelManager else LEVELS_PER_WORLD
+	if level < total_in_world:
+		if world == _save_data.progression.max_world_reached:
+			_save_data.progression.max_level_reached = maxi(_save_data.progression.max_level_reached, level + 1)
+	else:
+		if not _save_data.progression.worlds_completed.has(world):
+			_save_data.progression.worlds_completed.append(world)
+		_save_data.progression.max_world_reached = maxi(_save_data.progression.max_world_reached, world + 1)
+		if world == _save_data.progression.current_world:
+			_save_data.progression.max_level_reached = 1
 
 func _get_level_key(world: int, level: int) -> String:
 	return "w%d_l%d" % [world, level]
 
-
-# ─── Public API: Currency & Unlockables ─────────────────────────────────────
+func get_max_world_reached() -> int:
+	return int(_save_data.progression.get("max_world_reached", 1))
 
 func add_currency(amount: int) -> void:
 	if amount == 0: return
@@ -313,21 +292,22 @@ func unlock_item(category: String, item_id: String, cost: int = 0) -> bool:
 	if not _save_data.unlockables.has(category):
 		push_error("[GameState] Invalid unlock category: %s" % category)
 		return false
-	
 	var list: Array = _save_data.unlockables[category]
 	if item_id in list:
 		return true # Already unlocked
-	
 	if cost > 0:
 		if not spend_currency(cost):
 			return false
-	
 	list.append(item_id)
 	unlockable_acquired.emit(category, item_id)
 	_is_dirty = true
 	save_game()
 	return true
 
+func is_item_unlocked(category: String, item_id: String) -> bool:
+	if not _save_data.unlockables.has(category):
+		return false
+	return item_id in _save_data.unlockables[category]
 
 func equip_item(category: String, item_id: String) -> void:
 	if category == "skins":
