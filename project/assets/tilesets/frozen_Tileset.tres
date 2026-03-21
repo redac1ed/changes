@@ -1,8 +1,9 @@
-[gd_resource type="TileSet" format=3 uid="uid://c3mhdtud72g10"]
+[gd_resource type="TileSet" format=3 uid="uid://cq0jxgdxevyte"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_d2r11"]
-margins = Vector2i(4, 0)
-texture_region_size = Vector2i(32, 32)
+[ext_resource type="Texture2D" uid="uid://dcjwjn6uge23a" path="res://assets/snow_assets/Tileset.png" id="1_wg2py"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_48amy"]
+texture = ExtResource("1_wg2py")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -35,10 +36,6 @@ texture_region_size = Vector2i(32, 32)
 9:1/0 = 0
 10:1/0 = 0
 11:1/0 = 0
-12:1/0 = 0
-13:1/0 = 0
-15:1/0 = 0
-17:1/0 = 0
 18:1/0 = 0
 19:1/0 = 0
 0:2/0 = 0
@@ -157,8 +154,6 @@ texture_region_size = Vector2i(32, 32)
 13:7/0 = 0
 14:7/0 = 0
 15:7/0 = 0
-16:7/0 = 0
-17:7/0 = 0
 18:7/0 = 0
 19:7/0 = 0
 0:8/0 = 0
@@ -173,11 +168,8 @@ texture_region_size = Vector2i(32, 32)
 9:8/0 = 0
 10:8/0 = 0
 11:8/0 = 0
-12:8/0 = 0
 13:8/0 = 0
 14:8/0 = 0
-15:8/0 = 0
-16:8/0 = 0
 17:8/0 = 0
 18:8/0 = 0
 19:8/0 = 0
@@ -197,8 +189,6 @@ texture_region_size = Vector2i(32, 32)
 13:9/0 = 0
 14:9/0 = 0
 15:9/0 = 0
-16:9/0 = 0
-17:9/0 = 0
 18:9/0 = 0
 19:9/0 = 0
 0:10/0 = 0
@@ -218,7 +208,6 @@ texture_region_size = Vector2i(32, 32)
 14:10/0 = 0
 15:10/0 = 0
 16:10/0 = 0
-17:10/0 = 0
 18:10/0 = 0
 19:10/0 = 0
 0:11/0 = 0
@@ -237,9 +226,8 @@ texture_region_size = Vector2i(32, 32)
 13:11/0 = 0
 14:11/0 = 0
 15:11/0 = 0
-16:11/0 = 0
 18:11/0 = 0
 19:11/0 = 0
 
 [resource]
-sources/0 = SubResource("TileSetAtlasSource_d2r11")
+sources/0 = SubResource("TileSetAtlasSource_48amy")
