@@ -28,7 +28,7 @@ position = Vector2(0, 1040)
 position = Vector2(-288, 0)
 
 [node name="CameraRightStop" type="Node2D" parent="." unique_id=1002841489]
-position = Vector2(3144, 0)
+position = Vector2(3208, 0)
 
 [node name="BallSpawn" type="Marker2D" parent="." unique_id=1738623011]
 position = Vector2(224, -120)
@@ -79,3 +79,11 @@ script = ExtResource("6_tjbhe")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoalZone" unique_id=203938536]
 shape = SubResource("CircleShape2D_muy4i")
+
+[node name="Label" type="Label" parent="." unique_id=42591267]
+offset_left = 192.0
+offset_top = 360.00003
+offset_right = 368.0
+offset_bottom = 383.00003
+scale = Vector2(1.7855285, 2.2176094)
+text = "think fast chucklenuts!"
