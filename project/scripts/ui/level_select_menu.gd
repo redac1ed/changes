@@ -23,7 +23,7 @@ func _refresh_view() -> void:
 	if not GameState: return
 	if world_title:
 		world_title.text = "World %d" % _current_world_index
-		# Ideally fetch world name from a config
+
 	if total_stars_lbl:
 		total_stars_lbl.text = "Total Stars: %d" % GameState._save_data.meta.get("total_stars", 0)
 	_populate_grid()
@@ -31,11 +31,10 @@ func _refresh_view() -> void:
 
 func _populate_grid() -> void:
 	if not level_grid: return
-	
-	# Clear existing
+
 	for child in level_grid.get_children():
 		child.queue_free()
-	
+
 	var level_count := _get_level_count_for_current_world()
 	for i in range(1, level_count + 1):
 		var btn = Button.new()
@@ -46,12 +45,12 @@ func _populate_grid() -> void:
 		if unlocked:
 			var data = GameState.get_level_data(_current_world_index, i)
 			var stars = data.get("stars", 0)
-			# Add star icons
+
 			if stars > 0:
 				var star_str = ""
 				for s in stars: star_str += "★"
 				btn.text += "\n" + star_str
-			
+
 			btn.pressed.connect(_on_level_selected.bind(i))
 		else:
 			btn.text = "🔒"
@@ -84,7 +83,7 @@ func _on_next_world() -> void:
 
 func _on_level_selected(level_idx: int) -> void:
 	print("Selected Level %d-%d" % [_current_world_index, level_idx])
-	# Transition logic
+
 	if MenuManager:
 		MenuManager.clear_menus()
 
@@ -94,7 +93,6 @@ func _on_level_selected(level_idx: int) -> void:
 		LevelManager.load_level_by_path(scene_path)
 		return
 
-	# Fallback behavior
 	GameState.start_level(_current_world_index, level_idx)
 
 func _get_available_worlds() -> Array:

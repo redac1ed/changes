@@ -15,7 +15,6 @@ var _surface_points: PackedVector2Array
 func _ready() -> void:
 	super._ready()
 	trap_type = TrapType.ACID_POOL
-	# Collision for pool area
 	if _collision_shape:
 		var shape := RectangleShape2D.new()
 		shape.size = pool_size
@@ -30,15 +29,12 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_time_elapsed += delta
-	# Update surface wave
 	var segments := _surface_points.size()
 	for i in range(segments):
 		var x_norm: float = float(i) / max(segments - 1, 1)
 		var wave := sin(_time_elapsed * wave_speed + x_norm * 8.0) * wave_height
 		wave += sin(_time_elapsed * wave_speed * 1.7 + x_norm * 12.0) * wave_height * 0.4
 		_surface_points[i].y = -pool_size.y / 2.0 + wave
-	
-	# Spawn bubbles
 	if randf() < bubble_rate * delta:
 		_bubbles.append({
 			"x": randf_range(-pool_size.x * 0.45, pool_size.x * 0.45),
@@ -48,17 +44,13 @@ func _process(delta: float) -> void:
 			"time": 0.0,
 			"wobble_offset": randf() * TAU,
 		})
-	
-	# Update bubbles
 	var i := _bubbles.size() - 1
 	while i >= 0:
 		var b := _bubbles[i]
 		b["time"] += delta
 		b["y"] -= b["speed"] * delta
 		b["x"] += sin(_time_elapsed * 3.0 + b["wobble_offset"]) * 0.5
-		
 		if b["y"] <= -pool_size.y * 0.5 - 5:
-			# Pop — spawn drip particles
 			for _j in range(3):
 				_drip_particles.append({
 					"x": b["x"], "y": b["y"],
@@ -69,8 +61,6 @@ func _process(delta: float) -> void:
 				})
 			_bubbles.remove_at(i)
 		i -= 1
-	
-	# Update drip particles
 	i = _drip_particles.size() - 1
 	while i >= 0:
 		_drip_particles[i]["time"] += delta
@@ -85,36 +75,27 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	var hw := pool_size.x / 2.0
 	var hh := pool_size.y / 2.0
-	# Acid body
 	var body := PackedVector2Array()
-	# Start with surface wave
 	for pt in _surface_points:
 		body.append(pt)
-	# Bottom edge
 	body.append(Vector2(hw, hh))
 	body.append(Vector2(-hw, hh))
 	draw_colored_polygon(body, acid_color)
-	# Surface highlights
 	var highlight_color := Color(0.6, 1.0, 0.3, 0.4)
 	for seg_i in range(_surface_points.size() - 1):
 		if seg_i % 3 == 0:
 			var p1 := _surface_points[seg_i]
 			var p2 := _surface_points[min(seg_i + 1, _surface_points.size() - 1)]
 			draw_line(p1 + Vector2(0, 1), p2 + Vector2(0, 1), highlight_color, 1.5)
-	# Surface outline
-	draw_polyline(_surface_points, Color(0.5, 1.0, 0.2, 0.7), 2.0)
-	# Bubbles
+	draw_polyline(_surface_points, acid_color, 2.0)
 	for b in _bubbles:
 		var alpha := 0.6
 		if b["y"] < -hh + 5:
 			alpha = 0.3
-		var bc := Color(0.5, 1.0, 0.3, alpha)
+		var bc := Color(acid_color.r, acid_color.g, acid_color.b, alpha)
 		draw_circle(Vector2(b["x"], b["y"]), b["size"], bc)
-		# Highlight
-		draw_arc(Vector2(b["x"] - 1, b["y"] - 1), b["size"] * 0.6, PI * 0.8, PI * 1.6, 6, Color(0.8, 1.0, 0.7, alpha * 0.5), 1.0)
-	# Drip particles
+		draw_arc(Vector2(b["x"] - 1, b["y"] - 1), b["size"] * 0.6, PI * 0.8, PI * 1.6, 6, Color(acid_color.r + 0.3, acid_color.g + 0.3, acid_color.b + 0.3, alpha * 0.5), 1.0)
 	for dp in _drip_particles:
 		var dp_alpha: float = 1.0 - dp["time"] / 0.5
-		draw_circle(Vector2(dp["x"], dp["y"]), dp["size"], Color(0.4, 0.9, 0.2, dp_alpha))
-	# Warning skulls/icons at edges
+		draw_circle(Vector2(dp["x"], dp["y"]), dp["size"], Color(acid_color.r, acid_color.g, acid_color.b, dp_alpha))
 	var warn_c := Color(0.9, 0.8, 0.1, 0.4 + sin(_time_elapsed * 2.0) * 0.1)

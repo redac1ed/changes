@@ -43,10 +43,41 @@ func _ready() -> void:
 	contact_monitor = true
 	max_contacts_reported = 4
 	body_entered.connect(_on_collision)
+	
+	if GameState._save_data.unlockables.has("active_trail"):
+		_apply_trail(GameState._save_data.unlockables.active_trail)
+		
+	if GameState:
+		GameState.state_changed.connect(_on_game_state_changed)
+	
 	print("[Player] Ready at %s | drag_radius=%s | world_bounds=%s" % [str(global_position), drag_radius, str(world_bounds)])
 
+func _on_game_state_changed(what: String, value: Variant) -> void:
+	if what == "equip_trails":
+		_apply_trail(value as String)
+
+func _apply_trail(trail_id: String) -> void:
+	var trail = get_node_or_null("Trail") as Line2D
+	if not trail: return
+	
+	var gradient = Gradient.new()
+	if trail_id == "rainbow":
+		gradient.offsets = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+		gradient.colors = [Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.BLUE, Color.PURPLE]
+	elif trail_id == "fire":
+		gradient.offsets = [0.0, 0.5, 1.0]
+		gradient.colors = [Color.YELLOW, Color.ORANGE, Color.RED]
+	elif trail_id == "sparkle":
+		gradient.offsets = [0.0, 0.5, 1.0]
+		gradient.colors = [Color.WHITE, Color.YELLOW, Color(1, 1, 0, 0)]
+	else:
+		# default
+		gradient.offsets = [0.0, 1.0]
+		gradient.colors = [Color(0.95, 0.88, 0.72, 0.45), Color(0.95, 0.88, 0.72, 0.0)]
+	
+	trail.gradient = gradient
+
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
-	# Apply conveyor motion inside the rigid body's physics step so the solver keeps it.
 	var conveyor_velocity := Vector2.ZERO
 	for i in range(state.get_contact_count()):
 		var collider := state.get_contact_collider_object(i)
@@ -65,10 +96,26 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 			state.linear_velocity = Vector2.ZERO
 			_drag_slow_mode = false
 			call_deferred("set", "freeze", true)
+			
+	var active_ability = GameState._save_data.unlockables.get("active_ability", "none")
+	if Input.is_action_pressed("ability_use") and active_ability == "slow_fall" and state.linear_velocity.y > 0:
+		state.linear_velocity.y *= 0.85
+	
 	var vel := state.linear_velocity
 	var max_speed := 2500.0
+	
+	if active_ability == "boost":
+		max_speed = 3500.0
+		
 	if vel.length() > max_speed:
 		state.linear_velocity = vel.normalized() * max_speed
+		
+	if Input.is_action_just_pressed("ability_use") and active_ability == "boost":
+		if vel.length() < 100:
+			state.linear_velocity += Vector2(500, -500)
+		else:
+			state.linear_velocity *= 1.5
+		
 	if world_bounds.size != Vector2.ZERO:
 		var pos := state.transform.origin
 		var changed := false
@@ -118,7 +165,7 @@ func _input(event: InputEvent) -> void:
 		drag_current = get_global_mouse_position()
 
 func _draw() -> void:
-	# Trajectory and power ring drawn behind the ball
+
 	if is_dragging:
 		_draw_trajectory()
 		_draw_power_ring()
@@ -149,7 +196,7 @@ func _draw_trajectory() -> void:
 	var vel := dir * power
 	var grav := Vector2(0, ProjectSettings.get_setting(
 		"physics/2d/default_gravity", 980.0))
-	# Draw physics-accurate parabolic dots
+
 	for i in range(1, 32):
 		var t := i * 0.035
 		var pos := vel * t + 0.5 * grav * t * t
@@ -163,7 +210,7 @@ func _draw_aim_line() -> void:
 	if power < 10.0:
 		return
 	var dir := -drag_vec.normalized()
-	# Short solid aim line from ball center
+
 	var line_len := clampf(power * 0.08, 10.0, 60.0)
 	draw_line(Vector2.ZERO, dir * line_len, Color(1, 1, 1, 0.5), 2.0, true)
 
@@ -173,7 +220,7 @@ func _draw_power_ring() -> void:
 	var ratio := power / max_power
 	if ratio < 0.02:
 		return
-	# Color ramp: green → yellow → red
+
 	var col: Color
 	if ratio < 0.5:
 		col = Color(0.3, 0.9, 0.4).lerp(Color(1.0, 0.9, 0.2), ratio * 2.0)
@@ -189,7 +236,7 @@ func _draw_power_ring() -> void:
 		var next := Vector2(cos(angle), sin(angle)) * r
 		draw_line(prev, next, col, 2.5, true)
 		prev = next
-	# Tick marks at 25%, 50%, 75%
+
 	for pct in [0.25, 0.5, 0.75]:
 		if ratio >= pct:
 			var a: float = -PI / 2.0 + pct * TAU
@@ -214,7 +261,7 @@ func _start_drag(mpos: Vector2) -> void:
 		freeze = true
 	else:
 		_drag_slow_mode = true
-	# Grab squash
+
 	_squash = Vector2(1.1, 0.9)
 
 func _end_drag() -> void:
@@ -252,14 +299,14 @@ func _update_trail() -> void:
 			trail.add_point(gp, 0)
 	while trail.get_point_count() > TRAIL_LENGTH:
 		trail.remove_point(trail.get_point_count() - 1)
-	# Fade out trail when resting
+
 	if _is_resting() and trail.get_point_count() > 0:
 		trail.remove_point(trail.get_point_count() - 1)
 
 func _on_collision(body: Node) -> void:
 	if _prev_speed < 80.0:
 		return
-	# Direction-aware squash
+
 	var vel := linear_velocity.normalized()
 	var strength := clampf(_prev_speed / 500.0, 0.2, 1.0)
 	if abs(vel.y) > abs(vel.x):
@@ -282,17 +329,17 @@ func get_trajectory_path(initial_velocity: Vector2, max_points: int = 60) -> Pac
 	var pos := global_position
 	var vel := initial_velocity
 	var gravity := get_gravity()
-	var dt := 0.016  # Approximate 60 FPS frame time
+	var dt := 0.016
 	var friction_factor := 0.99
 	path.append(pos)
 	for i in range(max_points):
-		# Apply gravity
+
 		vel += gravity * dt
-		# Apply friction over time
+
 		vel *= friction_factor
-		# Update position
+
 		pos += vel * dt
-		# Stop if out of bounds or velocity negligible
+
 		if not world_bounds.has_point(pos) or vel.length() < 5.0:
 			break
 		path.append(pos)
@@ -366,35 +413,28 @@ func get_velocity_direction() -> Vector2:
 		return Vector2.ZERO
 	return vel.normalized()
 
-
 func get_velocity_angle() -> float:
 	return rad_to_deg(get_velocity_direction().angle())
 
 func apply_force_impulse(direction: Vector2, magnitude: float) -> void:
 	linear_velocity += direction.normalized() * magnitude
 
-
 func apply_directional_boost(angle_degrees: float, magnitude: float) -> void:
 	var direction := Vector2(cos(deg_to_rad(angle_degrees)), -sin(deg_to_rad(angle_degrees)))
 	apply_force_impulse(direction, magnitude)
-
 
 func clamp_velocity(max_speed: float) -> void:
 	if linear_velocity.length() > max_speed:
 		linear_velocity = linear_velocity.normalized() * max_speed
 
-
 func apply_damping(damping_factor: float) -> void:
 	linear_velocity *= damping_factor
-
 
 func reverse_velocity() -> void:
 	linear_velocity = -linear_velocity
 
-
 func reflect_off_surface(surface_normal: Vector2) -> void:
 	linear_velocity = linear_velocity.reflect(surface_normal)
-
 
 func set_velocity_toward_target(target: Vector2, speed: float) -> void:
 	var direction := (target - global_position).normalized()
@@ -408,11 +448,11 @@ func get_power_ring_scale() -> float:
 
 func get_glow_intensity() -> float:
 	var ratio := get_momentum_ratio()
-	return 0.2 + (ratio * 0.8)  # Range 0.2 - 1.0
+	return 0.2 + (ratio * 0.8)
 
 func get_trail_color() -> Color:
 	var ratio := clampf(get_momentum_ratio(), 0.0, 1.0)
-	# Gradient from cool to hot as speed increases
+
 	return Color(ratio, 0.5, 1.0 - ratio).lerp(Color.WHITE, ratio * 0.3)
 
 func is_in_slow_mode() -> bool:

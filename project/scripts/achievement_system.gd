@@ -6,7 +6,7 @@ signal progress_updated(id: String, current: int, target: int)
 const ICON_LOCKED := "🔒"
 const TOAST_DURATION := 4.0
 const ACHIEVEMENTS: Dictionary = {
-	# Progression
+
 	"first_steps": {
 		"title": "First Steps",
 		"desc": "Complete the first level",
@@ -35,8 +35,7 @@ const ACHIEVEMENTS: Dictionary = {
 		"category": "progression",
 		"points": 50
 	},
-	
-	# Skill
+
 	"hole_in_one": {
 		"title": "Hole in One!",
 		"desc": "Complete a level with a single shot",
@@ -66,8 +65,7 @@ const ACHIEVEMENTS: Dictionary = {
 		"category": "skill",
 		"points": 20
 	},
-	
-	# Collection
+
 	"coin_novice": {
 		"title": "Penny Pincher",
 		"desc": "Collect 100 coins total",
@@ -91,8 +89,7 @@ const ACHIEVEMENTS: Dictionary = {
 		"category": "collection",
 		"points": 30
 	},
-	
-	# Combat
+
 	"brawler": {
 		"title": "Brawler",
 		"desc": "Defeat 10 enemies",
@@ -109,8 +106,7 @@ const ACHIEVEMENTS: Dictionary = {
 		"points": 40,
 		"max_progress": 50
 	},
-	
-	# Secret
+
 	"konami": {
 		"title": "Classic Gamer",
 		"desc": "???",
@@ -133,20 +129,20 @@ var _toast_layer: CanvasLayer
 func _ready() -> void:
 	print("[AchievementSystem] Initializing...")
 	_setup_ui()
-	# Connect to GameState signals if available
+
 	if GameState:
 		GameState.save_loaded.connect(_on_save_loaded)
 		GameState.level_completed_event.connect(_on_level_completed)
 		GameState.currency_changed.connect(_on_currency_changed)
-		_on_save_loaded() # Load initial state
+		_on_save_loaded()
 
 func unlock(id: String) -> void:
 	if not ACHIEVEMENTS.has(id):
 		push_warning("[AchievementSystem] Unknown achievement ID: %s" % id)
 		return
 	if is_unlocked(id):
-		return # Already unlocked
-	# Update GameState
+		return
+
 	if GameState:
 		if not GameState._save_data.achievements.has(id):
 			GameState._save_data.achievements[id] = {
@@ -165,7 +161,7 @@ func increment_progress(id: String, amount: int = 1) -> void:
 	if is_unlocked(id): return
 	var def = ACHIEVEMENTS[id]
 	if not def.has("max_progress"):
-		unlock(id) # Immediate unlock if no progress bar
+		unlock(id)
 		return
 	var current = _get_progress(id)
 	var new_val = current + amount
@@ -188,8 +184,7 @@ func get_all_achievements() -> Array:
 		data["unlocked"] = is_unlocked(id)
 		if data.unlocked:
 			data["unlock_date"] = GameState._save_data.achievements[id].date
-		
-		# Hide secret ones
+
 		if data.get("hidden", false) and not data.unlocked:
 			data["title"] = "???"
 			data["desc"] = "Secret Achievement"
@@ -207,14 +202,13 @@ func _set_progress(id: String, val: int) -> void:
 		if not GameState._save_data.achievements.has(id):
 			GameState._save_data.achievements[id] = {"unlocked": false, "progress": 0}
 		GameState._save_data.achievements[id].progress = val
-		GameState._is_dirty = true # Mark for save, but don't force save every increment
-
+		GameState._is_dirty = true
 
 func _on_save_loaded() -> void:
 	pass
 
 func _on_level_completed(world: int, level: int, stats: Dictionary) -> void:
-	# Check level completion achievements
+
 	increment_progress("first_steps")
 	if stats.get("stars", 0) == 3:
 		increment_progress("precision")
@@ -224,7 +218,7 @@ func _on_level_completed(world: int, level: int, stats: Dictionary) -> void:
 		unlock("hole_in_one")
 
 func _on_currency_changed(total: int, _delta: int) -> void:
-	# Sync coin achievements
+
 	var p_novice = _get_progress("coin_novice")
 	if total > p_novice:
 		increment_progress("coin_novice", total - p_novice)
@@ -234,16 +228,15 @@ func _on_currency_changed(total: int, _delta: int) -> void:
 
 func _setup_ui() -> void:
 	_toast_layer = CanvasLayer.new()
-	_toast_layer.layer = 100 # Topmost
+	_toast_layer.layer = 100
 	add_child(_toast_layer)
 
 func _show_toast(id: String) -> void:
 	var def = ACHIEVEMENTS[id]
-	
-	# Create toast panel
+
 	var panel = PanelContainer.new()
 	panel.name = "Toast_%s" % id
-	# Style logic omitted for brevity (assume theme handles it or use stylebox)
+
 	var style = StyleBoxFlat.new()
 	style.bg_color = Color(0.1, 0.1, 0.15, 0.9)
 	style.border_width_bottom = 2
@@ -256,14 +249,12 @@ func _show_toast(id: String) -> void:
 	var hbox = HBoxContainer.new()
 	hbox.add_theme_constant_override("separation", 12)
 	panel.add_child(hbox)
-	
-	# Icon
+
 	var icon_lbl = Label.new()
 	icon_lbl.text = def.icon
 	icon_lbl.add_theme_font_size_override("font_size", 32)
 	hbox.add_child(icon_lbl)
-	
-	# Text container
+
 	var vbox = VBoxContainer.new()
 	hbox.add_child(vbox)
 	var title = Label.new()
@@ -276,14 +267,13 @@ func _show_toast(id: String) -> void:
 	desc.add_theme_font_size_override("font_size", 12)
 	desc.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
 	vbox.add_child(desc)
-	
-	# Animation
+
 	_toast_layer.add_child(panel)
 	panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	panel.position = Vector2(get_viewport().get_visible_rect().size.x + 20, 20) # Start offscreen
+	panel.position = Vector2(get_viewport().get_visible_rect().size.x + 20, 20)
 	var tw = create_tween()
 	var target_x = get_viewport().get_visible_rect().size.x - panel.size.x - 20
-	# Wait for size calculation
+
 	await get_tree().process_frame
 	target_x = get_viewport().get_visible_rect().size.x - panel.size.x - 20
 	tw.tween_property(panel, "position:x", target_x, 0.5).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)

@@ -46,7 +46,6 @@ var _current_direction: Vector2 = Vector2.RIGHT
 var _speed_scale: float = 1.0
 var _target_speed_scale: float = 1.0
 
-
 func _platform_ready() -> void:
 	platform_type = PlatformType.MOVING
 	platform_color = Color(0.45, 0.65, 0.85, 1.0)
@@ -59,11 +58,9 @@ func _platform_ready() -> void:
 		_current_direction = Vector2.RIGHT
 	_speed_scale = 1.0
 	_target_speed_scale = 1.0
-	
-	# If no waypoints provided, generate from axis/distance
+
 	if surface_mode == SurfaceMode.MOVING and waypoints.is_empty() and move_axis != MoveAxis.PATH:
 		_generate_waypoints_from_axis()
-
 
 func _generate_waypoints_from_axis() -> void:
 	waypoints.clear()
@@ -82,11 +79,10 @@ func _platform_physics_process(delta: float) -> void:
 		_process_conveyor(delta)
 		return
 
-	# Start delay
 	if _delay_timer > 0.0:
 		_delay_timer -= delta
 		return
-	# Endpoint pause
+
 	if _pause_timer > 0.0:
 		_pause_timer -= delta
 		_velocity = Vector2.ZERO
@@ -94,7 +90,7 @@ func _platform_physics_process(delta: float) -> void:
 		return
 	if waypoints.size() < 2:
 		return
-	# Advance progress
+
 	var to_idx_calc: int = _current_waypoint_idx + _direction
 	if to_idx_calc < 0 or to_idx_calc >= waypoints.size():
 		to_idx_calc = _current_waypoint_idx
@@ -104,34 +100,32 @@ func _platform_physics_process(delta: float) -> void:
 	if segment_length < 0.01:
 		segment_length = 1.0
 	_progress += (move_speed * delta) / segment_length
-	
-	# Handle segment completion
+
 	if _progress >= 1.0:
-		_progress -= 1.0 # Keep fractional progress
+		_progress -= 1.0
 		_current_waypoint_idx += _direction
 		if _current_waypoint_idx >= waypoints.size() - 1:
 			if loop_path and waypoints.size() > 2:
 				_current_waypoint_idx = 0
 			else:
-				# Reached the end: reverse direction instead of jumping back to index 0
+
 				_direction = -1
 				_current_waypoint_idx = waypoints.size() - 1
 				_pause_timer = pause_at_endpoints
 		elif _current_waypoint_idx < 0:
-			# Reached the start: go forward instead of jumping back to end
+
 			_direction = 1
 			_current_waypoint_idx = 0
 			_pause_timer = pause_at_endpoints
-	
-	# Calculate position
+
 	var from_idx: int = _current_waypoint_idx
 	var to_idx: int = _current_waypoint_idx + _direction
-	# Clamp indices to valid ranges so it stays exactly at the endpoint while paused or turning
+
 	if to_idx >= waypoints.size():
 		to_idx = waypoints.size() - 1
 	elif to_idx < 0:
 		to_idx = 0
-	
+
 	var from_pos: Vector2 = _original_position + waypoints[from_idx]
 	var to_pos: Vector2 = _original_position + waypoints[to_idx]
 	var t := _apply_motion_profile(_progress)
@@ -195,12 +189,11 @@ func _apply_motion_profile(t: float) -> float:
 	return t
 
 func _draw_platform_details(rect: Rect2) -> void:
-	# Direction arrows on surface
+
 	var arrow_y := rect.position.y + rect.size.y / 2.0
 	var arrow_size := 4.0
 	var center_x := rect.position.x + rect.size.x / 2.0
-	
-	# Left arrow
+
 	draw_line(
 		Vector2(center_x - 15, arrow_y),
 		Vector2(center_x - 15 - arrow_size, arrow_y),
@@ -211,7 +204,7 @@ func _draw_platform_details(rect: Rect2) -> void:
 		Vector2(center_x - 15 - arrow_size + 3, arrow_y - 3),
 		arrow_color, 2.0
 	)
-	# Right arrow
+
 	draw_line(
 		Vector2(center_x + 15, arrow_y),
 		Vector2(center_x + 15 + arrow_size, arrow_y),
@@ -222,8 +215,7 @@ func _draw_platform_details(rect: Rect2) -> void:
 		Vector2(center_x + 15 + arrow_size - 3, arrow_y - 3),
 		arrow_color, 2.0
 	)
-	
-	# Path preview dots
+
 	if show_path_preview and waypoints.size() >= 2:
 		if surface_mode == SurfaceMode.CONVEYOR:
 			return
@@ -232,7 +224,7 @@ func _draw_platform_details(rect: Rect2) -> void:
 			draw_circle(wp, 3.0, path_color)
 			if i < waypoints.size() - 1:
 				var next_wp: Vector2 = waypoints[i + 1] - (global_position - _original_position)
-				# Dotted line between waypoints
+
 				var dist := wp.distance_to(next_wp)
 				var dots := int(dist / 8.0)
 				for d in range(dots):

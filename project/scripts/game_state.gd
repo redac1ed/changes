@@ -1,21 +1,4 @@
 extends Node
-
-## ═══════════════════════════════════════════════════════════════════════════════
-## GameState Enhanced — Global State & Save System
-## ═══════════════════════════════════════════════════════════════════════════════
-##
-## Manages global game state, persistence, unlockables, and cross-scene data.
-## Replaces the basic GameState with a robust, serializable architecture.
-##
-## Features:
-## - Slot-based Save/Load System (JSON)
-## - Detailed Level Statistics (Stars, Time, Shots, Coins)
-## - Settings Persistence (Audio, Video, Accessibility)
-## - Unlockables Manager (Skins, Trails, Modes)
-## - Global Event Bus for state changes
-## - Cheat/Debug system integration
-
-# ─── Signals ─────────────────────────────────────────────────────────────────
 signal state_changed(what: String, value: Variant)
 signal level_completed_event(world: int, level: int, stats: Dictionary)
 signal save_loaded
@@ -24,18 +7,13 @@ signal unlockable_acquired(type: String, id: String)
 signal currency_changed(new_amount: int, delta: int)
 signal setting_changed(category: String, key: String, value: Variant)
 
-# ─── Constants ───────────────────────────────────────────────────────────────
 const SAVE_PATH_TEMPLATE := "user://save_slot_%d.json"
 const SETTINGS_PATH := "user://settings.cfg"
 const CURRENT_VERSION := "1.2.0"
 const MAX_WORLDS := 6
 const LEVELS_PER_WORLD := 10
 
-# ─── Data Structures ─────────────────────────────────────────────────────────
-# These dictionaries define the schema for our save data
-
 var _current_slot: int = 1
-
 var _save_data: Dictionary = {
 	"version": CURRENT_VERSION,
 	"meta": {
@@ -61,12 +39,14 @@ var _save_data: Dictionary = {
 	"unlockables": {
 		"skins": ["default"],
 		"trails": ["default"],
+		"abilities": ["none"],
 		"modes": ["story"],
 		"active_skin": "default",
 		"active_trail": "default",
+		"active_ability": "none"
 	},
-	"levels": {}, # Key: "w1_l1", Value: { stars: 3, best_time: 45.2, ... }
-	"achievements": {}, # Key: "ACH_001", Value: { unlocked: true, date: ... }
+	"levels": {},
+	"achievements": {},
 }
 
 var _settings: Dictionary = {
@@ -81,8 +61,8 @@ var _settings: Dictionary = {
 	"video": {
 		"fullscreen": false,
 		"vsync": true,
-		"particles": "high", # high, medium, low
-		"shake": 1.0,        # screen shake intensity 0.0-1.0
+		"particles": "high",
+		"shake": 1.0,
 		"post_process": true,
 	},
 	"accessibility": {
@@ -99,17 +79,11 @@ var _settings: Dictionary = {
 	}
 }
 
-# ─── Runtime State ──────────────────────────────────────────────────────────
-# Data that is NOT saved but exists during the session
 var _is_dirty: bool = false
 var _auto_save_timer: float = 0.0
-const AUTO_SAVE_INTERVAL: float = 60.0 # Save every minute
+const AUTO_SAVE_INTERVAL: float = 60.0
 var _session_start_time: float = 0.0
 var _level_start_time: float = 0.0
-
-# ─── Backward Compatibility Properties ───────────────────────────────────────
-# These properties provide compatibility with the legacy GameState API
-# They expose nested data as direct properties for easier access
 
 func get_levels_completed() -> int:
 	return _save_data.levels.size()
@@ -139,11 +113,11 @@ var current_level: int:
 	set(value): _save_data.progression.current_level = value
 
 func _ready() -> void:
-	process_mode = Node.PROCESS_MODE_ALWAYS # Run even when paused
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	print("[GameState] Initializing Enhanced GameState...")
 	_session_start_time = Time.get_ticks_msec() / 1000.0
 	load_settings()
-	load_game(1) # Default to slot 1 for now
+	load_game(1)
 	get_tree().auto_accept_quit = false
 
 func _notification(what: int) -> void:
@@ -177,9 +151,7 @@ func add_score(points: int) -> void:
 func complete_level(world: int, level: int, shots: int, coins: int = 0, forced_stars: int = -1) -> Dictionary:
 	var level_key := _get_level_key(world, level)
 	var time_taken := (Time.get_ticks_msec() / 1000.0) - _level_start_time
-	# Calculate stars (logic could be moved to LevelTemplate, but good to have fallback)
 	var stars := forced_stars if forced_stars >= 0 else calculate_stars(shots, world, level)
-	# Create default entry if new
 	if not _save_data.levels.has(level_key):
 		_save_data.levels[level_key] = {
 			"stars": 0,
@@ -195,7 +167,6 @@ func complete_level(world: int, level: int, shots: int, coins: int = 0, forced_s
 	if stars > data.stars:
 		data.stars = stars
 	add_currency(stars_gained)
-	# Update stats
 	data.times_played += 1
 	if shots < data.best_shots:
 		data.best_shots = shots
@@ -204,19 +175,17 @@ func complete_level(world: int, level: int, shots: int, coins: int = 0, forced_s
 		data.best_time = time_taken
 	if stars > data.stars:
 		data.stars = stars
-	# Update global counters
 	_save_data.meta.total_shots += shots
 	add_currency(coins)
-	# Check progression
 	_update_progression(world, level)
 	_is_dirty = true
-	save_game() # Checkpoint save
+	save_game()
 	var result := {
 		"stars": stars,
 		"time": time_taken,
 		"new_record": is_new_record,
 		"total_coins": _save_data.currency.coins,
-		"stars_gained": stars_gained,	
+		"stars_gained": stars_gained,
 		"total_stars_currency": _save_data.currency.coins,
 	}
 	level_completed_event.emit(world, level, result)
@@ -232,22 +201,17 @@ func get_level_data(world: int, level: int) -> Dictionary:
 
 func is_level_unlocked(world: int, level: int) -> bool:
 	if world == 1 and level == 1: return true
-	# Logic: Unlocked if previous level is completed
-	# Simplified: Checks if max_reached is high enough
-	# Real implementation would check previous level key
 	var prev_level = level - 1
 	var prev_world = world
 	if prev_level < 1:
 		prev_world -= 1
-		prev_level = LEVELS_PER_WORLD # Assuming 10 levels
-	if prev_world < 1: return true # First world always unlocked
+		prev_level = LEVELS_PER_WORLD
+	if prev_world < 1: return true
 	var prev_key = _get_level_key(prev_world, prev_level)
 	return _save_data.levels.has(prev_key)
 
 func calculate_stars(shots: int, world: int = 1, level: int = 1) -> int:
-	# This should ideally fetch from a LevelDatabase or resource
-	# Hardcoded defaults for now
-	var par = 3 # Base par
+	var par = 3
 	if shots <= par: return 3
 	if shots <= par + 2: return 2
 	if shots <= par + 4: return 1
@@ -278,7 +242,6 @@ func add_currency(amount: int) -> void:
 	currency_changed.emit(_save_data.currency.coins, amount)
 	_is_dirty = true
 
-
 func spend_currency(amount: int) -> bool:
 	if _save_data.currency.coins >= amount:
 		_save_data.currency.coins -= amount
@@ -287,14 +250,13 @@ func spend_currency(amount: int) -> bool:
 		return true
 	return false
 
-
 func unlock_item(category: String, item_id: String, cost: int = 0) -> bool:
 	if not _save_data.unlockables.has(category):
 		push_error("[GameState] Invalid unlock category: %s" % category)
 		return false
 	var list: Array = _save_data.unlockables[category]
 	if item_id in list:
-		return true # Already unlocked
+		return true
 	if cost > 0:
 		if not spend_currency(cost):
 			return false
@@ -310,35 +272,37 @@ func is_item_unlocked(category: String, item_id: String) -> bool:
 	return item_id in _save_data.unlockables[category]
 
 func equip_item(category: String, item_id: String) -> void:
+	if not _save_data.unlockables.has("active_ability"):
+		_save_data.unlockables["active_ability"] = "none"
+		
 	if category == "skins":
 		_save_data.unlockables.active_skin = item_id
 	elif category == "trails":
 		_save_data.unlockables.active_trail = item_id
+	elif category == "abilities":
+		_save_data.unlockables.active_ability = item_id
 	_is_dirty = true
 	state_changed.emit("equip_" + category, item_id)
-
-
-# ─── Save / Load System ─────────────────────────────────────────────────────
+	save_game()
 
 func save_game(slot: int = -1) -> void:
 	if slot == -1: slot = _current_slot
-	
+
 	var path := SAVE_PATH_TEMPLATE % slot
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	if not file:
 		push_error("[GameState] Failed to open save file: %s" % path)
 		return
-	
+
 	_save_data.meta.last_played = Time.get_datetime_string_from_system()
-	
+
 	var json_string := JSON.stringify(_save_data, "\t")
 	file.store_string(json_string)
 	file.close()
-	
+
 	_is_dirty = false
 	save_saved.emit()
 	print("[GameState] Game saved to slot %d" % slot)
-
 
 func load_game(slot: int) -> bool:
 	var path := SAVE_PATH_TEMPLATE % slot
@@ -346,19 +310,18 @@ func load_game(slot: int) -> bool:
 		print("[GameState] No save found for slot %d. Creating new." % slot)
 		reset_save_data()
 		return false
-	
+
 	var file := FileAccess.open(path, FileAccess.READ)
 	if not file:
 		push_error("[GameState] Failed to read save file: %s" % path)
 		return false
-	
+
 	var content := file.get_as_text()
 	var json = JSON.new()
 	var error = json.parse(content)
-	
+
 	if error == OK:
 		var loaded_data = json.get_data()
-		# Basic version migration could happen here
 		_save_data = _merge_dict(_save_data, loaded_data)
 		_current_slot = slot
 		save_loaded.emit()
@@ -368,13 +331,11 @@ func load_game(slot: int) -> bool:
 		push_error("[GameState] JSON Parse Error: %s" % json.get_error_message())
 		return false
 
-
 func delete_save(slot: int) -> void:
 	var path := SAVE_PATH_TEMPLATE % slot
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(path)
 		print("[GameState] Save slot %d deleted" % slot)
-
 
 func reset_save_data() -> void:
 	_save_data = {
@@ -411,24 +372,20 @@ func reset_save_data() -> void:
 	}
 	_is_dirty = true
 
-
-# ─── Settings System ────────────────────────────────────────────────────────
-
 func save_settings() -> void:
 	var config = ConfigFile.new()
-	
+
 	for section in _settings:
 		for key in _settings[section]:
 			config.set_value(section, key, _settings[section][key])
-	
+
 	config.save(SETTINGS_PATH)
 	print("[GameState] Settings saved")
-
 
 func load_settings() -> void:
 	var config = ConfigFile.new()
 	var err = config.load(SETTINGS_PATH)
-	
+
 	if err == OK:
 		for section in _settings:
 			if config.has_section(section):
@@ -440,12 +397,10 @@ func load_settings() -> void:
 	else:
 		print("[GameState] No settings found, using defaults")
 
-
 func get_setting(category: String, key: String):
 	if _settings.has(category) and _settings[category].has(key):
 		return _settings[category][key]
 	return null
-
 
 func set_setting(category: String, key: String, value: Variant) -> void:
 	if _settings.has(category):
@@ -453,24 +408,23 @@ func set_setting(category: String, key: String, value: Variant) -> void:
 		setting_changed.emit(category, key, value)
 		_apply_setting_change(category, key, value)
 
-
 func _apply_settings() -> void:
-	# Apply all settings on load
 	if AudioManager:
 		AudioManager.master_volume = _settings.audio.master
 		AudioManager.music_volume = _settings.audio.music
 		AudioManager.sfx_volume = _settings.audio.sfx
 		AudioManager.music_muted = _settings.audio.mute_music
 		AudioManager.sfx_muted = _settings.audio.mute_sfx
-	
-	# Apply Video
+
 	var win_mode = DisplayServer.WINDOW_MODE_FULLSCREEN if _settings.video.fullscreen else DisplayServer.WINDOW_MODE_WINDOWED
 	if DisplayServer.window_get_mode() != win_mode:
 		DisplayServer.window_set_mode(win_mode)
-
+		
+	var vsync_mode = DisplayServer.VSYNC_ENABLED if _settings.video.vsync else DisplayServer.VSYNC_DISABLED
+	if DisplayServer.window_get_vsync_mode() != vsync_mode:
+		DisplayServer.window_set_vsync_mode(vsync_mode)
 
 func _apply_setting_change(category: String, key: String, value: Variant) -> void:
-	# Immediate feedback for setting changes
 	if category == "audio" and AudioManager:
 		match key:
 			"master": AudioManager.master_volume = value
@@ -481,14 +435,19 @@ func _apply_setting_change(category: String, key: String, value: Variant) -> voi
 	elif category == "video":
 		match key:
 			"fullscreen":
+				var win_mode = DisplayServer.WINDOW_MODE_FULLSCREEN if value else DisplayServer.WINDOW_MODE_WINDOWED
+				DisplayServer.window_set_mode(win_mode)
+			"vsync":
+				var vsync_mode = DisplayServer.VSYNC_ENABLED if value else DisplayServer.VSYNC_DISABLED
+				DisplayServer.window_set_vsync_mode(vsync_mode)
+	elif category == "video":
+		match key:
+			"fullscreen":
 				var mode = DisplayServer.WINDOW_MODE_FULLSCREEN if value else DisplayServer.WINDOW_MODE_WINDOWED
 				DisplayServer.window_set_mode(mode)
 			"vsync":
 				var mode = DisplayServer.VSYNC_ENABLED if value else DisplayServer.VSYNC_DISABLED
 				DisplayServer.window_set_vsync_mode(mode)
-
-
-# ─── Helper Functions ───────────────────────────────────────────────────────
 
 func _merge_dict(target: Dictionary, patch: Dictionary) -> Dictionary:
 	var result = target.duplicate(true)
@@ -499,13 +458,7 @@ func _merge_dict(target: Dictionary, patch: Dictionary) -> Dictionary:
 			result[key] = patch[key]
 	return result
 
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# RESET FUNCTIONALITY
-# ═══════════════════════════════════════════════════════════════════════════════
-
 func reset() -> void:
-	"""Reset the game state to initial values - called when starting a new game"""
 	_save_data = {
 		"version": CURRENT_VERSION,
 		"meta": {
@@ -539,12 +492,9 @@ func reset() -> void:
 		"achievements": {},
 	}
 
-
 func get_world_name(world: int) -> String:
-	"""Get display name for a world - delegates to LevelManager"""
 	if LevelManager:
 		return LevelManager.get_world_name(world)
-	# Fallback if LevelManager not available
 	var world_names := {
 		1: "Meadow",
 		2: "Volcano",

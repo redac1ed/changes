@@ -20,14 +20,13 @@ var _impact_kill_window: float = 0.0
 
 func _trap_ready() -> void:
 	trap_type = TrapType.CRUSHER
-	# Extend crusher length (horizontal) while keeping height the same.
+
 	var crusher_size := Vector2(trap_size.x + extra_length, trap_size.y)
 	var shape := _collision_shape.shape as RectangleShape2D
 	if shape:
 		shape.size = crusher_size
 		trap_size = crusher_size
 
-	# Impact particles
 	_impact_particles = CPUParticles2D.new()
 	_impact_particles.emitting = false
 	_impact_particles.one_shot = true
@@ -57,7 +56,7 @@ func _trap_process(delta: float) -> void:
 				_state = CrusherState.WARNING
 				_state_timer = warning_time
 		CrusherState.WARNING:
-			# Vibrate warning
+
 			var shake := sin(_time_elapsed * 30.0) * 2.0
 			position.x = _original_position_x() + shake
 			if _state_timer <= 0:
@@ -81,14 +80,13 @@ func _trap_process(delta: float) -> void:
 				_slam_progress = 0
 				_state = CrusherState.UP
 				_state_timer = wait_time_up
-	# Update collision position
-	_collision_shape.position = Vector2(0, _slam_progress)
 
+	_collision_shape.position = Vector2(0, _slam_progress)
 
 func _on_body_entered(body: Node2D) -> void:
 	if not is_active:
 		return
-	# Crusher should only damage at the impact moment (full squash at the bottom).
+
 	if _impact_kill_window <= 0.0:
 		return
 	if body is RigidBody2D:
@@ -103,23 +101,19 @@ func _original_position_x() -> float:
 		_orig_x_set = true
 	return _orig_x_cached
 
-
 func _on_slam_impact() -> void:
 	_impact_particles.restart()
 	_impact_particles.emitting = true
 	_flash_timer = 0.2
 	_impact_kill_window = 0.12
 
-	# Kill anything currently under the crusher right at impact.
 	for body in get_overlapping_bodies():
 		if body is RigidBody2D:
 			_kill_ball(body)
-	
-	# Screen shake via camera
+
 	var cam := get_viewport().get_camera_2d()
 	if cam and cam.has_method("_on_impact"):
 		cam._on_impact(slam_shake)
-
 
 func _draw() -> void:
 	if not is_active:
@@ -129,13 +123,11 @@ func _draw() -> void:
 	var offset := Vector2(0, _slam_progress)
 	var block_rect := Rect2(Vector2(-half.x, -half.y) + offset, trap_size)
 
-	# Mount rail
 	draw_rect(
 		Rect2(Vector2(-5, 0), Vector2(10, crush_distance)),
 		Color(0.2, 0.2, 0.22, 0.45), true
 	)
 
-	# Big rectangular rock (chipped boulder slab)
 	var rock_points := PackedVector2Array([
 		block_rect.position + Vector2(4, 1),
 		block_rect.position + Vector2(block_rect.size.x - 3, 2),
@@ -147,13 +139,11 @@ func _draw() -> void:
 		block_rect.position + Vector2(1, 4),
 	])
 
-	# Shadow
 	var shadow_points := PackedVector2Array()
 	for p in rock_points:
 		shadow_points.append(p + Vector2(4, 4))
 	draw_colored_polygon(shadow_points, Color(0, 0, 0, 0.28))
 
-	# Main rock color + warning tint
 	var rock_color := Color(0.42, 0.4, 0.36, 1.0)
 	if _state == CrusherState.WARNING:
 		var flash := sin(_time_elapsed * 15.0) * 0.5 + 0.5
@@ -162,7 +152,6 @@ func _draw() -> void:
 	draw_colored_polygon(rock_points, rock_color)
 	draw_polyline(rock_points, Color(0.24, 0.23, 0.21, 0.95), 2.2, true)
 
-	# Layered stone bands
 	draw_line(
 		block_rect.position + Vector2(6, block_rect.size.y * 0.34),
 		block_rect.position + Vector2(block_rect.size.x - 6, block_rect.size.y * 0.28),
@@ -174,7 +163,6 @@ func _draw() -> void:
 		Color(0.35, 0.33, 0.30, 0.45), 1.8
 	)
 
-	# Cracks
 	var crack := Color(0.23, 0.22, 0.20, 0.8)
 	draw_line(
 		block_rect.position + Vector2(block_rect.size.x * 0.22, 6),
@@ -192,7 +180,6 @@ func _draw() -> void:
 		crack, 1.2
 	)
 
-	# Bottom warning stripe (readability/gameplay clarity)
 	var stripe_h := 7.0
 	var stripe_y := block_rect.position.y + block_rect.size.y - stripe_h
 	var stripe_count := int(block_rect.size.x / 12.0)
@@ -207,7 +194,6 @@ func _draw() -> void:
 				true
 			)
 
-	# Impact flash
 	if _flash_timer > 0:
 		var fa := _flash_timer / 0.2
 		draw_colored_polygon(rock_points, Color(1.0, 0.92, 0.75, fa * 0.22))

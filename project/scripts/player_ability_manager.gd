@@ -24,7 +24,6 @@ func process_abilities(delta: float) -> void:
 	_handle_input()
 
 func unlock_ability(type: AbilityType) -> void:
-	# Store in GameState
 	pass
 
 func activate_ability(type: AbilityType) -> bool:
@@ -45,7 +44,7 @@ func activate_ability(type: AbilityType) -> bool:
 		AbilityType.GHOST:
 			_active_ability = AbilityType.GHOST
 			_timers[AbilityType.GHOST] = GHOST_DURATION
-			_player.set_collision_mask_value(1, false) # Phase through walls
+			_player.set_collision_mask_value(1, false)
 			_player.modulate.a = 0.5
 			_start_cooldown(AbilityType.GHOST, 15.0)
 	ability_activated.emit(type)
@@ -58,11 +57,11 @@ func _handle_input() -> void:
 		activate_ability(AbilityType.BRAKE)
 
 func _update_timers(delta: float) -> void:
-	# Cooldowns
+
 	for type in _cooldowns.keys():
 		if _cooldowns[type] > 0:
 			_cooldowns[type] -= delta
-	# Active effects
+
 	for type in _timers.keys():
 		if _timers[type] > 0:
 			_timers[type] -= delta

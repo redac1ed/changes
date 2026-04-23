@@ -37,7 +37,6 @@ var level_time: float = 0.0
 var _restart_cooldown: float = 0.0
 var _spawn_position: Vector2
 
-
 func _ready() -> void:
 	print("[Level] Initializing world=%d level=%d" % [world_number, level_number])
 
@@ -80,7 +79,6 @@ func _ready() -> void:
 		transition_fx.play_out(SceneTransitionFX.TransitionType.FADE, 0.5)
 
 	print("[Level] Ready — bounds=%s" % [camera_limits])
-
 
 func _process(delta: float) -> void:
 	if level_complete:
@@ -131,7 +129,7 @@ func _apply_camera_stop_markers() -> bool:
 	print("[Level] Camera limits from stop markers: %s" % [camera_limits])
 	return true
 
-func _auto_detect_camera_limits() -> void: # important for lvl enhancement!!!!
+func _auto_detect_camera_limits() -> void:
 	var found := false
 	var min_pos := Vector2(INF, INF)
 	var max_pos := Vector2(-INF, -INF)

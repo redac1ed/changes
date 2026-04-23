@@ -18,7 +18,6 @@ func _ready() -> void:
 	_container.modulate.a    = 0.0
 	add_child(_container)
 
-	# Dark letterbox strip
 	var bg := ColorRect.new()
 	bg.color = Color(0.0, 0.0, 0.0, 0.62)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)

@@ -19,11 +19,11 @@ func _trap_ready() -> void:
 	trap_type = TrapType.SAW_BLADE
 	trap_size = Vector2(blade_radius * 2, blade_radius * 2)
 	_start_pos = position
-	# Circular collision
+
 	if _collision_shape and _collision_shape.shape:
 		_collision_shape.shape = CircleShape2D.new()
 		(_collision_shape.shape as CircleShape2D).radius = blade_radius - 2
-	# Spark particles
+
 	_chain_particles = CPUParticles2D.new()
 	_chain_particles.emitting = false
 	_chain_particles.one_shot = true
@@ -56,28 +56,28 @@ func _draw() -> void:
 		_draw_inactive()
 		return
 	var center := Vector2.ZERO
-	# Outer teeth ring
+
 	for i in range(teeth_count):
 		var angle := _spin_angle + i * (TAU / teeth_count)
 		var next_angle := angle + (TAU / teeth_count) * 0.4
-		
+
 		var outer_p := center + Vector2(cos(angle), sin(angle)) * blade_radius
 		var inner_p := center + Vector2(cos(angle), sin(angle)) * (blade_radius * 0.7)
 		var next_inner := center + Vector2(cos(next_angle), sin(next_angle)) * (blade_radius * 0.7)
-		
+
 		var tooth := PackedVector2Array([inner_p, outer_p, next_inner])
 		draw_colored_polygon(tooth, damage_color)
-	# Inner disc
+
 	draw_circle(center, blade_radius * 0.7, body_color)
 	draw_arc(center, blade_radius * 0.7, 0, TAU, 24, body_color.darkened(0.15), 2.0)
-	# Center hole
+
 	draw_circle(center, blade_radius * 0.15, Color(0.3, 0.3, 0.35, 1.0))
 	draw_circle(center, blade_radius * 0.08, Color(0.5, 0.5, 0.55, 1.0))
-	# Highlight
+
 	var highlight_angle := _spin_angle * 0.5
 	var hl_pos := center + Vector2(cos(highlight_angle), sin(highlight_angle)) * blade_radius * 0.4
 	draw_circle(hl_pos, 2.0, Color(1.0, 1.0, 1.0, 0.3))
-	# Flash on kill
+
 	if _flash_timer > 0:
 		var flash_alpha := _flash_timer / 0.3
 		draw_circle(center, blade_radius + 4, Color(1.0, 0.3, 0.2, flash_alpha * 0.3))

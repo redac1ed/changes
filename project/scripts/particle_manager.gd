@@ -1,20 +1,5 @@
 extends Node
-# class_name ParticleManager
 
-## ═══════════════════════════════════════════════════════════════════════════════
-## ParticleManager — Advanced Effect Pooling System
-## ═══════════════════════════════════════════════════════════════════════════════
-##
-## Centralized system for visual effects. Uses object pooling to reuse nodes
-## and minimize instantiation overhead. Supports CPUParticles2D and GPUParticles2D.
-##
-## Features:
-## - Object Pooling for multiple effect types
-## - Preset system for quick configuration
-## - Global scale/quality settings integration
-## - One-shot fire-and-forget API
-
-# ─── Configuration ───────────────────────────────────────────────────────────
 const POOL_SIZE := 32
 const MAX_ACTIVE_PARTICLES := 128
 
@@ -29,54 +14,37 @@ enum EffectType {
 	WATER_SPLASH
 }
 
-# ─── State ───────────────────────────────────────────────────────────────────
 var _pools: Dictionary = {} # Key: EffectType, Value: Array[Node2D]
 var _active_particles: Array[Node2D] = []
-
-# ─── Lifecycle ──────────────────────────────────────────────────────────────
 
 func _ready() -> void:
 	print("[ParticleManager] Initializing particle pools...")
 	_initialize_pools()
 
-
 func _process(delta: float) -> void:
-	# Cleanup finished particles if needed
 	pass
-
-
-# ─── Public API ─────────────────────────────────────────────────────────────
 
 func play(type: EffectType, position: Vector2, color: Color = Color.WHITE, direction: Vector2 = Vector2.UP) -> void:
 	if not _pools.has(type):
 		return
-	
 	var pool: Array = _pools[type]
 	var p: CPUParticles2D = null
-	
-	# Find available particle in pool
 	for candidate in pool:
 		if not candidate.emitting:
 			p = candidate
 			break
-	
-	# If pool exhausted, maybe expand?
 	if not p:
 		if pool.size() < MAX_ACTIVE_PARTICLES:
 			p = _create_particle_node(type)
 			add_child(p)
 			pool.append(p)
 		else:
-			# Steal oldest? Or just skip.
 			return
-	
-	# Configure and play
 	p.global_position = position
 	p.color = color
 	p.direction = direction
 	p.restart()
 	p.emitting = true
-
 
 func create_trail(target: Node2D, color: Color = Color.WHITE) -> Line2D:
 	var trail = Line2D.new()
@@ -85,7 +53,6 @@ func create_trail(target: Node2D, color: Color = Color.WHITE) -> Line2D:
 	trail.gradient = Gradient.new()
 	trail.gradient.set_color(0, color)
 	trail.gradient.set_color(1, Color(color.r, color.g, color.b, 0.0))
-	
 	var script = GDScript.new()
 	script.source_code = """
 extends Line2D
@@ -109,25 +76,20 @@ func _process(delta):
 	get_parent().add_child(trail)
 	return trail
 
-
-# ─── Internal: Pooling ──────────────────────────────────────────────────────
-
 func _initialize_pools() -> void:
 	for type in EffectType.values():
 		_pools[type] = []
-		for i in range(5): # Prewarm a few
+		for i in range(5): 
 			var p = _create_particle_node(type)
 			add_child(p)
 			_pools[type].append(p)
-
 
 func _create_particle_node(type: int) -> CPUParticles2D:
 	var p = CPUParticles2D.new()
 	p.emitting = false
 	p.one_shot = true
 	p.explosiveness = 0.9
-	p.local_coords = false # World space simulation
-	
+	p.local_coords = false 
 	match type:
 		EffectType.IMPACT_SMALL:
 			p.amount = 8
@@ -138,7 +100,6 @@ func _create_particle_node(type: int) -> CPUParticles2D:
 			p.initial_velocity_max = 100.0
 			p.scale_amount_min = 2.0
 			p.scale_amount_max = 4.0
-			
 		EffectType.IMPACT_LARGE:
 			p.amount = 20
 			p.lifetime = 0.5
@@ -148,7 +109,6 @@ func _create_particle_node(type: int) -> CPUParticles2D:
 			p.initial_velocity_max = 200.0
 			p.scale_amount_min = 3.0
 			p.scale_amount_max = 6.0
-			
 		EffectType.EXPLOSION:
 			p.amount = 40
 			p.lifetime = 0.8
@@ -162,7 +122,6 @@ func _create_particle_node(type: int) -> CPUParticles2D:
 			p.color_ramp.add_point(0.0, Color(1, 1, 0)) # Yellow
 			p.color_ramp.add_point(0.5, Color(1, 0, 0)) # Red
 			p.color_ramp.add_point(1.0, Color(0.2, 0.2, 0.2, 0)) # Smoke
-			
 		EffectType.SPARKLE:
 			p.amount = 5
 			p.lifetime = 0.6
@@ -172,7 +131,6 @@ func _create_particle_node(type: int) -> CPUParticles2D:
 			p.initial_velocity_max = 40.0
 			p.angular_velocity_min = 100.0
 			p.angular_velocity_max = 200.0
-			
 		EffectType.CONFETTI:
 			p.amount = 30
 			p.lifetime = 2.0
@@ -187,5 +145,4 @@ func _create_particle_node(type: int) -> CPUParticles2D:
 			p.scale_amount_max = 5.0
 			p.hue_variation_min = 0.0
 			p.hue_variation_max = 1.0 # Rainbow
-			
 	return p

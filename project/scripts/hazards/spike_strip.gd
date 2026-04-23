@@ -5,7 +5,7 @@ enum SpikeOrientation { FLOOR, CEILING, LEFT_WALL, RIGHT_WALL }
 
 @export_category("Spike Settings")
 @export var orientation: SpikeOrientation = SpikeOrientation.FLOOR
-@export var spike_count: int = 0  ## 0 = auto from size
+@export var spike_count: int = 0
 @export var spike_height_ratio: float = 0.65
 @export var gleam_speed: float = 2.0
 @export var gleam_enabled: bool = true

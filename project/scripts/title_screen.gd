@@ -6,11 +6,9 @@ enum MenuState { MAIN, WORLD_SELECT, SETTINGS, CREDITS, SHOP }
 var current_state: MenuState = MenuState.MAIN
 
 const WORLDS = [
-		{"name": "Meadow", "subtitle": "Rolling green hills", "color": Color(0.45, 0.82, 0.45), "icon": "M", "levels": 3},
+	{"name": "Meadow", "subtitle": "Rolling green hills", "color": Color(0.45, 0.82, 0.45), "icon": "M", "levels": 3},
 	{"name": "Volcano", "subtitle": "Fiery obstacles", "color": Color(0.95, 0.35, 0.2), "icon": "V", "levels": 3},
-	{"name": "Sky", "subtitle": "Wind-swept heights", "color": Color(0.55, 0.78, 0.95), "icon": "S", "levels": 3},
-	{"name": "Ocean", "subtitle": "Deep currents", "color": Color(0.2, 0.5, 0.85), "icon": "O", "levels": 3},
-	{"name": "Space", "subtitle": "Zero gravity", "color": Color(0.6, 0.4, 0.9), "icon": "X", "levels": 3},
+	{"name": "Snow", "subtitle": "Icy terrain", "color": Color(0.85, 0.9, 0.95), "icon": "N", "levels": 3},
 ]
 var bg_layer: Control
 var title_label: Label
@@ -88,7 +86,7 @@ func _ready() -> void:
 	tween.tween_property(self, "modulate:a", 1.0, 0.8).set_ease(Tween.EASE_OUT)
 
 func _exit_tree() -> void:
-	# Stop title screen music when leaving the title screen
+
 	if AudioManager:
 		AudioManager.stop_music()
 
@@ -103,12 +101,12 @@ func _build_background() -> void:
 	bg_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg_layer)
-	# Pure black base
+
 	var bg := ColorRect.new()
 	bg.color = Color(0.0, 0.0, 0.0, 1.0)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg_layer.add_child(bg)
-	# Starfield — greyscale, subtle
+
 	var starfield_tex := TextureRect.new()
 	starfield_tex.texture = load("res://assets/sprites/pixelart_starfield.png")
 	starfield_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
@@ -116,7 +114,7 @@ func _build_background() -> void:
 	starfield_tex.modulate = Color(0.55, 0.55, 0.55, 0.75)
 	starfield_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bg_layer.add_child(starfield_tex)
-	# Visualizer bars — centered, white, translucent
+
 	var visualizer_width := SCREEN_W - VISUALIZER_SIDE_PADDING * 2.0
 	var bar_width := 4.0
 	var bar_spacing := visualizer_width / float(VISUALIZER_BAR_COUNT)
@@ -138,13 +136,13 @@ func _build_background() -> void:
 	_next_visualizer_shuffle_time = time_elapsed + 5.0
 
 func _setup_spectrum() -> void:
-	# Find Music bus, fall back to Master
+
 	var bus_idx := AudioServer.get_bus_index("Music")
 	if bus_idx < 0:
 		bus_idx = AudioServer.get_bus_index("Master")
 	if bus_idx < 0:
 		return
-	# Remove duplicate spectrum effects from previous loads
+
 	for i in range(AudioServer.get_bus_effect_count(bus_idx) - 1, -1, -1):
 		if AudioServer.get_bus_effect(bus_idx, i) is AudioEffectSpectrumAnalyzer:
 			AudioServer.remove_bus_effect(bus_idx, i)
@@ -184,7 +182,7 @@ func _update_background(delta: float) -> void:
 	if time_elapsed >= _next_visualizer_shuffle_time:
 		visualizer_index_order.shuffle()
 		_next_visualizer_shuffle_time = time_elapsed + 5.0
-		
+
 func _build_rolling_ball() -> void:
 	rolling_ball = Panel.new()
 	rolling_ball.size = Vector2(BALL_SIZE, BALL_SIZE)
@@ -412,10 +410,7 @@ func _build_world_panel() -> void:
 		var cx: float = start_x + (card_w + gap_x) * col
 		var cy: float = start_y + (card_h + gap_y) * row
 		_build_world_card(WORLDS[i], i, cx, cy, card_w, card_h)
-	var back_btn := _create_menu_button("<- back", 16)
-	back_btn.position = Vector2(SCREEN_W / 2.0 - 190, SCREEN_H - 65)
-	back_btn.pressed.connect(_on_back_to_main)
-	world_panel.add_child(back_btn)
+	_add_panel_back_button(world_panel)
 
 func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float, h: float) -> void:
 	var card := Panel.new()
@@ -521,7 +516,6 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 	pbtn.pressed.connect(_on_world_play.bind(world_number))
 	card.add_child(pbtn)
 
-
 func _build_settings_panel() -> void:
 	settings_panel = Control.new()
 	settings_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -617,10 +611,7 @@ func _build_settings_panel() -> void:
 	reset_btn.add_theme_color_override("font_hover_color", Color(0.85, 0.85, 0.85))
 	reset_btn.pressed.connect(_on_reset_progress)
 	card.add_child(reset_btn)
-	var back_btn := _create_menu_button("<- back", 16)
-	back_btn.position = Vector2(SCREEN_W / 2.0 - 190, SCREEN_H - 65)
-	back_btn.pressed.connect(_on_back_to_main)
-	settings_panel.add_child(back_btn)
+	_add_panel_back_button(settings_panel)
 
 func _build_slider(parent: Control, label_text: String, y_pos: float, initial: float, callback: String) -> void:
 	var lbl := Label.new()
@@ -693,14 +684,14 @@ func _build_credits_panel() -> void:
 	var y_offset: float = 100.0
 	for i in entries.size():
 		var entry: Dictionary = entries[i]
-		# Hairline divider between entries
+
 		if i > 0:
 			var div := ColorRect.new()
 			div.position = Vector2(80, y_offset - 10)
 			div.size = Vector2(400, 1)
 			div.color = Color(1.0, 1.0, 1.0, 0.07)
 			card.add_child(div)
-		# Role — small uppercase accent label
+
 		var role_lbl := Label.new()
 		role_lbl.text = entry["role"].to_upper()
 		role_lbl.position = Vector2(40, y_offset)
@@ -709,7 +700,7 @@ func _build_credits_panel() -> void:
 		role_lbl.add_theme_font_size_override("font_size", 10)
 		role_lbl.add_theme_color_override("font_color", Color(0.45, 0.72, 1.0, 0.75))
 		card.add_child(role_lbl)
-		# Name — larger, near-white
+
 		var name_lbl := Label.new()
 		name_lbl.text = entry["name"]
 		name_lbl.position = Vector2(40, y_offset + 17)
@@ -728,10 +719,7 @@ func _build_credits_panel() -> void:
 	love_lbl.add_theme_font_size_override("font_size", 13)
 	love_lbl.add_theme_color_override("font_color", Color(0.35, 0.35, 0.35))
 	card.add_child(love_lbl)
-	var back_btn := _create_menu_button("<- back", 16)
-	back_btn.position = Vector2(SCREEN_W / 2.0 - 190, SCREEN_H - 65)
-	back_btn.pressed.connect(_on_back_to_main)
-	credits_panel.add_child(back_btn)
+	_add_panel_back_button(credits_panel)
 
 func _build_shop_panel() -> void:
 	var shop = ShopMenuScene.new()
@@ -739,12 +727,7 @@ func _build_shop_panel() -> void:
 	shop.visible = false
 	add_child(shop)
 	panels["shop"] = shop
-	var back_btn = Button.new()
-	back_btn.text = "Back"
-	back_btn.position = Vector2(40, 40)
-	back_btn.size = Vector2(100, 40)
-	back_btn.pressed.connect(_on_back_pressed)
-	shop.add_child(back_btn)
+	_add_panel_back_button(shop)
 	shop.back_requested.connect(func():
 		_show_panel("main")
 	)
@@ -754,6 +737,50 @@ func _on_shop_pressed() -> void:
 		_build_shop_panel()
 	_show_panel("shop")
 	move_child(mute_btn, get_child_count() - 1)
+
+func _add_panel_back_button(panel: Control) -> void:
+	var back_btn := Button.new()
+	back_btn.text = "← Back"
+	back_btn.custom_minimum_size = Vector2(140, 50)
+	back_btn.position = Vector2(SCREEN_W / 2.0 - 70, SCREEN_H - 75)
+	back_btn.size = Vector2(140, 50)
+	back_btn.add_theme_font_size_override("font_size", 16)
+	
+	# Enhanced dark background style
+	var style_n := StyleBoxFlat.new()
+	style_n.bg_color = Color(0.0, 0.0, 0.0, 0.7)
+	style_n.border_width_left = 2
+	style_n.border_width_top = 2
+	style_n.border_width_right = 2
+	style_n.border_width_bottom = 2
+	style_n.border_color = Color(0.85, 0.6, 0.2, 0.8)
+	style_n.corner_radius_top_left = 4
+	style_n.corner_radius_top_right = 4
+	style_n.corner_radius_bottom_left = 4
+	style_n.corner_radius_bottom_right = 4
+	style_n.content_margin_left = 12
+	style_n.content_margin_right = 12
+	style_n.content_margin_top = 8
+	style_n.content_margin_bottom = 8
+	
+	# Hover state - brighter golden border and lighter bg
+	var style_h := style_n.duplicate()
+	style_h.bg_color = Color(0.1, 0.1, 0.1, 0.9)
+	style_h.border_color = Color(1.0, 0.85, 0.3, 1.0)
+	
+	# Pressed state - darker with glow
+	var style_p := style_n.duplicate()
+	style_p.bg_color = Color(0.0, 0.0, 0.0, 0.85)
+	style_p.border_color = Color(1.0, 0.9, 0.4, 0.9)
+	
+	back_btn.add_theme_stylebox_override("normal", style_n)
+	back_btn.add_theme_stylebox_override("hover", style_h)
+	back_btn.add_theme_stylebox_override("pressed", style_p)
+	back_btn.add_theme_color_override("font_color", Color(0.85, 0.7, 0.3))
+	back_btn.add_theme_color_override("font_hover_color", Color(1.0, 0.9, 0.4))
+	back_btn.pressed.connect(_on_back_pressed)
+	back_btn.mouse_entered.connect(_on_button_hover.bind(back_btn))
+	panel.add_child(back_btn)
 
 func _create_menu_button(text: String, font_size: int) -> Button:
 	var btn := Button.new()
@@ -860,7 +887,7 @@ func _on_button_hover(btn: Button) -> void:
 
 func _on_play_pressed() -> void:
 	_play_tv_close_and_load(func() -> void:
-		
+
 		LevelManager.load_world(1)
 	)
 
@@ -925,7 +952,4 @@ func _on_reset_progress() -> void:
 	_build_world_panel()
 
 func _on_back_pressed() -> void:
-	if panels.has("shop"):
-		panels["shop"].visible = false
-	# Or maybe go back to main menu?
-	# For now just hide shop as it's the only one adding a back button connected to this
+	_show_panel("main")

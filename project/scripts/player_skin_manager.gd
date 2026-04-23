@@ -65,8 +65,7 @@ func apply_skin(skin_id: String) -> void:
 	var sprite = _player.get_node_or_null("Sprite2D")
 	if sprite:
 		if data.texture:
-			# sprite.texture = load(data.texture)
-			pass # Placeholder for actual resource loading
+			pass
 		else:
 			sprite.texture = null
 	_player.queue_redraw()

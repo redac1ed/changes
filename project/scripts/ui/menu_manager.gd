@@ -30,9 +30,9 @@ func register_menu(name: String, node: Control) -> void:
 func push_menu(name: String, params: Dictionary = {}) -> void:
 	if not _registered_menus.has(name):
 		push_error("[MenuManager] Menu not found: %s" % name)
-		return	
+		return
 	var menu = _registered_menus[name]
-	# If menu already in stack, pop until we reach it
+
 	if menu in _menu_stack:
 		while _menu_stack.back() != menu:
 			pop_menu()
@@ -43,7 +43,7 @@ func push_menu(name: String, params: Dictionary = {}) -> void:
 	_animate_in(menu)
 	if menu.has_method("on_open"):
 		menu.on_open(params)
-	# Show overlay if stack was empty
+
 	if _menu_stack.size() == 1:
 		_fade_overlay(true)
 		get_tree().paused = true
@@ -57,8 +57,7 @@ func pop_menu() -> void:
 	if menu.has_method("on_close"):
 		menu.on_close()
 	menu_closed.emit(menu.name)
-	
-	# Show previous menu if exists
+
 	if _menu_stack.size() > 0:
 		var prev = _menu_stack.back()
 		_animate_in(prev)
@@ -70,7 +69,7 @@ func pop_menu() -> void:
 
 func clear_menus() -> void:
 	while not _menu_stack.is_empty():
-		pop_menu()	
+		pop_menu()
 	if _overlay:
 		_fade_overlay(false)
 	get_tree().paused = false

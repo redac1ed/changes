@@ -35,24 +35,22 @@ var _draw_node: Control
 
 func _ready() -> void:
 	layer = 10
-	
+
 	_draw_node = Control.new()
 	_draw_node.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_draw_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_draw_node.draw.connect(_on_draw)
 	add_child(_draw_node)
-	
+
 	if GameState and GameState.has_signal("level_completed_event"):
 		GameState.level_completed_event.connect(_on_level_completed)
-
 
 func _process(delta: float) -> void:
 	if is_paused:
 		return
-	
+
 	_time_elapsed += delta
-	
-	# Animations
+
 	if _shot_flash > 0:
 		_shot_flash -= delta * 3.0
 	if combo_timer > 0:
@@ -61,16 +59,14 @@ func _process(delta: float) -> void:
 			combo_multiplier = 1
 	if _combo_scale > 1.0:
 		_combo_scale = move_toward(_combo_scale, 1.0, delta * 4.0)
-	
-	# Update notifications
+
 	var i := _notifications.size() - 1
 	while i >= 0:
 		_notifications[i]["time"] += delta
 		if _notifications[i]["time"] >= _notification_lifetime:
 			_notifications.remove_at(i)
 		i -= 1
-	
-	# Update score popups
+
 	i = _score_popup_items.size() - 1
 	while i >= 0:
 		_score_popup_items[i]["time"] += delta
@@ -78,7 +74,7 @@ func _process(delta: float) -> void:
 		if _score_popup_items[i]["time"] >= 1.5:
 			_score_popup_items.remove_at(i)
 		i -= 1
-	
+
 	_draw_node.queue_redraw()
 
 func add_shot() -> void:
@@ -138,7 +134,7 @@ func _on_draw() -> void:
 	_draw_star_preview()
 
 func _draw_top_bar() -> void:
-	# Subtle gradient bar across top
+
 	var bar_h := 44.0
 	for i in range(int(bar_h)):
 		var t := float(i) / bar_h
@@ -147,7 +143,7 @@ func _draw_top_bar() -> void:
 		_draw_node.draw_line(
 			Vector2(0, i), Vector2(SCREEN_W, i), c, 1.0
 		)
-	# Bottom edge
+
 	_draw_node.draw_line(
 		Vector2(0, bar_h), Vector2(SCREEN_W, bar_h),
 		Color(0.3, 0.35, 0.55, 0.25), 1.0
@@ -158,13 +154,13 @@ func _draw_shot_counter() -> void:
 	var y := 12.0
 	var panel := Rect2(x - 4, y - 2, 100, 28)
 	_draw_panel(panel)
-	# Arrow icon for shots
+
 	var ix := x + 10
 	var iy := y + 13
 	var shot_c := HUD_ACCENT
 	if _shot_flash > 0:
 		shot_c = shot_c.lerp(Color.WHITE, _shot_flash)
-	# Arrow shape
+
 	_draw_node.draw_line(Vector2(ix, iy), Vector2(ix + 12, iy), shot_c, 2.0)
 	_draw_node.draw_line(Vector2(ix + 8, iy - 4), Vector2(ix + 12, iy), shot_c, 2.0)
 	_draw_node.draw_line(Vector2(ix + 8, iy + 4), Vector2(ix + 12, iy), shot_c, 2.0)
@@ -180,8 +176,7 @@ func _draw_timer() -> void:
 	var secs := int(level_time) % 60
 	var ms := int(fmod(level_time, 1.0) * 100)
 	var time_str := "%d:%02d.%02d" % [mins, secs, ms]
-	
-	# Clock icon
+
 	var cx := x + 12
 	var cy := y + 13
 	_draw_node.draw_arc(Vector2(cx, cy), 7.0, 0, TAU, 12, HUD_TEXT_COLOR.darkened(0.2), 1.5)
@@ -193,20 +188,19 @@ func _draw_timer() -> void:
 func _draw_combo_display() -> void:
 	if combo_multiplier <= 1:
 		return
-	
+
 	var x := SCREEN_W / 2.0
 	var y := 16.0
 	var text := "x%d COMBO" % combo_multiplier
 	var font := ThemeDB.fallback_font
 	var font_size := int(20 * _combo_scale)
-	
-	# Glow behind
+
 	var glow_alpha := 0.3 * (combo_timer / 3.0)
 	var glow_color := Color(COMBO_COLOR.r, COMBO_COLOR.g, COMBO_COLOR.b, glow_alpha)
 	_draw_node.draw_circle(Vector2(x, y + 8), 25.0 * _combo_scale, glow_color)
-	# Text shadow
+
 	_draw_node.draw_string(font, Vector2(x - 40 + 1, y + 15 + 1), text, HORIZONTAL_ALIGNMENT_CENTER, 80, font_size, Color(0, 0, 0, 0.5))
-	# Text
+
 	var combo_c := COMBO_COLOR
 	if combo_multiplier >= 4:
 		combo_c = COMBO_COLOR.lerp(Color(1, 0.2, 0.2), sin(_time_elapsed * 6.0) * 0.5 + 0.5)
@@ -217,8 +211,7 @@ func _draw_level_indicator() -> void:
 	var text := "%s - Level %d" % [world_name, level_number]
 	var x := SCREEN_W / 2.0 - 60
 	var y := SCREEN_H - 14.0
-	
-	# Subtle bottom bar
+
 	var bar_y := SCREEN_H - 30
 	for i in range(30):
 		var t := float(i) / 30.0
@@ -227,12 +220,12 @@ func _draw_level_indicator() -> void:
 			Vector2(0, bar_y + i), Vector2(SCREEN_W, bar_y + i),
 			Color(0.03, 0.03, 0.08, alpha), 1.0
 		)
-	
+
 	_draw_node.draw_string(font, Vector2(x + 1, y + 1), text, HORIZONTAL_ALIGNMENT_CENTER, 120, 13, Color(0, 0, 0, 0.5))
 	_draw_node.draw_string(font, Vector2(x, y), text, HORIZONTAL_ALIGNMENT_CENTER, 120, 13, HUD_TEXT_COLOR.darkened(0.2))
 
 func _draw_star_preview() -> void:
-	# Show expected star rating based on current shots
+
 	var stars := GameState.calculate_stars(shot_count) if GameState else 0
 	var x := HUD_MARGIN + 250
 	var y := 18.0
