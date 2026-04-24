@@ -1,10 +1,10 @@
 [gd_scene format=4 uid="uid://dgo7t7gatt4mk"]
 
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="1_2pjsi"]
-[ext_resource type="Script" uid="uid://d14v8untdx8fq" path="res://scripts/levels/level_7.gd" id="1_iebia"]
+[ext_resource type="Script" uid="uid://cvs7m0dg6tims" path="res://scripts/levels/level_7.gd" id="1_iebia"]
 [ext_resource type="Script" uid="uid://dcha457qa82iu" path="res://scripts/hazards/crusher_trap.gd" id="2_iebia"]
-[ext_resource type="Script" uid="uid://c6efpsjrh0xpl" path="res://scripts/hazards/acid_pool.gd" id="3_muy4i"]
-[ext_resource type="Script" uid="uid://bvfhbt3cfch4b" path="res://scripts/hazards/fire_jet.gd" id="4_w4ltw"]
+[ext_resource type="Script" uid="uid://iusfux0eef6l" path="res://scripts/hazards/acid_pool.gd" id="3_muy4i"]
+[ext_resource type="Script" uid="uid://l0bywi05rbna" path="res://scripts/hazards/fire_jet.gd" id="4_w4ltw"]
 [ext_resource type="Script" uid="uid://psmkmssy1pom" path="res://scripts/hazards/saw_blade.gd" id="5_56rvi"]
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="6_tjbhe"]
 
@@ -13,6 +13,8 @@ radius = 35.0
 
 [node name="World2MainLevel2" type="Node2D" unique_id=1620891989]
 script = ExtResource("1_iebia")
+level_number = 2
+world_number = 2
 
 [node name="main_layer" type="TileMapLayer" parent="." unique_id=249277150]
 scale = Vector2(2, 2)

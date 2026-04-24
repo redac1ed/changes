@@ -1,10 +1,10 @@
 [gd_scene format=4 uid="uid://be41lpopybpsp"]
 
 [ext_resource type="Script" uid="uid://bj3a0p5sa0byq" path="res://scripts/levels/level_3.gd" id="1_ph2mh"]
-[ext_resource type="Script" uid="uid://c6efpsjrh0xpl" path="res://scripts/hazards/acid_pool.gd" id="2_ph2mh"]
+[ext_resource type="Script" uid="uid://iusfux0eef6l" path="res://scripts/hazards/acid_pool.gd" id="2_ph2mh"]
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="3_2eyss"]
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="4_y7mlo"]
-[ext_resource type="Script" uid="uid://c8i6e03ee25fj" path="res://scripts/hazards/spike_strip.gd" id="6_ph2mh"]
+[ext_resource type="Script" uid="uid://dusn86fy4y26b" path="res://scripts/hazards/spike_strip.gd" id="6_ph2mh"]
 [ext_resource type="Script" uid="uid://b0dy33wopbxul" path="res://scripts/platforms/bounce_platform.gd" id="6_tdwkj"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4kmhl"]
@@ -14,7 +14,7 @@ radius = 35.0
 
 [node name="world1_main_level3" type="Node2D" unique_id=651641308]
 script = ExtResource("1_ph2mh")
-level_number = 0
+level_number = 3
 metadata/_edit_horizontal_guides_ = [-243.0]
 metadata/_edit_vertical_guides_ = [2754.0, 2752.0, 1888.0]
 

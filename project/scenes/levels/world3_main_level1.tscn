@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dtfgailexb0n3" path="res://scripts/levels/level_11.gd" id="1_u7vba"]
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="2_nvd8k"]
-[ext_resource type="Script" uid="uid://c8i6e03ee25fj" path="res://scripts/hazards/spike_strip.gd" id="3_nvd8k"]
-[ext_resource type="Script" uid="uid://c6efpsjrh0xpl" path="res://scripts/hazards/acid_pool.gd" id="4_3a440"]
+[ext_resource type="Script" uid="uid://dusn86fy4y26b" path="res://scripts/hazards/spike_strip.gd" id="3_nvd8k"]
+[ext_resource type="Script" uid="uid://iusfux0eef6l" path="res://scripts/hazards/acid_pool.gd" id="4_3a440"]
 [ext_resource type="Script" uid="uid://dvu32vnrbeujo" path="res://scripts/platforms/ice_platform.gd" id="5_3a440"]
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="6_xqj56"]
 
@@ -12,6 +12,7 @@ radius = 35.0
 
 [node name="World3MainLevel1" type="Node2D" unique_id=1844345164]
 script = ExtResource("1_u7vba")
+world_number = 3
 metadata/_edit_vertical_guides_ = [3436.0, 2217.0]
 
 [node name="why back" type="Label" parent="." unique_id=625751028]

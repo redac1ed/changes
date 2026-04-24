@@ -1,17 +1,18 @@
 [gd_scene format=4 uid="uid://b7t8k6esamkhi"]
 
-[ext_resource type="Script" uid="uid://cxknmvr2lk2jq" path="res://scripts/levels/level_6.gd" id="1_v1on2"]
+[ext_resource type="Script" uid="uid://ckxgy4xxynb03" path="res://scripts/levels/level_6.gd" id="1_v1on2"]
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="2_2fgn7"]
-[ext_resource type="Script" uid="uid://bvfhbt3cfch4b" path="res://scripts/hazards/fire_jet.gd" id="3_mad0q"]
+[ext_resource type="Script" uid="uid://l0bywi05rbna" path="res://scripts/hazards/fire_jet.gd" id="3_mad0q"]
 [ext_resource type="Script" uid="uid://cjqevsprxqc8g" path="res://scripts/platforms/crumbling_platform.gd" id="4_w0sk0"]
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="5_mad0q"]
-[ext_resource type="Script" uid="uid://c6efpsjrh0xpl" path="res://scripts/hazards/acid_pool.gd" id="6_rls1g"]
+[ext_resource type="Script" uid="uid://iusfux0eef6l" path="res://scripts/hazards/acid_pool.gd" id="6_rls1g"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rls1g"]
 radius = 35.0
 
 [node name="World2MainLevel1" type="Node2D" unique_id=1698080554]
 script = ExtResource("1_v1on2")
+world_number = 2
 metadata/_edit_horizontal_guides_ = [801.0]
 
 [node name="main_layer" type="TileMapLayer" parent="." unique_id=1330462440]

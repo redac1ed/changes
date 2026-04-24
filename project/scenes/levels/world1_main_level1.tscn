@@ -9,7 +9,6 @@ radius = 35.0
 
 [node name="world1_main_level1" type="Node2D" unique_id=651641308]
 script = ExtResource("6_lv1scr")
-level_number = 0
 
 [node name="BallSpawn" type="Marker2D" parent="." unique_id=1842755036]
 position = Vector2(176, 544)

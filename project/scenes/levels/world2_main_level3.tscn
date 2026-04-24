@@ -14,6 +14,8 @@ radius = 35.0
 
 [node name="World2MainLevel3" type="Node2D" unique_id=1812252340]
 script = ExtResource("1_u0wpc")
+level_number = 3
+world_number = 2
 
 [node name="main_layer" type="TileMapLayer" parent="." unique_id=971328940]
 scale = Vector2(2, 2)
