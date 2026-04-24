@@ -1,11 +1,11 @@
 [gd_scene format=4 uid="uid://bwwh7oyn6devv"]
 
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="1_adsyl"]
-[ext_resource type="Script" uid="uid://hk3olxtvtfnn" path="res://scripts/levels/level_5.gd" id="1_y387w"]
+[ext_resource type="Script" uid="uid://dw2oj2prytn4t" path="res://scripts/levels/level_5.gd" id="1_y387w"]
 [ext_resource type="Script" uid="uid://psmkmssy1pom" path="res://scripts/hazards/saw_blade.gd" id="3_dqs4d"]
 [ext_resource type="Script" uid="uid://b0dy33wopbxul" path="res://scripts/platforms/bounce_platform.gd" id="4_vqgcf"]
-[ext_resource type="Script" uid="uid://c6efpsjrh0xpl" path="res://scripts/hazards/acid_pool.gd" id="6_wl82d"]
-[ext_resource type="Script" uid="uid://c8i6e03ee25fj" path="res://scripts/hazards/spike_strip.gd" id="7_v4crq"]
+[ext_resource type="Script" uid="uid://iusfux0eef6l" path="res://scripts/hazards/acid_pool.gd" id="6_wl82d"]
+[ext_resource type="Script" uid="uid://dusn86fy4y26b" path="res://scripts/hazards/spike_strip.gd" id="7_v4crq"]
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="8_vrq7m"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_f5r7f"]
