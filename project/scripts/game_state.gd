@@ -149,9 +149,18 @@ func add_score(points: int) -> void:
 	add_currency(points)
 
 func complete_level(world: int, level: int, shots: int, coins: int = 0, forced_stars: int = -1) -> Dictionary:
-	var level_key := _get_level_key(world, level)
+	var normalized_world := world
+	var normalized_level := level
+	if current_world > 0:
+		normalized_world = current_world
+	if normalized_world <= 0:
+		normalized_world = 1
+	if normalized_level <= 0:
+		normalized_level = maxi(1, int(current_level) + 1)
+
+	var level_key := _get_level_key(normalized_world, normalized_level)
 	var time_taken := (Time.get_ticks_msec() / 1000.0) - _level_start_time
-	var stars := forced_stars if forced_stars >= 0 else calculate_stars(shots, world, level)
+	var stars := forced_stars if forced_stars >= 0 else calculate_stars(shots, normalized_world, normalized_level)
 	if not _save_data.levels.has(level_key):
 		_save_data.levels[level_key] = {
 			"stars": 0,
@@ -177,7 +186,7 @@ func complete_level(world: int, level: int, shots: int, coins: int = 0, forced_s
 		data.stars = stars
 	_save_data.meta.total_shots += shots
 	add_currency(coins)
-	_update_progression(world, level)
+	_update_progression(normalized_world, normalized_level)
 	_is_dirty = true
 	save_game()
 	var result := {
@@ -188,7 +197,7 @@ func complete_level(world: int, level: int, shots: int, coins: int = 0, forced_s
 		"stars_gained": stars_gained,
 		"total_stars_currency": _save_data.currency.coins,
 	}
-	level_completed_event.emit(world, level, result)
+	level_completed_event.emit(normalized_world, normalized_level, result)
 	return result
 
 func fail_level() -> void:
@@ -491,6 +500,8 @@ func reset() -> void:
 		"levels": {},
 		"achievements": {},
 	}
+	_is_dirty = true
+	save_game()
 
 func get_world_name(world: int) -> String:
 	if LevelManager:

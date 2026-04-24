@@ -98,8 +98,9 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 			call_deferred("set", "freeze", true)
 			
 	var active_ability = GameState._save_data.unlockables.get("active_ability", "none")
-	if Input.is_action_pressed("ability_use") and active_ability == "slow_fall" and state.linear_velocity.y > 0:
-		state.linear_velocity.y *= 0.85
+	if active_ability == "slow_fall" and state.linear_velocity.y > 0 and state.linear_velocity.length() < 300.0:
+		state.linear_velocity.y *= 0.65
+		state.linear_velocity.y = minf(state.linear_velocity.y, 156.0)
 	
 	var vel := state.linear_velocity
 	var max_speed := 2500.0

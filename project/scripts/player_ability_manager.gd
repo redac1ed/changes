@@ -1,7 +1,7 @@
 extends Node
 class_name PlayerAbilityManager
 
-enum AbilityType { NONE, BOOST, BRAKE, SHIELD, GHOST }
+enum AbilityType { NONE, BOOST, BRAKE, SHIELD, GHOST, SLOW_FALL }
 
 const BOOST_FORCE := 800.0
 const BRAKE_FACTOR := 0.95
@@ -22,6 +22,7 @@ func setup(player_node: RigidBody2D) -> void:
 func process_abilities(delta: float) -> void:
 	_update_timers(delta)
 	_handle_input()
+	_apply_slow_fall()
 
 func unlock_ability(type: AbilityType) -> void:
 	pass
@@ -55,6 +56,16 @@ func _handle_input() -> void:
 		activate_ability(AbilityType.BOOST)
 	elif Input.is_action_just_pressed("ability_2"):
 		activate_ability(AbilityType.BRAKE)
+
+func _apply_slow_fall() -> void:
+	if not _player:
+		return
+	var active_ability: String = GameState._save_data.unlockables.get("active_ability", "none")
+	if active_ability != "slow_fall":
+		return
+	if _player.linear_velocity.y > 0 and _player.linear_velocity.length() < 300.0:
+		_player.linear_velocity.y *= 0.85
+		_player.linear_velocity.y = minf(_player.linear_velocity.y, 186.0)
 
 func _update_timers(delta: float) -> void:
 

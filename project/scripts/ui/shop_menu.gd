@@ -197,7 +197,14 @@ func _populate_carousel(category: String) -> void:
 		cost_label_small.add_theme_font_size_override("font_size", 11)
 		cost_label_small.add_theme_color_override("font_color", Color.GOLD)
 		cost_label_small.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		if not is_owned:
+		if is_owned:
+			var owned_label := Label.new()
+			owned_label.text = "OWNED"
+			owned_label.add_theme_font_size_override("font_size", 11)
+			owned_label.add_theme_color_override("font_color", Color.GREEN)
+			owned_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			item_container.add_child(owned_label)
+		else:
 			item_container.add_child(cost_label_small)
 		
 		carousel_box.add_child(item_container)

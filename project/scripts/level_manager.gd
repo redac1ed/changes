@@ -38,7 +38,7 @@ func _ready():
 				WORLD_SCENES[world_key].sort()
 	print("[LevelManager] Discovered scenes: %s" % str(WORLD_SCENES))
 
-func load_world(world: int) -> void:
+func load_world(world: int, start_level: int = 0) -> void:
 	if not WORLD_SCENES.has(world):
 		if world < 6:
 			load_world(world + 1)
@@ -46,12 +46,17 @@ func load_world(world: int) -> void:
 			GameState.game_completed = true
 		return
 	GameState.current_world = world
-	GameState.current_level = 0
 	var scene_path: String
 	if WORLD_SCENES[world] is String:
 		scene_path = WORLD_SCENES[world]
+		GameState.current_level = 0
 	else:
-		scene_path = WORLD_SCENES[world][0]
+		if start_level < len(WORLD_SCENES[world]):
+			scene_path = WORLD_SCENES[world][start_level]
+			GameState.current_level = start_level
+		else:
+			scene_path = WORLD_SCENES[world][0]
+			GameState.current_level = 0
 	_load_scene(scene_path)
 
 func load_next_level() -> void:
