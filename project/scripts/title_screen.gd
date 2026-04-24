@@ -483,6 +483,12 @@ func _build_world_card(data: Dictionary, idx: int, x: float, y: float, w: float,
 		for k in GameState._save_data.levels.keys():
 			if String(k).begins_with("w%d_" % world_number):
 				completed_levels += 1
+		if GameState.get_levels_completed() > 0:
+			if world_number < GameState.current_world:
+				completed_levels = maxi(completed_levels, total_levels)
+			elif world_number == GameState.current_world:
+				completed_levels = maxi(completed_levels, int(GameState.current_level))
+		completed_levels = clampi(completed_levels, 0, total_levels)
 	count_lbl.text = "%d / %d" % [completed_levels, total_levels]
 	var pct: float = (float(completed_levels) / float(maxi(total_levels, 1))) if unlocked else 0.0
 	var bar_fill := ColorRect.new()
@@ -893,7 +899,7 @@ func _on_play_pressed() -> void:
 
 func _on_continue_pressed() -> void:
 	_play_tv_close_and_load(func() -> void:
-		LevelManager.load_world(GameState.current_world)
+		LevelManager.load_world(GameState.current_world, GameState.current_level)
 	)
 
 func _on_worlds_pressed() -> void:

@@ -37,7 +37,41 @@ var level_time: float = 0.0
 var _restart_cooldown: float = 0.0
 var _spawn_position: Vector2
 
+func _sync_level_identity_from_scene() -> void:
+	var source_name := ""
+	var current_scene := get_tree().current_scene
+	if current_scene:
+		if current_scene.scene_file_path != "":
+			source_name = current_scene.scene_file_path.get_file().get_basename().to_lower()
+		else:
+			source_name = current_scene.name.to_lower()
+
+	if source_name.is_empty():
+		if world_number <= 0:
+			world_number = 1
+		if level_number <= 0:
+			level_number = 1
+		return
+
+	var world_regex := RegEx.new()
+	world_regex.compile("world(\\d+)")
+	var level_regex := RegEx.new()
+	level_regex.compile("level[_]?(\\d+)")
+
+	var world_match := world_regex.search(source_name)
+	if world_match:
+		world_number = maxi(1, int(world_match.get_string(1)))
+	elif world_number <= 0:
+		world_number = 1
+
+	var level_match := level_regex.search(source_name)
+	if level_match:
+		level_number = maxi(1, int(level_match.get_string(1)))
+	elif level_number <= 0:
+		level_number = 1
+
 func _ready() -> void:
+	_sync_level_identity_from_scene()
 	print("[Level] Initializing world=%d level=%d" % [world_number, level_number])
 
 	_setup_ball()

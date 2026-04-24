@@ -33,6 +33,7 @@ var _flash_timer: float = 0.0
 var _activation_timer: float = 0.0
 
 func _ready() -> void:
+	add_to_group("traps")
 	_setup_collision()
 	_setup_death_particles()
 	collision_layer = 0
