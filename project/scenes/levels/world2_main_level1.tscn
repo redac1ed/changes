@@ -23,6 +23,18 @@ tile_set = ExtResource("2_2fgn7")
 [node name="BallSpawn" type="Marker2D" parent="." unique_id=213617672]
 position = Vector2(224, 704)
 
+[node name="CameraTopStop" type="Node2D" parent="." unique_id=1444994817]
+position = Vector2(0, -184)
+
+[node name="CameraBottomStop" type="Node2D" parent="." unique_id=1101108092]
+position = Vector2(48, 1060)
+
+[node name="CameraLeftStop" type="Node2D" parent="." unique_id=41191795]
+position = Vector2(-80, 12)
+
+[node name="CameraRightStop" type="Node2D" parent="." unique_id=1097812915]
+position = Vector2(5016, 0)
+
 [node name="Fire_jet" type="Area2D" parent="." unique_id=1078292331]
 z_index = -1
 position = Vector2(2376, 616)
