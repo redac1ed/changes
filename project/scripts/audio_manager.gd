@@ -55,13 +55,13 @@ var sfx_pool: Array[AudioStreamPlayer] = []
 var sfx_pool_index: int = 0
 
 const WORLD_MUSIC := {
-	0: "res://assets/audio/music/tutorial_theme.ogg",
-	1: "res://assets/audio/music/meadow_theme.ogg",
-	2: "res://assets/audio/music/volcano_theme.ogg",
-	3: "res://assets/audio/music/sky_theme.ogg",
-	4: "res://assets/audio/music/ocean_theme.ogg",
-	5: "res://assets/audio/music/space_theme.ogg",
-	6: "res://assets/audio/music/bonus_theme.ogg",
+	0: "res://assets/audio/lobby2.mp3",
+	1: "res://assets/audio/lobby2.mp3",
+	2: "res://assets/audio/lobby2.mp3",
+	3: "res://assets/audio/lobby2.mp3",
+	4: "res://assets/audio/lobby2.mp3",
+	5: "res://assets/audio/lobby2.mp3",
+	6: "res://assets/audio/lobby2.mp3",
 }
 
 const SFX_LIBRARY := {
@@ -102,6 +102,15 @@ func _ready() -> void:
 	print("[AudioManager] Audio system ready")
 
 func _setup_audio_buses() -> void:
+	if AudioServer.get_bus_index(MUSIC_BUS) == -1:
+		AudioServer.add_bus(AudioServer.bus_count)
+		AudioServer.set_bus_name(AudioServer.bus_count - 1, MUSIC_BUS)
+	if AudioServer.get_bus_index(SFX_BUS) == -1:
+		AudioServer.add_bus(AudioServer.bus_count)
+		AudioServer.set_bus_name(AudioServer.bus_count - 1, SFX_BUS)
+	if AudioServer.get_bus_index(UI_BUS) == -1:
+		AudioServer.add_bus(AudioServer.bus_count)
+		AudioServer.set_bus_name(AudioServer.bus_count - 1, UI_BUS)
 
 	var bus_layout := AudioServer.generate_bus_layout()
 

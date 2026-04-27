@@ -509,9 +509,6 @@ func get_world_name(world: int) -> String:
 	var world_names := {
 		1: "Meadow",
 		2: "Volcano",
-		3: "Sky",
-		4: "Ocean",
-		5: "Space",
-		6: "Bonus"
+		3: "Snow"
 	}
 	return world_names.get(world, "Unknown")

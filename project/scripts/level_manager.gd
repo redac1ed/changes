@@ -4,10 +4,7 @@ var WORLD_SCENES: Dictionary = {}
 var WORLD_CONFIG: Dictionary = {
 	1: {"name": "Meadow", "theme": "nature", "difficulty": 1, "levels": 3, "color": Color(0.45, 0.82, 0.45)},
 	2: {"name": "Volcano", "theme": "fire", "difficulty": 2, "levels": 3, "color": Color(0.95, 0.35, 0.2)},
-	3: {"name": "Sky", "theme": "wind", "difficulty": 2, "levels": 3, "color": Color(0.55, 0.78, 0.95)},
-	4: {"name": "Ocean", "theme": "water", "difficulty": 3, "levels": 3, "color": Color(0.2, 0.5, 0.85)},
-	5: {"name": "Space", "theme": "gravity", "difficulty": 3, "levels": 3, "color": Color(0.6, 0.4, 0.9)},
-	6: {"name": "Bonus", "theme": "infinite", "difficulty": 4, "levels": 1, "color": Color(1.0, 0.85, 0.1)},
+	3: {"name": "Snow", "theme": "wind", "difficulty": 2, "levels": 3, "color": Color(0.55, 0.78, 0.95)}
 }
 
 var _current_scene: Node = null

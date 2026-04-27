@@ -113,10 +113,8 @@ func _setup_alien_indicators() -> void:
 	_alien_indicator_layer.add_child(_alien_indicator_control)
 
 func _play_random_victory_audio() -> void:
-	if AudioManager:
-		AudioManager.stop_music(0.2)
 	var victory_player := AudioStreamPlayer.new()
-	victory_player.bus = "Music"
+	victory_player.bus = "UI"
 	add_child(victory_player)
 	victory_player.stream = load("res://assets/audio/bossfight_2.mp3")
 	var victory_subtitle = SUBTITLE_VICTORY_1
@@ -125,18 +123,12 @@ func _play_random_victory_audio() -> void:
 	victory_player.finished.connect(func():
 		_subtitles.hide_line()
 		victory_player.queue_free()
-		if AudioManager:
-			var track: String = AudioManager.WORLD_MUSIC.get(world_number,
-					"res://assets/audio/music/meadow_theme.ogg")
-			AudioManager.play_music(track)
 	, CONNECT_ONE_SHOT)
 
 func _play_world_music() -> void:
 	if not AudioManager:
 		return
-	var track: String = AudioManager.WORLD_MUSIC.get(world_number,
-			"res://assets/audio/music/meadow_theme.ogg")
-	AudioManager.play_music(track)
+	AudioManager.play_music("res://assets/audio/lobby3.mp3")
 
 func register_alien_hit() -> void:
 	_alien_hit_count += 1
@@ -148,12 +140,9 @@ func play_boss_audio() -> void:
 	if _has_played_boss_audio:
 		return
 	_has_played_boss_audio = true
-	
-	if AudioManager:
-		AudioManager.stop_music(0.2)
 		
 	var boss_player := AudioStreamPlayer.new()
-	boss_player.bus = "Music"
+	boss_player.bus = "UI"
 	add_child(boss_player)
 	boss_player.stream = load("res://assets/audio/bossfight_1.mp3")
 	boss_player.play()
@@ -162,10 +151,6 @@ func play_boss_audio() -> void:
 	boss_player.finished.connect(func():
 		_subtitles.hide_line()
 		boss_player.queue_free()
-		if AudioManager:
-			var track: String = AudioManager.WORLD_MUSIC.get(world_number,
-					"res://assets/audio/music/meadow_theme.ogg")
-			AudioManager.play_music(track)
 	, CONNECT_ONE_SHOT)
 
 func _process(delta: float) -> void:
@@ -279,10 +264,8 @@ func _on_ball_killed(_ball: Node2D) -> void:
 		_ball.freeze = true
 		_ball.hide()
 		
-	if AudioManager:
-		AudioManager.stop_music(0.2)
 	var death_player := AudioStreamPlayer.new()
-	death_player.bus = "Music"
+	death_player.bus = "UI"
 	add_child(death_player)
 	var use_intro_5 := randf() < 0.5
 	death_player.stream = load("res://assets/audio/intro_5.mp3" if use_intro_5 else "res://assets/audio/intro_6.mp3")
@@ -291,9 +274,5 @@ func _on_ball_killed(_ball: Node2D) -> void:
 	death_player.finished.connect(func():
 		_subtitles.hide_line()
 		death_player.queue_free()
-		if AudioManager:
-			var track: String = AudioManager.WORLD_MUSIC.get(world_number,
-					"res://assets/audio/music/meadow_theme.ogg")
-			AudioManager.play_music(track)
 		_restart_level()
 	, CONNECT_ONE_SHOT)
