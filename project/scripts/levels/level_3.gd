@@ -23,10 +23,8 @@ func _ready() -> void:
 	_play_random_victory_audio()
 
 func _play_random_victory_audio() -> void:
-	if AudioManager:
-		AudioManager.stop_music(0.2)
 	var victory_player := AudioStreamPlayer.new()
-	victory_player.bus = "Music"
+	victory_player.bus = "UI"
 	add_child(victory_player)
 	var use_intro_3 = randf() < 0.5
 	victory_player.stream = load("res://assets/audio/intro_3.mp3" if use_intro_3 else "res://assets/audio/intro_4.mp3")
@@ -36,10 +34,6 @@ func _play_random_victory_audio() -> void:
 	victory_player.finished.connect(func():
 		_subtitles.hide_line()
 		victory_player.queue_free()
-		if AudioManager:
-			var track: String = AudioManager.WORLD_MUSIC.get(world_number,
-					"res://assets/audio/music/meadow_theme.ogg")
-			AudioManager.play_music(track)
 	, CONNECT_ONE_SHOT)
 
 func _play_world_music() -> void:
@@ -56,10 +50,8 @@ func _build_level() -> void:
 			trap.ball_killed.connect(_on_ball_killed)
 
 func _on_ball_killed(_ball: Node2D) -> void:
-	if AudioManager:
-		AudioManager.stop_music(0.2)
 	var death_player := AudioStreamPlayer.new()
-	death_player.bus = "Music"
+	death_player.bus = "UI"
 	add_child(death_player)
 	var use_intro_5 := randf() < 0.5
 	death_player.stream = load("res://assets/audio/intro_5.mp3" if use_intro_5 else "res://assets/audio/intro_6.mp3")
@@ -68,8 +60,4 @@ func _on_ball_killed(_ball: Node2D) -> void:
 	death_player.finished.connect(func():
 		_subtitles.hide_line()
 		death_player.queue_free()
-		if AudioManager:
-			var track: String = AudioManager.WORLD_MUSIC.get(world_number,
-					"res://assets/audio/music/meadow_theme.ogg")
-			AudioManager.play_music(track)
 	, CONNECT_ONE_SHOT)

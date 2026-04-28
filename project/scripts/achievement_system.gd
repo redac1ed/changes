@@ -15,7 +15,7 @@ const ACHIEVEMENTS: Dictionary = {
 		"points": 10
 	},
 	"world_1_complete": {
-		"title": "Meadow Master",
+		"title": "Swamp Master",
 		"desc": "Complete all levels in World 1",
 		"icon": "🌿",
 		"category": "progression",
@@ -29,7 +29,7 @@ const ACHIEVEMENTS: Dictionary = {
 		"points": 50
 	},
 	"world_3_complete": {
-		"title": "Sky Scraper",
+		"title": "Snow Scraper",
 		"desc": "Complete all levels in World 3",
 		"icon": "☁️",
 		"category": "progression",
@@ -58,63 +58,6 @@ const ACHIEVEMENTS: Dictionary = {
 		"category": "skill",
 		"points": 40
 	},
-	"pacifist": {
-		"title": "Pacifist",
-		"desc": "Complete a level without destroying any enemies",
-		"icon": "🕊️",
-		"category": "skill",
-		"points": 20
-	},
-
-	"coin_novice": {
-		"title": "Penny Pincher",
-		"desc": "Collect 100 coins total",
-		"icon": "🪙",
-		"category": "collection",
-		"points": 10,
-		"max_progress": 100
-	},
-	"coin_master": {
-		"title": "Millionaire",
-		"desc": "Collect 1000 coins total",
-		"icon": "💰",
-		"category": "collection",
-		"points": 50,
-		"max_progress": 1000
-	},
-	"gem_hunter": {
-		"title": "Gem Hunter",
-		"desc": "Find a hidden gem",
-		"icon": "💎",
-		"category": "collection",
-		"points": 30
-	},
-
-	"brawler": {
-		"title": "Brawler",
-		"desc": "Defeat 10 enemies",
-		"icon": "🥊",
-		"category": "combat",
-		"points": 15,
-		"max_progress": 10
-	},
-	"destroyer": {
-		"title": "Destroyer",
-		"desc": "Defeat 50 enemies",
-		"icon": "💣",
-		"category": "combat",
-		"points": 40,
-		"max_progress": 50
-	},
-
-	"konami": {
-		"title": "Classic Gamer",
-		"desc": "???",
-		"icon": "🎮",
-		"category": "secret",
-		"points": 100,
-		"hidden": true
-	},
 	"infinite_void": {
 		"title": "Into the Abyss",
 		"desc": "Fall out of bounds 10 times in one session",
@@ -123,7 +66,6 @@ const ACHIEVEMENTS: Dictionary = {
 		"points": 10
 	}
 }
-var _progress_cache: Dictionary = {}
 var _toast_layer: CanvasLayer
 
 func _ready() -> void:
