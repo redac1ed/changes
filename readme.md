@@ -12,3 +12,6 @@ TBD
 
 ## License
 This project is open source and available under the MIT License.
+
+## Authors 
+Created by [redac1ed](https://github.com/redac1ed) and [sarcasmking](https://github.com/sarcasmking).
