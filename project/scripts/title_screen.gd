@@ -36,9 +36,6 @@ var _spectrum_bus_idx: int = -1
 var _spectrum_effect_idx: int = -1
 var _spectrum_inst: AudioEffectSpectrumAnalyzerInstance = null
 var mute_btn: Button
-var master_vol: float = 1.0
-var music_vol: float = 0.8
-var sfx_vol: float = 1.0
 var screen_shake: bool = true
 var fullscreen: bool = false
 var visualizer_smoothed_heights: Array[float] = []
@@ -561,9 +558,9 @@ func _build_settings_panel() -> void:
 	audio_hdr.add_theme_font_size_override("font_size", 18)
 	audio_hdr.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	card.add_child(audio_hdr)
-	_build_slider(card, "Master Volume", 120, master_vol, "_on_master_vol_changed")
-	_build_slider(card, "Music Volume",  175, music_vol,  "_on_music_vol_changed")
-	_build_slider(card, "SFX Volume",    230, sfx_vol,    "_on_sfx_vol_changed")
+	_build_slider(card, "Master Volume", 120, AudioManager.master_volume, "_on_master_vol_changed")
+	_build_slider(card, "Music Volume",  175, AudioManager.music_volume,  "_on_music_vol_changed")
+	_build_slider(card, "SFX Volume",    230, AudioManager.sfx_volume,    "_on_sfx_vol_changed")
 	var disp_hdr := Label.new()
 	disp_hdr.text = "Display"
 	disp_hdr.position = Vector2(40, 295)
@@ -930,15 +927,18 @@ func _on_mute_pressed() -> void:
 		mute_btn.text = "[✕]" if AudioManager.music_muted else "[♪]"
 
 func _on_master_vol_changed(val: float) -> void:
-	master_vol = val
+	if AudioManager:
+		AudioManager.master_volume = val
 
 func _on_music_vol_changed(val: float) -> void:
-	music_vol = val
-	GameState.music_muted = (val < 0.01)
+	if AudioManager:
+		AudioManager.music_volume = val
+	GameState._settings["audio"]["mute_music"] = (val < 0.01)
 
 func _on_sfx_vol_changed(val: float) -> void:
-	sfx_vol = val
-	GameState.sfx_muted = (val < 0.01)
+	if AudioManager:
+		AudioManager.sfx_volume = val
+	GameState._settings["audio"]["mute_sfx"] = (val < 0.01)
 
 func _on_fullscreen_toggled(pressed: bool) -> void:
 	fullscreen = pressed

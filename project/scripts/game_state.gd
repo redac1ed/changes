@@ -419,17 +419,17 @@ func set_setting(category: String, key: String, value: Variant) -> void:
 
 func _apply_settings() -> void:
 	if AudioManager:
-		AudioManager.master_volume = _settings.audio.master
-		AudioManager.music_volume = _settings.audio.music
-		AudioManager.sfx_volume = _settings.audio.sfx
-		AudioManager.music_muted = _settings.audio.mute_music
-		AudioManager.sfx_muted = _settings.audio.mute_sfx
+		AudioManager.master_volume = _settings["audio"]["master"]
+		AudioManager.music_volume = _settings["audio"]["music"]
+		AudioManager.sfx_volume = _settings["audio"]["sfx"]
+		AudioManager.music_muted = _settings["audio"]["mute_music"]
+		AudioManager.sfx_muted = _settings["audio"]["mute_sfx"]
 
-	var win_mode = DisplayServer.WINDOW_MODE_FULLSCREEN if _settings.video.fullscreen else DisplayServer.WINDOW_MODE_WINDOWED
+	var win_mode = DisplayServer.WINDOW_MODE_FULLSCREEN if _settings["video"]["fullscreen"] else DisplayServer.WINDOW_MODE_WINDOWED
 	if DisplayServer.window_get_mode() != win_mode:
 		DisplayServer.window_set_mode(win_mode)
 		
-	var vsync_mode = DisplayServer.VSYNC_ENABLED if _settings.video.vsync else DisplayServer.VSYNC_DISABLED
+	var vsync_mode = DisplayServer.VSYNC_ENABLED if _settings["video"]["vsync"] else DisplayServer.VSYNC_DISABLED
 	if DisplayServer.window_get_vsync_mode() != vsync_mode:
 		DisplayServer.window_set_vsync_mode(vsync_mode)
 
@@ -509,9 +509,6 @@ func get_world_name(world: int) -> String:
 	var world_names := {
 		1: "Meadow",
 		2: "Volcano",
-		3: "Sky",
-		4: "Ocean",
-		5: "Space",
-		6: "Bonus"
+		3: "Frozen"
 	}
 	return world_names.get(world, "Unknown")

@@ -9,9 +9,9 @@ var _subtitles: SubtitleOverlay
 
 func get_custom_star_rules() -> Dictionary:
 	return {
-		"three_shots": 2, "three_time": 18.0,
-		"two_shots": 4,   "two_time": 30.0,
-		"one_shots": 7
+		"three_shots": 14, "three_time": 3600.0,
+		"two_shots": 17,   "two_time": 3600.0,
+		"one_shots": 20
 	}
 
 func _ready() -> void:

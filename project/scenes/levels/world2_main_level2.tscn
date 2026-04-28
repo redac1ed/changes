@@ -96,6 +96,7 @@ start_delay = 8.0
 jet_direction = Vector2(0, 1)
 
 [node name="Saw_Blade" type="Area2D" parent="." unique_id=510845331]
+z_index = -2
 position = Vector2(1960, 400)
 scale = Vector2(2, 2)
 script = ExtResource("5_56rvi")

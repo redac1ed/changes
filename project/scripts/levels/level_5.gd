@@ -7,6 +7,13 @@ const SUBTITLE_DEATH_2 := "I.. don't even know what to say."
 
 var _subtitles: SubtitleOverlay
 
+func get_custom_star_rules() -> Dictionary:
+	return {
+		"three_shots": 16, "three_time": 3600.0,
+		"two_shots": 19,   "two_time": 3600.0,
+		"one_shots": 23
+	}
+
 func _ready() -> void:
 	_subtitles = SubtitleOverlay.new()
 	add_child(_subtitles)

@@ -89,6 +89,13 @@ class FloatingAlien extends Node2D:
 			global_position += dir * roam_speed * delta
 			label.position.y = -24 + sin(time_passed * 3.0 + random_offset) * 10.0
 
+func get_custom_star_rules() -> Dictionary:
+	return {
+		"three_shots": 100, "three_time": 3600.0,
+		"two_shots": 101,   "two_time": 3600.0,
+		"one_shots": 102
+	}
+
 func _ready() -> void:
 	_subtitles = SubtitleOverlay.new()
 	add_child(_subtitles)

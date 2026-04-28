@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bmhnh3dh2brvi" path="res://scripts/levels/level_2.gd" id="1_t2kep"]
 [ext_resource type="TileSet" uid="uid://ddudc0vym1a4v" path="res://assets/tilesets/swamp_tileset.tres" id="3_t2kep"]
 [ext_resource type="Script" uid="uid://b5x84nayrl0mi" path="res://scripts/goal.gd" id="5_pgto0"]
+[ext_resource type="Script" uid="uid://iusfux0eef6l" path="res://scripts/hazards/acid_pool.gd" id="5_x0rpe"]
 [ext_resource type="Script" uid="uid://b0dy33wopbxul" path="res://scripts/platforms/bounce_platform.gd" id="6_v5rsi"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4kmhl"]
@@ -48,3 +49,14 @@ offset_right = 2332.0
 offset_bottom = 452.0
 theme_override_font_sizes/font_size = 36
 text = "This one is bouncy :D"
+
+[node name="Acid_Pool" type="Area2D" parent="." unique_id=33320380]
+z_index = -2
+position = Vector2(1904, 832)
+script = ExtResource("5_x0rpe")
+pool_size = Vector2(10000, 96)
+acid_color = Color(0.14879006, 0.79013234, 0.9999998, 0.8509804)
+bubble_rate = 0.0
+wave_speed = 0.0
+wave_height = 0.0
+trap_type = 5
