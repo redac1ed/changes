@@ -37,7 +37,6 @@ var _spectrum_effect_idx: int = -1
 var _spectrum_inst: AudioEffectSpectrumAnalyzerInstance = null
 var mute_btn: Button
 var screen_shake: bool = true
-var fullscreen: bool = false
 var visualizer_smoothed_heights: Array[float] = []
 var _next_visualizer_shuffle_time: float = 0.0
 const SCREEN_W: float = 1200.0
@@ -66,6 +65,10 @@ const BUTTONS_START_Y: float = 380.0
 
 func _ready() -> void:
 	randomize()
+	if GameState:
+		var shake_val = GameState.get_setting("video", "shake")
+		screen_shake = true if (shake_val != null and shake_val > 0.0) else false
+
 	_build_background()
 	_build_rolling_ball()
 	_build_main_panel()
@@ -568,27 +571,15 @@ func _build_settings_panel() -> void:
 	disp_hdr.add_theme_font_size_override("font_size", 18)
 	disp_hdr.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	card.add_child(disp_hdr)
-	var fs_label := Label.new()
-	fs_label.text = "Fullscreen"
-	fs_label.position = Vector2(40, 330)
-	fs_label.size = Vector2(200, 25)
-	fs_label.add_theme_font_size_override("font_size", 15)
-	fs_label.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
-	card.add_child(fs_label)
-	var fs_btn := CheckButton.new()
-	fs_btn.position = Vector2(380, 328)
-	fs_btn.button_pressed = fullscreen
-	fs_btn.toggled.connect(_on_fullscreen_toggled)
-	card.add_child(fs_btn)
 	var shake_label := Label.new()
 	shake_label.text = "Screen Shake"
-	shake_label.position = Vector2(40, 370)
+	shake_label.position = Vector2(40, 330) # shift up to fill fullscreen's spot
 	shake_label.size = Vector2(200, 25)
 	shake_label.add_theme_font_size_override("font_size", 15)
 	shake_label.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	card.add_child(shake_label)
 	var shake_btn := CheckButton.new()
-	shake_btn.position = Vector2(380, 368)
+	shake_btn.position = Vector2(380, 328) # shift up
 	shake_btn.button_pressed = screen_shake
 	shake_btn.toggled.connect(_on_shake_toggled)
 	card.add_child(shake_btn)
@@ -939,13 +930,6 @@ func _on_sfx_vol_changed(val: float) -> void:
 	if AudioManager:
 		AudioManager.sfx_volume = val
 	GameState._settings["audio"]["mute_sfx"] = (val < 0.01)
-
-func _on_fullscreen_toggled(pressed: bool) -> void:
-	fullscreen = pressed
-	if pressed:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-	else:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 
 func _on_shake_toggled(pressed: bool) -> void:
 	screen_shake = pressed

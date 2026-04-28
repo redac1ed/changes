@@ -3,6 +3,7 @@ extends LevelTemplate
 const SUBTITLE_VICTORY_1 := "From a swamp to a volcano place or something? This is weird..."
 const SUBTITLE_DEATH_1 := "Are you that bad? This game is SO easy!"
 const SUBTITLE_DEATH_2 := "I.. don't even know what to say."
+const SUBTITLE_DEATH_3 := "I am just disappointed in you.."
 
 var _subtitles: SubtitleOverlay
 
@@ -52,9 +53,16 @@ func _on_ball_killed(_ball: Node2D) -> void:
 	var death_player := AudioStreamPlayer.new()
 	death_player.bus = "UI"
 	add_child(death_player)
-	var use_intro_5 := randf() < 0.5
-	death_player.stream = load("res://assets/audio/intro_5.mp3" if use_intro_5 else "res://assets/audio/intro_6.mp3")
-	_subtitles.show_line(SUBTITLE_DEATH_1 if use_intro_5 else SUBTITLE_DEATH_2)
+	var rand_choice := randi() % 3
+	if rand_choice == 0:
+		death_player.stream = load("res://assets/audio/intro_5.mp3")
+		_subtitles.show_line(SUBTITLE_DEATH_1)
+	elif rand_choice == 1:
+		death_player.stream = load("res://assets/audio/intro_6.mp3")
+		_subtitles.show_line(SUBTITLE_DEATH_2)
+	else:
+		death_player.stream = load("res://assets/audio/intro_7.mp3")
+		_subtitles.show_line(SUBTITLE_DEATH_3)
 	death_player.play()
 	death_player.finished.connect(func():
 		_subtitles.hide_line()

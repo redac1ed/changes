@@ -425,7 +425,7 @@ func _apply_settings() -> void:
 		AudioManager.music_muted = _settings["audio"]["mute_music"]
 		AudioManager.sfx_muted = _settings["audio"]["mute_sfx"]
 
-	var win_mode = DisplayServer.WINDOW_MODE_FULLSCREEN if _settings["video"]["fullscreen"] else DisplayServer.WINDOW_MODE_WINDOWED
+	var win_mode = DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN if _settings["video"]["fullscreen"] else DisplayServer.WINDOW_MODE_WINDOWED
 	if DisplayServer.window_get_mode() != win_mode:
 		DisplayServer.window_set_mode(win_mode)
 		
@@ -444,19 +444,11 @@ func _apply_setting_change(category: String, key: String, value: Variant) -> voi
 	elif category == "video":
 		match key:
 			"fullscreen":
-				var win_mode = DisplayServer.WINDOW_MODE_FULLSCREEN if value else DisplayServer.WINDOW_MODE_WINDOWED
+				var win_mode = DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN if value else DisplayServer.WINDOW_MODE_WINDOWED
 				DisplayServer.window_set_mode(win_mode)
 			"vsync":
 				var vsync_mode = DisplayServer.VSYNC_ENABLED if value else DisplayServer.VSYNC_DISABLED
 				DisplayServer.window_set_vsync_mode(vsync_mode)
-	elif category == "video":
-		match key:
-			"fullscreen":
-				var mode = DisplayServer.WINDOW_MODE_FULLSCREEN if value else DisplayServer.WINDOW_MODE_WINDOWED
-				DisplayServer.window_set_mode(mode)
-			"vsync":
-				var mode = DisplayServer.VSYNC_ENABLED if value else DisplayServer.VSYNC_DISABLED
-				DisplayServer.window_set_vsync_mode(mode)
 
 func _merge_dict(target: Dictionary, patch: Dictionary) -> Dictionary:
 	var result = target.duplicate(true)
