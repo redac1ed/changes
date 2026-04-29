@@ -4,3 +4,6 @@
 *.gd.uid
 /project/assets/swamp_assets/**/*.import
 /project/assets/volcano_assets/*/.import
+Changes.console.exe
+Changes.exe
+export_presets.cfg
