@@ -2,9 +2,9 @@ extends Node
 
 var WORLD_SCENES: Dictionary = {}
 var WORLD_CONFIG: Dictionary = {
-	1: {"name": "Meadow", "theme": "nature", "difficulty": 1, "levels": 3, "color": Color(0.45, 0.82, 0.45)},
+	1: {"name": "Meadow", "theme": "nature", "difficulty": 1, "levels": 5, "color": Color(0.45, 0.82, 0.45)},
 	2: {"name": "Volcano", "theme": "fire", "difficulty": 2, "levels": 3, "color": Color(0.95, 0.35, 0.2)},
-	3: {"name": "Snow", "theme": "wind", "difficulty": 2, "levels": 3, "color": Color(0.55, 0.78, 0.95)}
+	3: {"name": "Snow", "theme": "wind", "difficulty": 2, "levels": 2, "color": Color(0.55, 0.78, 0.95)}
 }
 
 var _current_scene: Node = null
@@ -15,25 +15,27 @@ var _death_count_current: int = 0
 var _collectibles_found: Dictionary = {}
 
 func _ready():
-	var dir := DirAccess.open("res://scenes/levels")
-	if dir != null:
-		dir.list_dir_begin()
-		var file_name: String = dir.get_next()
-		while file_name != "":
-			if file_name.ends_with(".tscn") and file_name != "bonus.tscn":
-				var parts: PackedStringArray = file_name.get_basename().split("_")
-				if parts.size() >= 3 and parts[0].begins_with("world") and parts[2].begins_with("level"):
-					var world: int = int(parts[0].substr(5))
-					var level: int = int(parts[2].substr(5))
-					if not WORLD_SCENES.has(world):
-						WORLD_SCENES[world] = []
-					WORLD_SCENES[world].append("res://scenes/levels/" + file_name)
-			file_name = dir.get_next()
-		dir.list_dir_end()
-		for world_key in WORLD_SCENES.keys():
-			if WORLD_SCENES[world_key] is Array:
-				WORLD_SCENES[world_key].sort()
-	print("[LevelManager] Discovered scenes: %s" % str(WORLD_SCENES))
+	# Pre-populate WORLD_SCENES with known level paths (works in both editor and exported game)
+	# Note: DirAccess.open does not work in exported games because resources are packed
+	WORLD_SCENES = {
+		1: [
+			"res://scenes/levels/world1_main_level1.tscn",
+			"res://scenes/levels/world1_main_level2.tscn",
+			"res://scenes/levels/world1_main_level3.tscn",
+			"res://scenes/levels/world1_main_level4.tscn",
+			"res://scenes/levels/world1_main_level5.tscn",
+		],
+		2: [
+			"res://scenes/levels/world2_main_level1.tscn",
+			"res://scenes/levels/world2_main_level2.tscn",
+			"res://scenes/levels/world2_main_level3.tscn",
+		],
+		3: [
+			"res://scenes/levels/world3_main_level1.tscn",
+			"res://scenes/levels/world3_main_level2.tscn",
+		],
+	}
+	print("[LevelManager] Initialized scenes: %s" % str(WORLD_SCENES))
 
 func load_world(world: int, start_level: int = 0) -> void:
 	if not WORLD_SCENES.has(world):
